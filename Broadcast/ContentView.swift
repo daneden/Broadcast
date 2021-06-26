@@ -111,7 +111,7 @@ struct ContentView: View {
     
     sendingTweet = true
     
-    twitterAPI.sendTweet(text: tweetText)
+    twitterAPI.sendTweet(text: tweetText ?? "Beep boop")
   }
 }
 

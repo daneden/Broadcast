@@ -15,17 +15,6 @@ struct BroadcastApp: App {
     WindowGroup {
       ContentView()
         .environmentObject(twitterAPI)
-        .onOpenURL { url in
-          guard let urlScheme = url.scheme,
-                let callbackURL = URL(string: "\(TwitterAPI.ClientCredentials.CallbackURLScheme)://"),
-                let callbackURLScheme = callbackURL.scheme
-          else { return }
-          
-          guard urlScheme.caseInsensitiveCompare(callbackURLScheme) == .orderedSame
-          else { return }
-          
-          twitterAPI.onOAuthRedirect.send(url)
-        }
     }
   }
 }

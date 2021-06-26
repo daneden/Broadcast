@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -22,6 +22,7 @@
 		7188E64D2687C6A1007CFD78 /* Binding.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E64C2687C6A1007CFD78 /* Binding.extension.swift */; };
 		7188E64F2687CCD0007CFD78 /* PhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E64E2687CCD0007CFD78 /* PhotoPicker.swift */; };
 		7188E6532687D16C007CFD78 /* ThumbnailFilmstrip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6522687D16C007CFD78 /* ThumbnailFilmstrip.swift */; };
+		7188E6562687DDED007CFD78 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 7188E6552687DDED007CFD78 /* Swifter */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +50,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7188E6562687DDED007CFD78 /* Swifter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,6 +144,9 @@
 			dependencies = (
 			);
 			name = Broadcast;
+			packageProductDependencies = (
+				7188E6552687DDED007CFD78 /* Swifter */,
+			);
 			productName = Broadcast;
 			productReference = 7188E6252687B0FE007CFD78 /* Broadcast.app */;
 			productType = "com.apple.product-type.application";
@@ -169,6 +174,9 @@
 				Base,
 			);
 			mainGroup = 7188E61C2687B0FE007CFD78;
+			packageReferences = (
+				7188E6542687DDED007CFD78 /* XCRemoteSwiftPackageReference "Swifter" */,
+			);
 			productRefGroup = 7188E6262687B0FE007CFD78 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -396,6 +404,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7188E6542687DDED007CFD78 /* XCRemoteSwiftPackageReference "Swifter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mattdonnelly/Swifter";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7188E6552687DDED007CFD78 /* Swifter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7188E6542687DDED007CFD78 /* XCRemoteSwiftPackageReference "Swifter" */;
+			productName = Swifter;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7188E61D2687B0FE007CFD78 /* Project object */;
 }
