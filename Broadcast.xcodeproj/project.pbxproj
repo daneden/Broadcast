@@ -32,6 +32,8 @@
 		7188E6672688B99E007CFD78 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6662688B99E007CFD78 /* VisualEffectView.swift */; };
 		7188E66A2688D7BA007CFD78 /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 7188E6692688D7BA007CFD78 /* Introspect */; };
 		7188E66C2688DB44007CFD78 /* UIApplication.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E66B2688DB44007CFD78 /* UIApplication.extension.swift */; };
+		719087CD26891586005B96CE /* TwitterText in Frameworks */ = {isa = PBXBuildFile; productRef = 719087CC26891586005B96CE /* TwitterText */; };
+		719087CF26891C7F005B96CE /* Array.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 719087CE26891C7F005B96CE /* Array.extension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -59,6 +61,7 @@
 		7188E6642688A436007CFD78 /* ThemeHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeHelper.swift; sourceTree = "<group>"; };
 		7188E6662688B99E007CFD78 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
 		7188E66B2688DB44007CFD78 /* UIApplication.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.extension.swift; sourceTree = "<group>"; };
+		719087CE26891C7F005B96CE /* Array.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Array.extension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +72,7 @@
 				7188E65D26887DCD007CFD78 /* SwiftKeychainWrapper in Frameworks */,
 				7188E66A2688D7BA007CFD78 /* Introspect in Frameworks */,
 				7188E6562687DDED007CFD78 /* Swifter in Frameworks */,
+				719087CD26891586005B96CE /* TwitterText in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,6 +127,7 @@
 				7188E64A2687C44D007CFD78 /* String.extension.swift */,
 				7188E6602688A01F007CFD78 /* Font.extension.swift */,
 				7188E66B2688DB44007CFD78 /* UIApplication.extension.swift */,
+				719087CE26891C7F005B96CE /* Array.extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -173,6 +178,7 @@
 				7188E6552687DDED007CFD78 /* Swifter */,
 				7188E65C26887DCD007CFD78 /* SwiftKeychainWrapper */,
 				7188E6692688D7BA007CFD78 /* Introspect */,
+				719087CC26891586005B96CE /* TwitterText */,
 			);
 			productName = Broadcast;
 			productReference = 7188E6252687B0FE007CFD78 /* Broadcast.app */;
@@ -205,6 +211,7 @@
 				7188E6542687DDED007CFD78 /* XCRemoteSwiftPackageReference "Swifter" */,
 				7188E65B26887DCD007CFD78 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				7188E6682688D7BA007CFD78 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
+				719087CB26891586005B96CE /* XCRemoteSwiftPackageReference "twitter-text" */,
 			);
 			productRefGroup = 7188E6262687B0FE007CFD78 /* Products */;
 			projectDirPath = "";
@@ -249,6 +256,7 @@
 				7188E6422687B444007CFD78 /* ParameterStringParser.swift in Sources */,
 				7188E6532687D16C007CFD78 /* ThumbnailFilmstrip.swift in Sources */,
 				7188E64B2687C44D007CFD78 /* String.extension.swift in Sources */,
+				719087CF26891C7F005B96CE /* Array.extension.swift in Sources */,
 				7188E64D2687C6A1007CFD78 /* Binding.extension.swift in Sources */,
 				7188E6672688B99E007CFD78 /* VisualEffectView.swift in Sources */,
 				7188E65F26889147007CFD78 /* SignOutView.swift in Sources */,
@@ -380,7 +388,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"Broadcast/Preview Content\"";
 				DEVELOPMENT_TEAM = YC249PY26F;
 				ENABLE_PREVIEWS = YES;
@@ -403,7 +411,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"Broadcast/Preview Content\"";
 				DEVELOPMENT_TEAM = YC249PY26F;
 				ENABLE_PREVIEWS = YES;
@@ -468,6 +476,14 @@
 				minimumVersion = 0.1.3;
 			};
 		};
+		719087CB26891586005B96CE /* XCRemoteSwiftPackageReference "twitter-text" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nysander/twitter-text.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -485,6 +501,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7188E6682688D7BA007CFD78 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
 			productName = Introspect;
+		};
+		719087CC26891586005B96CE /* TwitterText */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 719087CB26891586005B96CE /* XCRemoteSwiftPackageReference "twitter-text" */;
+			productName = TwitterText;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

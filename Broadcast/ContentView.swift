@@ -7,6 +7,14 @@
 
 import SwiftUI
 import Introspect
+import TwitterText
+
+let placeholderCandidates: [String] = [
+  "Wh—what’s going on?",
+  "Oh hey uh, what’s up",
+  "What’s Twitter?",
+  "Tweet away, sweet child",
+]
 
 struct ContentView: View {
   @ScaledMetric private var leftOffset: CGFloat = 4
@@ -20,14 +28,14 @@ struct ContentView: View {
   @State var signOutScreenIsPresented = false
   @State var sendingTweet = false
   
-  private let placeholder = "What’s happening?"
+  @State private var placeholder: String = placeholderCandidates.randomElement()
   
   private var tweetText: String? {
     twitterClient.tweet
   }
   
   private var charCount: Int {
-    (tweetText ?? "").count
+    TwitterText.tweetLength(text: tweetText ?? "")
   }
   
   private var validTweet: Bool {
@@ -49,16 +57,16 @@ struct ContentView: View {
       return " (the app probably looks pretty bad right now, huh)"
     case 1024...2047:
       return " (I bet you’re wondering when this will stop)"
-    case 2048...4096:
-      return " (I’ll give you a clue: two nice numbers)"
-    case 4096...19999:
+    case 2048...19999:
       return " (you’re really gonna keep going?)"
     case 20000...30000:
       return " (I’m impressed, really)"
-    case 30000...40000:
+    case 30000...42348:
       return " (almost there)"
-    case 41788...Int.max:
+    case 42349:
       return " (nice)"
+    case 42349...Int.max:
+      return " (fin)"
     default:
       return ""
     }
@@ -80,7 +88,7 @@ struct ContentView: View {
                     .accessibility(hidden: true)
                   
                   TextEditor(text: Binding($twitterClient.tweet, replacingNilWith: ""))
-                    .frame(minHeight: geom.size.height / 3, alignment: .leading)
+                    .frame(minHeight: geom.size.height / 2, alignment: .leading)
                     .foregroundColor(Color(.label))
                     .multilineTextAlignment(.leading)
                     .keyboardType(.twitter)
@@ -90,15 +98,12 @@ struct ContentView: View {
                 }
                 .font(.broadcastTitle2)
                 
-                if let tweetText = twitterClient.tweet ?? "",
-                   let count = tweetText.count {
-                  Divider()
-                  
-                  Text("\(280 - count)\(tweetLengthWarning)")
-                    .foregroundColor(count > 200 ? count >= 280 ? Color(.systemRed) : Color(.systemOrange) : .secondary)
-                    .font(.system(size: captionSize * max(CGFloat(charCount) / 280, 1), weight: .bold, design: .rounded))
-                    .multilineTextAlignment(.trailing)
-                }
+                Divider()
+                
+                Text("\(280 - charCount)\(tweetLengthWarning)")
+                  .foregroundColor(charCount > 200 ? charCount >= 280 ? Color(.systemRed) : Color(.systemOrange) : .secondary)
+                  .font(.system(size: min(captionSize * max(CGFloat(charCount) / 280, 1), 80), weight: .bold, design: .rounded))
+                  .multilineTextAlignment(.trailing)
               }
               .padding()
               .background(Color(.tertiarySystemGroupedBackground))
@@ -106,12 +111,17 @@ struct ContentView: View {
               
               if case .error(let errorMessage) = twitterClient.state {
                 Text(errorMessage ?? "Some weird kind of error occurred; @_dte is probably to blame since he made this app.")
-                  .font(.broadcastBody.weight(.semibold))
+                  .font(.broadcastFootnote.weight(.semibold))
                   .foregroundColor(Color(.systemRed))
-                  .padding(verticalPadding)
+                  .padding()
                   .frame(maxWidth: .infinity)
                   .background(Color(.systemRed).opacity(0.2))
-                  .cornerRadius(verticalPadding)
+                  .cornerRadius(captionSize)
+                  .onTapGesture {
+                    withAnimation {
+                      twitterClient.state = .idle
+                    }
+                  }
               }
               
               ThumbnailFilmstrip(image: $twitterClient.image)
@@ -167,7 +177,7 @@ struct ContentView: View {
         .padding()
         .animation(.spring())
         .background(
-          VisualEffectView(effect: UIBlurEffect(style: .prominent))
+          VisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial))
             .ignoresSafeArea()
             .opacity(twitterClient.user == nil ? 0 : 1)
         )
@@ -196,6 +206,8 @@ struct ContentView: View {
     }
     
     twitterClient.sendTweet(tweet: tweetText ?? "")
+    
+    placeholder = placeholderCandidates.randomElement()
   }
 }
 

@@ -39,6 +39,8 @@ struct SignOutView: View {
           .clipShape(Circle())
           .onTapGesture {
             themeHelper.rotateTheme()
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
           }
         .offset(offset)
         .highPriorityGesture(

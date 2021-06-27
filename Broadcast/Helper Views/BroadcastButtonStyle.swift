@@ -16,16 +16,18 @@ struct BroadcastButtonStyle: ButtonStyle {
   var isFullWidth = true
   var isLoading = false
   
-  var backgroundColor: Color {
-    switch prominence {
-    case .primary:
-      return .accentColor
-    case .secondary:
-      return .accentColor.opacity(0.1)
-    case .tertiary:
-      return Color(.secondarySystemBackground)
-    case .destructive:
-      return Color(.systemRed)
+  var backgroundColor: some View {
+    Group {
+      switch prominence {
+      case .primary:
+        Color.accentColor
+      case .secondary:
+        Color.accentColor.opacity(0.1)
+      case .tertiary:
+        VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
+      case .destructive:
+        Color(.systemRed)
+      }
     }
   }
   

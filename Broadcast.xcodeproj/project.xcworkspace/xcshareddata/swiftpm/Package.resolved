@@ -27,6 +27,24 @@
           "revision": "2e09be8af614401bc9f87d40093ec19ce56ccaf2",
           "version": "0.1.3"
         }
+      },
+      {
+        "package": "twitter-text",
+        "repositoryURL": "https://github.com/nysander/twitter-text.git",
+        "state": {
+          "branch": null,
+          "revision": "09fb2896ca4bec3b17513de2da9376559062116d",
+          "version": "0.0.1"
+        }
+      },
+      {
+        "package": "UnicodeURL",
+        "repositoryURL": "https://github.com/nysander/UnicodeURL.git",
+        "state": {
+          "branch": null,
+          "revision": "fe15c8b585c2e6d22dfe81da899183e6aa376a93",
+          "version": "0.1.0"
+        }
       }
     ]
   },
