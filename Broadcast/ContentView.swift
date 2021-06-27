@@ -97,6 +97,7 @@ struct ContentView: View {
                   Text("\(280 - count)\(tweetLengthWarning)")
                     .foregroundColor(count > 200 ? count >= 280 ? Color(.systemRed) : Color(.systemOrange) : .secondary)
                     .font(.system(size: captionSize * max(CGFloat(charCount) / 280, 1), weight: .bold, design: .rounded))
+                    .multilineTextAlignment(.trailing)
                 }
               }
               .padding()
@@ -106,7 +107,6 @@ struct ContentView: View {
               if case .error(let errorMessage) = twitterClient.state {
                 Text(errorMessage ?? "Some weird kind of error occurred; @_dte is probably to blame since he made this app.")
                   .font(.broadcastBody.weight(.semibold))
-                  .multilineTextAlignment(.trailing)
                   .foregroundColor(Color(.systemRed))
                   .padding(verticalPadding)
                   .frame(maxWidth: .infinity)
