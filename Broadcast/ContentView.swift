@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Introspect
 
 struct ContentView: View {
   @ScaledMetric private var leftOffset: CGFloat = 4
@@ -77,18 +78,17 @@ struct ContentView: View {
                     .foregroundColor(Color(.placeholderText))
                     .opacity(tweetText == nil ? 1 : 0)
                     .accessibility(hidden: true)
-                    .minimumScaleFactor(0.01)
                   
                   TextEditor(text: Binding($twitterClient.tweet, replacingNilWith: ""))
                     .frame(minHeight: geom.size.height / 3, alignment: .leading)
                     .foregroundColor(Color(.label))
                     .multilineTextAlignment(.leading)
-                    .minimumScaleFactor(0.01)
+                    .keyboardType(.twitter)
+                    .introspectTextView { textView in
+                      textView.isScrollEnabled = false
+                    }
                 }
                 .font(.broadcastTitle2)
-                .padding()
-                .background(Color(.secondarySystemBackground))
-                .cornerRadius(captionSize)
                 
                 if let tweetText = twitterClient.tweet ?? "",
                    let count = tweetText.count {
@@ -98,17 +98,20 @@ struct ContentView: View {
                     .foregroundColor(count > 200 ? count >= 280 ? Color(.systemRed) : Color(.systemOrange) : .secondary)
                     .font(.system(size: captionSize * max(CGFloat(charCount) / 280, 1), weight: .bold, design: .rounded))
                 }
-                
-                if case .error(let errorMessage) = twitterClient.state {
-                  Text(errorMessage ?? "Some weird kind of error occurred; @_dte is probably to blame since he made this app.")
-                    .font(.broadcastBody.weight(.semibold))
-                    .multilineTextAlignment(.trailing)
-                    .foregroundColor(Color(.systemRed))
-                    .padding(verticalPadding)
-                    .frame(maxWidth: .infinity)
-                    .background(Color(.systemRed).opacity(0.2))
-                    .cornerRadius(verticalPadding)
-                }
+              }
+              .padding()
+              .background(Color(.tertiarySystemGroupedBackground))
+              .cornerRadius(captionSize)
+              
+              if case .error(let errorMessage) = twitterClient.state {
+                Text(errorMessage ?? "Some weird kind of error occurred; @_dte is probably to blame since he made this app.")
+                  .font(.broadcastBody.weight(.semibold))
+                  .multilineTextAlignment(.trailing)
+                  .foregroundColor(Color(.systemRed))
+                  .padding(verticalPadding)
+                  .frame(maxWidth: .infinity)
+                  .background(Color(.systemRed).opacity(0.2))
+                  .cornerRadius(verticalPadding)
               }
               
               ThumbnailFilmstrip(image: $twitterClient.image)
@@ -116,22 +119,28 @@ struct ContentView: View {
               WelcomeView()
             }
           }
-          .frame(maxWidth: .infinity, maxHeight: .infinity)
           .padding()
           .padding(.bottom, bottomPadding)
+          .frame(maxWidth: geom.size.width)
         }
         
         VStack {
           if let screenName = twitterClient.user?.screenName {
             HStack {
-              Button(action: sendTweet) {
+              Button(action: {
+                sendTweet()
+                UIApplication.shared.endEditing()
+              }) {
                 Label("Send Tweet", systemImage: "paperplane.fill")
                   .font(.broadcastHeadline)
               }
               .buttonStyle(BroadcastButtonStyle(isLoading: twitterClient.state == .busy))
               .disabled(!validTweet)
               
-              Button(action: { photoPickerIsPresented.toggle() }) {
+              Button(action: {
+                photoPickerIsPresented.toggle()
+                UIApplication.shared.endEditing()
+              }) {
                 Label("Add Media", systemImage: "photo.on.rectangle.angled")
                   .labelStyle(IconOnlyLabelStyle())
               }
@@ -140,11 +149,12 @@ struct ContentView: View {
             .disabled(twitterClient.state == .busy)
             
             Text("Logged in as @\(screenName)")
-              .padding(.top)
+              .padding(.top, verticalPadding)
               .font(.broadcastCaption.weight(.medium))
               .foregroundColor(.accentColor)
               .onTapGesture {
                 signOutScreenIsPresented = true
+                UIApplication.shared.endEditing()
               }
           } else {
             Button(action: { twitterClient.signIn() }) {
@@ -161,6 +171,7 @@ struct ContentView: View {
             .ignoresSafeArea()
             .opacity(twitterClient.user == nil ? 0 : 1)
         )
+        .gesture(DragGesture().onEnded({ _ in UIApplication.shared.endEditing() }))
       }
       .sheet(isPresented: $photoPickerIsPresented) {
         ImagePicker(image: $twitterClient.image)
