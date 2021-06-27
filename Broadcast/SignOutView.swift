@@ -18,15 +18,15 @@ struct SignOutView: View {
   @State private var engine: CHHapticEngine?
   
   var labelOpacity: Double {
-    Double(1 - offset.height / 200)
+    Double(1 - abs(offset.height) / 200)
   }
   
   var body: some View {
     VStack {
       Spacer()
-      Text("Drag to sign out")
+      Label("Drag to sign out", systemImage: "arrow.down.circle")
+        .font(.broadcastBody.bold())
         .foregroundColor(.secondary)
-        .fontWeight(.bold)
         .padding()
         .opacity(labelOpacity)
       
@@ -44,13 +44,13 @@ struct SignOutView: View {
         .highPriorityGesture(
           DragGesture()
             .onChanged { gesture in
-              self.offset.height = min(gesture.translation.height, 240)
+              withAnimation { self.offset.height = min(gesture.translation.height, 240) }
               
               withAnimation(.interactiveSpring()) { willDelete = self.offset.height >= 200 }
             }
             
             .onEnded { _ in
-              if abs(self.offset.height) >= 200 {
+              if self.offset.height >= 200 {
                 startSignOut()
               } else {
                 withAnimation(.interactiveSpring(response: 0.3, dampingFraction: 0.6, blendDuration: 0.4)) {
@@ -66,6 +66,7 @@ struct SignOutView: View {
         Image(systemName: "trash")
           .padding()
           .background(willDelete ? Color(.systemRed) : Color(.secondarySystemBackground))
+          .foregroundColor(willDelete ? .white : .primary)
           .clipShape(Circle())
       }
       .font(.broadcastLargeTitle)

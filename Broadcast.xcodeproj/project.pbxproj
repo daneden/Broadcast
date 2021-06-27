@@ -29,6 +29,7 @@
 		7188E6612688A01F007CFD78 /* Font.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6602688A01F007CFD78 /* Font.extension.swift */; };
 		7188E6632688A0FC007CFD78 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6622688A0FC007CFD78 /* WelcomeView.swift */; };
 		7188E6652688A436007CFD78 /* ThemeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6642688A436007CFD78 /* ThemeHelper.swift */; };
+		7188E6672688B99E007CFD78 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6662688B99E007CFD78 /* VisualEffectView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,6 +55,7 @@
 		7188E6602688A01F007CFD78 /* Font.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Font.extension.swift; sourceTree = "<group>"; };
 		7188E6622688A0FC007CFD78 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		7188E6642688A436007CFD78 /* ThemeHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeHelper.swift; sourceTree = "<group>"; };
+		7188E6662688B99E007CFD78 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +143,7 @@
 				7188E6522687D16C007CFD78 /* ThumbnailFilmstrip.swift */,
 				7188E657268871DD007CFD78 /* TwitterClient.swift */,
 				7188E65926887760007CFD78 /* NoShape.swift */,
+				7188E6662688B99E007CFD78 /* VisualEffectView.swift */,
 			);
 			path = "Helper Views";
 			sourceTree = "<group>";
@@ -239,6 +242,7 @@
 				7188E6532687D16C007CFD78 /* ThumbnailFilmstrip.swift in Sources */,
 				7188E64B2687C44D007CFD78 /* String.extension.swift in Sources */,
 				7188E64D2687C6A1007CFD78 /* Binding.extension.swift in Sources */,
+				7188E6672688B99E007CFD78 /* VisualEffectView.swift in Sources */,
 				7188E65F26889147007CFD78 /* SignOutView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -368,6 +372,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"Broadcast/Preview Content\"";
 				DEVELOPMENT_TEAM = YC249PY26F;
 				ENABLE_PREVIEWS = YES;
@@ -390,6 +395,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"Broadcast/Preview Content\"";
 				DEVELOPMENT_TEAM = YC249PY26F;
 				ENABLE_PREVIEWS = YES;

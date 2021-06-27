@@ -44,7 +44,7 @@ class ThemeHelper: ObservableObject {
   }
   
   private var allColors: [Color] = [
-    .accentColor,
+    Color("twitterBrandColor"),
     Color(.systemIndigo),
     Color(.systemPurple),
     Color(.systemPink),

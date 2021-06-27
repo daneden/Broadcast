@@ -24,6 +24,10 @@ struct ContentView: View {
     twitterClient.tweet
   }
   
+  var charCount: Int {
+    (tweetText ?? "").count
+  }
+  
   var validTweet: Bool {
     let text = tweetText ?? ""
     if twitterClient.image != nil && text.count <= 280 {
@@ -81,7 +85,6 @@ struct ContentView: View {
               Label("Send Tweet", systemImage: "paperplane.fill")
                 .font(.broadcastHeadline)
             }
-            .id("cta")
             .buttonStyle(BroadcastButtonStyle(isLoading: twitterClient.state == .busy))
             .disabled(!validTweet)
             
@@ -95,8 +98,8 @@ struct ContentView: View {
           
           Text("Logged in as @\(screenName)")
             .padding(.top)
-            .font(.broadcastCaption.bold())
-            .foregroundColor(.secondary)
+            .font(.broadcastCaption.weight(.medium))
+            .foregroundColor(.accentColor)
             .onTapGesture {
               signOutScreenIsPresented = true
             }
@@ -105,20 +108,16 @@ struct ContentView: View {
             Label("Sign In With Twitter", image: "twitter.fill")
               .font(.broadcastHeadline)
           }
-          .id("cta")
           .buttonStyle(BroadcastButtonStyle())
         }
       }
       .padding()
-      .padding(.top, 40)
-      .background(
-        LinearGradient(
-          gradient: Gradient(colors: [Color(.systemBackground).opacity(0), Color(.systemBackground)]),
-          startPoint: .top,
-          endPoint: .bottom
-        )
-      )
       .animation(.spring())
+      .background(
+        VisualEffectView(effect: UIBlurEffect(style: .prominent))
+          .ignoresSafeArea()
+          .opacity(twitterClient.user == nil ? 0 : 1)
+      )
     }
     .sheet(isPresented: $photoPickerIsPresented) {
       ImagePicker(image: $twitterClient.image)
