@@ -18,6 +18,9 @@ struct BroadcastApp: App {
         .environmentObject(twitterClient)
         .environmentObject(themeHelper)
         .accentColor(themeHelper.color)
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+          twitterClient.revalidateAccount()
+        }
     }
   }
 }

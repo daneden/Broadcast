@@ -21,7 +21,7 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   
   enum SessionState: Hashable {
     case idle
-    case error
+    case error(message: String? = nil)
     case busy
   }
   
@@ -74,13 +74,16 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
           self.user = User(id: id, screenName: screenName)
           self.state = .idle
         } else {
-          self.state = .error
+          self.state = .error(message: "Ack! Unable to authorize that Twitter account. Maybe try again?")
         }
       }
     }
   }
   
   func sendTweet(tweet: String, media: Data? = nil) {
+    let defaultTweetErrorMessage = "Oh man, something went wrong sending that tweet. It might be too long."
+    let mediaTweetErrorMessage = "Oh man, something went wrong sending that tweet. It might be too long, or there could be an issue with your selected media."
+    
     DispatchQueue.main.async {
       self.state = .busy
     }
@@ -93,8 +96,8 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
           self.tweet = nil
         }
       } failure: { error in
-        print(error.localizedDescription)
-        DispatchQueue.main.async { self.state = .error }
+        self.revalidateAccount()
+        DispatchQueue.main.async { self.state = .error(message: mediaTweetErrorMessage) }
       }
     } else {
       client.postTweet(status: tweet) { result in
@@ -103,7 +106,8 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
           self.tweet = nil
         }
       } failure: { error in
-        DispatchQueue.main.async { self.state = .error }
+        self.revalidateAccount()
+        DispatchQueue.main.async { self.state = .error(message: defaultTweetErrorMessage) }
       }
     }
   }
@@ -139,6 +143,21 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
       self.user = nil
       self.image = nil
       self.tweet = nil
+      self.state = .idle
+    }
+  }
+  
+  func revalidateAccount() {
+    if user != nil {
+      client.getAccountSettings(failure: { error in
+        if let error = error as? SwifterError,
+           case .urlResponseError(let code, _, _) = error.kind,
+           code == 401 {
+          self.signOut()
+        } else {
+          print(error.localizedDescription)
+        }
+      })
     }
   }
 }

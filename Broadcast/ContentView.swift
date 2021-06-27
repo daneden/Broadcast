@@ -11,7 +11,8 @@ struct ContentView: View {
   @ScaledMetric private var leftOffset: CGFloat = 4
   @ScaledMetric private var verticalPadding: CGFloat = 7
   @ScaledMetric private var bottomPadding: CGFloat = 120
-  @ScaledMetric private var minComposerHeight: CGFloat = 80
+  @ScaledMetric private var minComposerHeight: CGFloat = 120
+  @ScaledMetric private var captionSize: CGFloat = 14
   
   @EnvironmentObject var twitterClient: TwitterClient
   @State var photoPickerIsPresented = false
@@ -20,15 +21,15 @@ struct ContentView: View {
   
   private let placeholder = "What’s happening?"
   
-  var tweetText: String? {
+  private var tweetText: String? {
     twitterClient.tweet
   }
   
-  var charCount: Int {
+  private var charCount: Int {
     (tweetText ?? "").count
   }
   
-  var validTweet: Bool {
+  private var validTweet: Bool {
     let text = tweetText ?? ""
     if twitterClient.image != nil && text.count <= 280 {
       return true
@@ -37,96 +38,139 @@ struct ContentView: View {
     return !text.isEmpty && text.count <= 280
   }
   
+  private var tweetLengthWarning: String {
+    switch charCount {
+    case 380...479:
+      return " (ok c’mon dude)"
+    case 480...679:
+      return " (this isn’t the notes app)"
+    case 680...1023:
+      return " (the app probably looks pretty bad right now, huh)"
+    case 1024...2047:
+      return " (I bet you’re wondering when this will stop)"
+    case 2048...4096:
+      return " (I’ll give you a clue: two nice numbers)"
+    case 4096...19999:
+      return " (you’re really gonna keep going?)"
+    case 20000...30000:
+      return " (I’m impressed, really)"
+    case 30000...40000:
+      return " (almost there)"
+    case 41788...Int.max:
+      return " (nice)"
+    default:
+      return ""
+    }
+  }
+  
   var body: some View {
-    ZStack(alignment: .bottom) {
-      ScrollView {
-        VStack {
-          if $twitterClient.user.wrappedValue != nil {
-            VStack(alignment: .trailing) {
-              ZStack(alignment: .topLeading) {
-                Text(tweetText ?? placeholder)
-                  .padding(.leading, leftOffset)
-                  .padding(.vertical, verticalPadding)
-                  .foregroundColor(Color(.placeholderText))
-                  .opacity(tweetText == nil ? 1 : 0)
-                  .accessibility(hidden: true)
+    GeometryReader { geom in
+      ZStack(alignment: .bottom) {
+        ScrollView {
+          VStack {
+            if $twitterClient.user.wrappedValue != nil {
+              VStack(alignment: .trailing) {
+                ZStack(alignment: .topLeading) {
+                  Text(tweetText ?? placeholder)
+                    .padding(.leading, leftOffset)
+                    .padding(.vertical, verticalPadding)
+                    .foregroundColor(Color(.placeholderText))
+                    .opacity(tweetText == nil ? 1 : 0)
+                    .accessibility(hidden: true)
+                    .minimumScaleFactor(0.01)
+                  
+                  TextEditor(text: Binding($twitterClient.tweet, replacingNilWith: ""))
+                    .frame(minHeight: geom.size.height / 3, alignment: .leading)
+                    .foregroundColor(Color(.label))
+                    .multilineTextAlignment(.leading)
+                    .minimumScaleFactor(0.01)
+                }
+                .font(.broadcastTitle2)
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(captionSize)
                 
-                TextEditor(text: Binding($twitterClient.tweet, replacingNilWith: ""))
-                  .frame(minHeight: minComposerHeight, alignment: .leading)
-                  .foregroundColor(Color(.label))
-                  .multilineTextAlignment(.leading)
-                  .allowsHitTesting(true)
+                if let tweetText = twitterClient.tweet ?? "",
+                   let count = tweetText.count {
+                  Divider()
+                  
+                  Text("\(280 - count)\(tweetLengthWarning)")
+                    .foregroundColor(count > 200 ? count >= 280 ? Color(.systemRed) : Color(.systemOrange) : .secondary)
+                    .font(.system(size: captionSize * max(CGFloat(charCount) / 280, 1), weight: .bold, design: .rounded))
+                }
+                
+                if case .error(let errorMessage) = twitterClient.state {
+                  Text(errorMessage ?? "Some weird kind of error occurred; @_dte is probably to blame since he made this app.")
+                    .font(.broadcastBody.weight(.semibold))
+                    .multilineTextAlignment(.trailing)
+                    .foregroundColor(Color(.systemRed))
+                    .padding(verticalPadding)
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.systemRed).opacity(0.2))
+                    .cornerRadius(verticalPadding)
+                }
               }
-              .font(.broadcastTitle)
               
-              if let tweetText = twitterClient.tweet ?? "",
-                 let count = tweetText.count {
-                Divider()
-                
-                Text("\(280 - count)")
-                  .foregroundColor(count > 200 ? count >= 280 ? Color(.systemRed) : Color(.systemOrange) : .secondary)
-                  .font(.broadcastCaption.bold())
-              }
+              ThumbnailFilmstrip(image: $twitterClient.image)
+            } else {
+              WelcomeView()
             }
+          }
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+          .padding()
+          .padding(.bottom, bottomPadding)
+        }
+        
+        VStack {
+          if let screenName = twitterClient.user?.screenName {
+            HStack {
+              Button(action: sendTweet) {
+                Label("Send Tweet", systemImage: "paperplane.fill")
+                  .font(.broadcastHeadline)
+              }
+              .buttonStyle(BroadcastButtonStyle(isLoading: twitterClient.state == .busy))
+              .disabled(!validTweet)
+              
+              Button(action: { photoPickerIsPresented.toggle() }) {
+                Label("Add Media", systemImage: "photo.on.rectangle.angled")
+                  .labelStyle(IconOnlyLabelStyle())
+              }
+              .buttonStyle(BroadcastButtonStyle(prominence: .tertiary, isFullWidth: false))
+            }
+            .disabled(twitterClient.state == .busy)
             
-            ThumbnailFilmstrip(image: $twitterClient.image)
+            Text("Logged in as @\(screenName)")
+              .padding(.top)
+              .font(.broadcastCaption.weight(.medium))
+              .foregroundColor(.accentColor)
+              .onTapGesture {
+                signOutScreenIsPresented = true
+              }
           } else {
-            WelcomeView()
+            Button(action: { twitterClient.signIn() }) {
+              Label("Sign In With Twitter", image: "twitter.fill")
+                .font(.broadcastHeadline)
+            }
+            .buttonStyle(BroadcastButtonStyle())
           }
         }
         .padding()
-        .padding(.bottom, bottomPadding)
+        .animation(.spring())
+        .background(
+          VisualEffectView(effect: UIBlurEffect(style: .prominent))
+            .ignoresSafeArea()
+            .opacity(twitterClient.user == nil ? 0 : 1)
+        )
       }
-      
-      VStack {
-        if let screenName = twitterClient.user?.screenName {
-          HStack {
-            Button(action: sendTweet) {
-              Label("Send Tweet", systemImage: "paperplane.fill")
-                .font(.broadcastHeadline)
-            }
-            .buttonStyle(BroadcastButtonStyle(isLoading: twitterClient.state == .busy))
-            .disabled(!validTweet)
-            
-            Button(action: { photoPickerIsPresented.toggle() }) {
-              Label("Add Media", systemImage: "photo.on.rectangle.angled")
-                .labelStyle(IconOnlyLabelStyle())
-            }
-            .buttonStyle(BroadcastButtonStyle(prominence: .tertiary, isFullWidth: false))
-          }
-          .disabled(twitterClient.state == .busy)
-          
-          Text("Logged in as @\(screenName)")
-            .padding(.top)
-            .font(.broadcastCaption.weight(.medium))
-            .foregroundColor(.accentColor)
-            .onTapGesture {
-              signOutScreenIsPresented = true
-            }
-        } else {
-          Button(action: { twitterClient.signIn() }) {
-            Label("Sign In With Twitter", image: "twitter.fill")
-              .font(.broadcastHeadline)
-          }
-          .buttonStyle(BroadcastButtonStyle())
-        }
+      .sheet(isPresented: $photoPickerIsPresented) {
+        ImagePicker(image: $twitterClient.image)
       }
-      .padding()
-      .animation(.spring())
-      .background(
-        VisualEffectView(effect: UIBlurEffect(style: .prominent))
-          .ignoresSafeArea()
-          .opacity(twitterClient.user == nil ? 0 : 1)
-      )
-    }
-    .sheet(isPresented: $photoPickerIsPresented) {
-      ImagePicker(image: $twitterClient.image)
-    }
-    .sheet(isPresented: $signOutScreenIsPresented) {
-      SignOutView()
-    }
-    .onAppear {
-      UITextView.appearance().backgroundColor = .clear
+      .sheet(isPresented: $signOutScreenIsPresented) {
+        SignOutView()
+      }
+      .onAppear {
+        UITextView.appearance().backgroundColor = .clear
+      }
     }
   }
   
