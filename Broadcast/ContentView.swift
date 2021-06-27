@@ -10,18 +10,23 @@ import SwiftUI
 struct ContentView: View {
   @ScaledMetric private var leftOffset: CGFloat = 4
   @ScaledMetric private var verticalPadding: CGFloat = 7
+  @ScaledMetric private var bottomPadding: CGFloat = 120
   @ScaledMetric private var minComposerHeight: CGFloat = 80
   
-  @EnvironmentObject var twitterAPI: TwitterAPI
-  @State var tweetText: String?
-  @State var pickerResult: [UIImage] = []
+  @EnvironmentObject var twitterClient: TwitterClient
   @State var photoPickerIsPresented = false
+  @State var signOutScreenIsPresented = false
   @State var sendingTweet = false
-  let placeholder = "What’s happening?"
+  
+  private let placeholder = "What’s happening?"
+  
+  var tweetText: String? {
+    twitterClient.tweet
+  }
   
   var validTweet: Bool {
     let text = tweetText ?? ""
-    if !pickerResult.isEmpty && text.count <= 280 {
+    if twitterClient.image != nil && text.count <= 280 {
       return true
     }
     
@@ -32,86 +37,111 @@ struct ContentView: View {
     ZStack(alignment: .bottom) {
       ScrollView {
         VStack {
-          if twitterAPI.user != nil {
+          if $twitterClient.user.wrappedValue != nil {
             VStack(alignment: .trailing) {
               ZStack(alignment: .topLeading) {
-                TextEditor(text: Binding($tweetText, replacingNilWith: ""))
-                  .frame(minHeight: minComposerHeight, alignment: .leading)
-                  .foregroundColor(Color(.label))
-                  .multilineTextAlignment(.leading)
                 Text(tweetText ?? placeholder)
                   .padding(.leading, leftOffset)
                   .padding(.vertical, verticalPadding)
                   .foregroundColor(Color(.placeholderText))
                   .opacity(tweetText == nil ? 1 : 0)
                   .accessibility(hidden: true)
+                
+                TextEditor(text: Binding($twitterClient.tweet, replacingNilWith: ""))
+                  .frame(minHeight: minComposerHeight, alignment: .leading)
+                  .foregroundColor(Color(.label))
+                  .multilineTextAlignment(.leading)
+                  .allowsHitTesting(true)
               }
-              .font(.title)
+              .font(.broadcastTitle)
               
-              if let tweetText = tweetText ?? "",
+              if let tweetText = twitterClient.tweet ?? "",
                  let count = tweetText.count {
                 Divider()
                 
                 Text("\(280 - count)")
                   .foregroundColor(count > 200 ? count >= 280 ? Color(.systemRed) : Color(.systemOrange) : .secondary)
-                  .font(.caption.bold())
+                  .font(.broadcastCaption.bold())
               }
-            }.padding()
+            }
             
-            ThumbnailFilmstrip(images: $pickerResult)
+            ThumbnailFilmstrip(image: $twitterClient.image)
+          } else {
+            WelcomeView()
           }
         }
+        .padding()
+        .padding(.bottom, bottomPadding)
       }
       
-        VStack {
-          if let screenName = twitterAPI.user?.screenName {
+      VStack {
+        if let screenName = twitterClient.user?.screenName {
           HStack {
-            Button(action: { print("tweet \(tweetText ?? "(empty)")") }) {
+            Button(action: sendTweet) {
               Label("Send Tweet", systemImage: "paperplane.fill")
-                .font(.headline)
+                .font(.broadcastHeadline)
             }
             .id("cta")
-            .buttonStyle(BroadcastButtonStyle(isLoading: sendingTweet))
-            .disabled(!validTweet || sendingTweet)
-            .animation(.spring())
+            .buttonStyle(BroadcastButtonStyle(isLoading: twitterClient.state == .busy))
+            .disabled(!validTweet)
             
             Button(action: { photoPickerIsPresented.toggle() }) {
-              Label("Add Photos", systemImage: "photo.on.rectangle.angled")
+              Label("Add Media", systemImage: "photo.on.rectangle.angled")
                 .labelStyle(IconOnlyLabelStyle())
             }
-            .buttonStyle(BroadcastButtonStyle(prominence: .secondary, isFullWidth: false))
+            .buttonStyle(BroadcastButtonStyle(prominence: .tertiary, isFullWidth: false))
           }
+          .disabled(twitterClient.state == .busy)
           
-          Text("Logged in as \(screenName)")
-            .padding()
-            .font(.caption.bold())
+          Text("Logged in as @\(screenName)")
+            .padding(.top)
+            .font(.broadcastCaption.bold())
             .foregroundColor(.secondary)
-          } else {
-            Button(action: { twitterAPI.authorize() }) {
-              Label("Sign In With Twitter", image: "twitter.fill")
-                .font(.headline)
+            .onTapGesture {
+              signOutScreenIsPresented = true
             }
-            .id("cta")
-            .buttonStyle(BroadcastButtonStyle())
+        } else {
+          Button(action: { twitterClient.signIn() }) {
+            Label("Sign In With Twitter", image: "twitter.fill")
+              .font(.broadcastHeadline)
           }
-        }.padding()
-    }
-    .sheet(isPresented: $twitterAPI.authorizationSheetIsPresented) {
-      SafariView(url: $twitterAPI.authorizationURL)
+          .id("cta")
+          .buttonStyle(BroadcastButtonStyle())
+        }
+      }
+      .padding()
+      .padding(.top, 40)
+      .background(
+        LinearGradient(
+          gradient: Gradient(colors: [Color(.systemBackground).opacity(0), Color(.systemBackground)]),
+          startPoint: .top,
+          endPoint: .bottom
+        )
+      )
+      .animation(.spring())
     }
     .sheet(isPresented: $photoPickerIsPresented) {
-      PhotoPicker(pickerResult: $pickerResult, isPresented: $photoPickerIsPresented, limit: 4 - pickerResult.count)
+      ImagePicker(image: $twitterClient.image)
+    }
+    .sheet(isPresented: $signOutScreenIsPresented) {
+      SignOutView()
+    }
+    .onAppear {
+      UITextView.appearance().backgroundColor = .clear
     }
   }
   
   func sendTweet() {
-    guard twitterAPI.user != nil else {
+    guard twitterClient.user != nil else {
       return
     }
     
-    sendingTweet = true
+    if let image = twitterClient.image {
+      twitterClient.sendTweet(tweet: tweetText ?? "", media: image.jpegData(compressionQuality: 80))
+      return
+    }
     
-    twitterAPI.sendTweet(text: tweetText ?? "Beep boop")
+    twitterClient.sendTweet(tweet: tweetText ?? "")
   }
 }
 

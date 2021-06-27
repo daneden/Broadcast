@@ -9,12 +9,15 @@ import SwiftUI
 
 @main
 struct BroadcastApp: App {
-  @StateObject var twitterAPI = TwitterAPI()
+  @StateObject var themeHelper = ThemeHelper()
+  @StateObject var twitterClient = TwitterClient()
   
   var body: some Scene {
     WindowGroup {
       ContentView()
-        .environmentObject(twitterAPI)
+        .environmentObject(twitterClient)
+        .environmentObject(themeHelper)
+        .accentColor(themeHelper.color)
     }
   }
 }

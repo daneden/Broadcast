@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum BroadcastButtonProminence {
-  case primary, secondary
+  case primary, secondary, tertiary, destructive
 }
 
 struct BroadcastButtonStyle: ButtonStyle {
@@ -22,15 +22,21 @@ struct BroadcastButtonStyle: ButtonStyle {
       return .accentColor
     case .secondary:
       return .accentColor.opacity(0.1)
+    case .tertiary:
+      return Color(.secondarySystemBackground)
+    case .destructive:
+      return Color(.systemRed)
     }
   }
   
   var foregroundColor: Color {
     switch prominence {
-    case .primary:
-      return .white
     case .secondary:
       return .accentColor
+    case .tertiary:
+      return .primary
+    default:
+      return .white
     }
   }
   
@@ -38,6 +44,7 @@ struct BroadcastButtonStyle: ButtonStyle {
     HStack {
       if isFullWidth { Spacer(minLength: 0) }
       configuration.label
+        .font(.broadcastBody.bold())
         .opacity(configuration.isPressed ? 0.8 : 1)
         .opacity(isLoading ? 0 : 1)
       if isFullWidth { Spacer(minLength: 0) }
