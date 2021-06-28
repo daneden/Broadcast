@@ -23,7 +23,6 @@
 		7188E6532687D16C007CFD78 /* AttachmentThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6522687D16C007CFD78 /* AttachmentThumbnail.swift */; };
 		7188E6562687DDED007CFD78 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 7188E6552687DDED007CFD78 /* Swifter */; };
 		7188E658268871DD007CFD78 /* TwitterClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E657268871DD007CFD78 /* TwitterClient.swift */; };
-		7188E65A26887760007CFD78 /* NoShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E65926887760007CFD78 /* NoShape.swift */; };
 		7188E65D26887DCD007CFD78 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 7188E65C26887DCD007CFD78 /* SwiftKeychainWrapper */; };
 		7188E65F26889147007CFD78 /* SignOutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E65E26889147007CFD78 /* SignOutView.swift */; };
 		7188E6612688A01F007CFD78 /* Font.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6602688A01F007CFD78 /* Font.extension.swift */; };
@@ -56,7 +55,6 @@
 		7188E64E2687CCD0007CFD78 /* PhotoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPicker.swift; sourceTree = "<group>"; };
 		7188E6522687D16C007CFD78 /* AttachmentThumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentThumbnail.swift; sourceTree = "<group>"; };
 		7188E657268871DD007CFD78 /* TwitterClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitterClient.swift; sourceTree = "<group>"; };
-		7188E65926887760007CFD78 /* NoShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoShape.swift; sourceTree = "<group>"; };
 		7188E65E26889147007CFD78 /* SignOutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignOutView.swift; sourceTree = "<group>"; };
 		7188E6602688A01F007CFD78 /* Font.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Font.extension.swift; sourceTree = "<group>"; };
 		7188E6622688A0FC007CFD78 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
@@ -102,16 +100,16 @@
 		7188E6272687B0FE007CFD78 /* Broadcast */ = {
 			isa = PBXGroup;
 			children = (
-				7188E6452687B6AF007CFD78 /* Helper Views */,
-				7188E6402687B431007CFD78 /* Helpers */,
-				7188E6392687B192007CFD78 /* Extensions */,
+				7188E6312687B0FF007CFD78 /* Info.plist */,
 				7188E6282687B0FE007CFD78 /* BroadcastApp.swift */,
 				7188E62A2687B0FE007CFD78 /* ContentView.swift */,
-				7188E62C2687B0FF007CFD78 /* Assets.xcassets */,
-				7188E6312687B0FF007CFD78 /* Info.plist */,
-				7188E62E2687B0FF007CFD78 /* Preview Content */,
 				7188E65E26889147007CFD78 /* SignOutView.swift */,
 				7188E6622688A0FC007CFD78 /* WelcomeView.swift */,
+				7188E62C2687B0FF007CFD78 /* Assets.xcassets */,
+				7188E6392687B192007CFD78 /* Extensions */,
+				7188E6452687B6AF007CFD78 /* Helper Views */,
+				7188E6402687B431007CFD78 /* Helpers */,
+				7188E62E2687B0FF007CFD78 /* Preview Content */,
 			);
 			path = Broadcast;
 			sourceTree = "<group>";
@@ -127,11 +125,11 @@
 		7188E6392687B192007CFD78 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				719087CE26891C7F005B96CE /* Array.extension.swift */,
+				7188E6602688A01F007CFD78 /* Font.extension.swift */,
 				7188E63A2687B19D007CFD78 /* Notification.extension.swift */,
 				7188E64A2687C44D007CFD78 /* String.extension.swift */,
-				7188E6602688A01F007CFD78 /* Font.extension.swift */,
 				7188E66B2688DB44007CFD78 /* UIApplication.extension.swift */,
-				719087CE26891C7F005B96CE /* Array.extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -153,13 +151,12 @@
 		7188E6452687B6AF007CFD78 /* Helper Views */ = {
 			isa = PBXGroup;
 			children = (
-				7188E6462687B6C2007CFD78 /* SafariView.swift */,
+				7188E6522687D16C007CFD78 /* AttachmentThumbnail.swift */,
 				7188E6482687C0E0007CFD78 /* BroadcastButtonStyle.swift */,
 				7188E64E2687CCD0007CFD78 /* PhotoPicker.swift */,
-				7188E6522687D16C007CFD78 /* AttachmentThumbnail.swift */,
-				7188E65926887760007CFD78 /* NoShape.swift */,
-				7188E6662688B99E007CFD78 /* VisualEffectView.swift */,
 				71AA4AC5268A032400B7B577 /* RemoteImage.swift */,
+				7188E6462687B6C2007CFD78 /* SafariView.swift */,
+				7188E6662688B99E007CFD78 /* VisualEffectView.swift */,
 			);
 			path = "Helper Views";
 			sourceTree = "<group>";
@@ -253,7 +250,6 @@
 				7188E6632688A0FC007CFD78 /* WelcomeView.swift in Sources */,
 				7188E6472687B6C2007CFD78 /* SafariView.swift in Sources */,
 				7188E6492687C0E0007CFD78 /* BroadcastButtonStyle.swift in Sources */,
-				7188E65A26887760007CFD78 /* NoShape.swift in Sources */,
 				7188E6652688A436007CFD78 /* ThemeHelper.swift in Sources */,
 				7188E63F2687B41E007CFD78 /* URLRFC3986Support.swift in Sources */,
 				7188E658268871DD007CFD78 /* TwitterClient.swift in Sources */,
