@@ -22,7 +22,7 @@ let placeholderCandidates: [String] = [
 struct ContentView: View {
   @ScaledMetric private var leftOffset: CGFloat = 4
   @ScaledMetric private var verticalPadding: CGFloat = 6
-  @ScaledMetric private var bottomPadding: CGFloat = 72
+  @ScaledMetric private var bottomPadding: CGFloat = 80
   @ScaledMetric private var minComposerHeight: CGFloat = 120
   @ScaledMetric private var captionSize: CGFloat = 14
   
