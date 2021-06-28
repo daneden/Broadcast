@@ -13,6 +13,7 @@ enum BroadcastButtonProminence {
 }
 
 struct BroadcastButtonStyle: ButtonStyle {
+  @ScaledMetric var paddingSize: CGFloat = 16
   var prominence: BroadcastButtonProminence = .primary
   var isFullWidth = true
   var isLoading = false
@@ -54,7 +55,7 @@ struct BroadcastButtonStyle: ButtonStyle {
         .opacity(isLoading ? 0 : 1)
       if isFullWidth { Spacer(minLength: 0) }
     }
-    .padding()
+    .padding(paddingSize)
     .background(backgroundColor)
     .foregroundColor(foregroundColor)
     .overlay(

@@ -22,7 +22,7 @@ let placeholderCandidates: [String] = [
 struct ContentView: View {
   @ScaledMetric private var leftOffset: CGFloat = 4
   @ScaledMetric private var verticalPadding: CGFloat = 6
-  @ScaledMetric private var bottomPadding: CGFloat = 88
+  @ScaledMetric private var bottomPadding: CGFloat = 72
   @ScaledMetric private var minComposerHeight: CGFloat = 120
   @ScaledMetric private var captionSize: CGFloat = 14
   
@@ -141,7 +141,7 @@ struct ContentView: View {
                   }
               }
               
-              ThumbnailFilmstrip(image: $twitterClient.image)
+              AttachmentThumbnail(image: $twitterClient.image)
             } else {
               WelcomeView()
             }
@@ -152,7 +152,7 @@ struct ContentView: View {
         }
         
         VStack {
-          if let screenName = twitterClient.user?.screenName {
+          if twitterClient.user != nil {
             HStack {
               Button(action: {
                 sendTweet()
@@ -185,7 +185,7 @@ struct ContentView: View {
         .padding()
         .animation(.spring())
         .background(
-          VisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial))
+          VisualEffectView(effect: UIBlurEffect(style: .regular))
             .ignoresSafeArea()
             .opacity(twitterClient.user == nil ? 0 : 1)
         )

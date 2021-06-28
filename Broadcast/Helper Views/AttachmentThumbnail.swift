@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ThumbnailFilmstrip: View {
+struct AttachmentThumbnail: View {
   @Binding var image: UIImage?
   
   var body: some View {
@@ -22,14 +22,11 @@ struct ThumbnailFilmstrip: View {
           Button(action: removeImage) {
             Label("Remove Image", systemImage: "xmark.circle.fill")
               .labelStyle(IconOnlyLabelStyle())
-              .font(.broadcastTitle)
+              .font(.broadcastTitle.bold())
           }
-          .foregroundColor(.primary)
-          .background(Color(.systemBackground))
+          .buttonStyle(BroadcastButtonStyle(paddingSize: 0, prominence: .tertiary, isFullWidth: false))
           .clipShape(Circle())
-          .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
-          .offset(x: 8, y: -8)
-          .highPriorityGesture(TapGesture().onEnded(removeImage))
+          .offset(x: -8, y: 8)
         }
       }
     }.transition(.opacity)
@@ -43,6 +40,6 @@ struct ThumbnailFilmstrip: View {
 
 struct ThumbnailFilmstrip_Previews: PreviewProvider {
   static var previews: some View {
-    ThumbnailFilmstrip(image: .constant(nil))
+    AttachmentThumbnail(image: .constant(nil))
   }
 }
