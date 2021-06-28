@@ -20,13 +20,13 @@ struct AttachmentThumbnail: View {
             .clipShape(RoundedRectangle(cornerRadius: 8))
 
           Button(action: removeImage) {
-            Label("Remove Image", systemImage: "xmark.circle.fill")
+            Label("Remove Image", systemImage: "xmark.circle")
               .labelStyle(IconOnlyLabelStyle())
               .font(.broadcastTitle.bold())
               .foregroundColor(.white)
-              .shadow(color: .black.opacity(0.2), radius: 16, x: 0, y: 8)
+              .shadow(color: .black, radius: 8, x: 0, y: 4)
           }
-          .buttonStyle(BroadcastButtonStyle(paddingSize: 0, prominence: .tertiary, isFullWidth: false))
+          .buttonStyle(BroadcastButtonStyle(paddingSize: -2, prominence: .tertiary, isFullWidth: false))
           .clipShape(Circle())
           .offset(x: -8, y: 8)
         }
