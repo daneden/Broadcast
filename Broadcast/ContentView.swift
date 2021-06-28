@@ -21,7 +21,7 @@ let placeholderCandidates: [String] = [
 
 struct ContentView: View {
   @ScaledMetric private var leftOffset: CGFloat = 4
-  @ScaledMetric private var verticalPadding: CGFloat = 7
+  @ScaledMetric private var verticalPadding: CGFloat = 6
   @ScaledMetric private var bottomPadding: CGFloat = 120
   @ScaledMetric private var minComposerHeight: CGFloat = 120
   @ScaledMetric private var captionSize: CGFloat = 14
@@ -86,20 +86,33 @@ struct ContentView: View {
           VStack {
             if $twitterClient.user.wrappedValue != nil {
               VStack(alignment: .trailing) {
-                ZStack(alignment: .topLeading) {
-                  Text(tweetText ?? placeholder)
-                    .padding(.leading, leftOffset)
-                    .padding(.vertical, verticalPadding)
-                    .foregroundColor(Color(.placeholderText))
-                    .opacity(tweetText == nil ? 1 : 0)
-                    .accessibility(hidden: true)
+                HStack(alignment: .top) {
+                  if let profileImageURL = twitterClient.profileImageURL {
+                    RemoteImage(url: profileImageURL.absoluteString)
+                      .frame(width: 36, height: 36)
+                      .cornerRadius(36)
+                      .onTapGesture {
+                        signOutScreenIsPresented = true
+                        UIApplication.shared.endEditing()
+                      }
+                  }
                   
-                  TextEditor(text: Binding($twitterClient.tweet, replacingNilWith: ""))
-                    .foregroundColor(Color(.label))
-                    .multilineTextAlignment(.leading)
-                    .keyboardType(.twitter)
-                }
-                .font(.broadcastTitle2)
+                  ZStack(alignment: .topLeading) {
+                    Text(tweetText ?? placeholder)
+                      .padding(.leading, leftOffset)
+                      .padding(.vertical, verticalPadding)
+                      .foregroundColor(Color(.placeholderText))
+                      .opacity(tweetText == nil ? 1 : 0)
+                      .accessibility(hidden: true)
+                    
+                    TextEditor(text: Binding($twitterClient.tweet, replacingNilWith: ""))
+                      .foregroundColor(Color(.label))
+                      .multilineTextAlignment(.leading)
+                      .keyboardType(.twitter)
+                      .padding(.top, (verticalPadding / 3) * -1)
+                  }
+                  .font(.broadcastTitle3)
+                }.transition(.scale)
                 
                 Divider()
                 
@@ -161,15 +174,6 @@ struct ContentView: View {
               .buttonStyle(BroadcastButtonStyle(prominence: .tertiary, isFullWidth: false))
             }
             .disabled(twitterClient.state == .busy)
-            
-            Text("Logged in as @\(screenName)")
-              .padding(.top, verticalPadding)
-              .font(.broadcastCaption.weight(.medium))
-              .foregroundColor(.accentColor)
-              .onTapGesture {
-                signOutScreenIsPresented = true
-                UIApplication.shared.endEditing()
-              }
           } else {
             Button(action: { twitterClient.signIn() }) {
               Label("Sign In With Twitter", image: "twitter.fill")

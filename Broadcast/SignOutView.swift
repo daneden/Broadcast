@@ -17,6 +17,8 @@ struct SignOutView: View {
   @State private var willDelete = false
   @State private var engine: CHHapticEngine?
   
+  @ScaledMetric var size: CGFloat = 88
+  
   var labelOpacity: Double {
     Double(1 - abs(offset.height) / 200)
   }
@@ -24,17 +26,27 @@ struct SignOutView: View {
   var body: some View {
     VStack {
       Spacer()
-      Label("Drag to sign out", systemImage: "arrow.down.circle")
-        .font(.broadcastBody.bold())
-        .foregroundColor(.secondary)
-        .padding()
-        .opacity(labelOpacity)
+      if let screenName = twitterClient.user?.screenName {
+        Label("Drag to sign out @\(screenName)", systemImage: "arrow.down.circle")
+          .font(.broadcastBody.bold())
+          .foregroundColor(.secondary)
+          .padding()
+          .opacity(labelOpacity)
+      }
       
       VStack {
-        Label("Sign Out", systemImage: "person.fill")
-          .labelStyle(IconOnlyLabelStyle())
+        Group {
+          if let profileImageURL = twitterClient.profileImageURL?.absoluteString {
+            RemoteImage(url: profileImageURL)
+              .cornerRadius(size)
+          } else {
+            Image("person.fill")
+              .resizable()
+          }
+        }
           .foregroundColor(.white)
-          .padding()
+          .padding(8)
+          .frame(width: size, height: size)
           .background(willDelete ? Color(.secondarySystemBackground) : .accentColor)
           .clipShape(Circle())
           .onTapGesture {
@@ -46,7 +58,7 @@ struct SignOutView: View {
         .highPriorityGesture(
           DragGesture()
             .onChanged { gesture in
-              withAnimation { self.offset.height = min(gesture.translation.height, 240) }
+              withAnimation { self.offset.height = min(gesture.translation.height, 200 + size) }
               
               withAnimation(.interactiveSpring()) { willDelete = self.offset.height >= 200 }
             }
@@ -66,12 +78,14 @@ struct SignOutView: View {
         Color.clear.frame(height: 180)
         
         Image(systemName: "trash")
-          .padding()
+          .resizable()
+          .aspectRatio(contentMode: .fit)
+          .padding(size * 0.3)
+          .frame(width: size, height: size)
           .background(willDelete ? Color(.systemRed) : Color(.secondarySystemBackground))
           .foregroundColor(willDelete ? .white : .primary)
           .clipShape(Circle())
       }
-      .font(.broadcastLargeTitle)
       Spacer()
       
       Button(action: { presentationMode.wrappedValue.dismiss() }) {

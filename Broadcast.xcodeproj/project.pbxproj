@@ -34,6 +34,7 @@
 		7188E66C2688DB44007CFD78 /* UIApplication.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E66B2688DB44007CFD78 /* UIApplication.extension.swift */; };
 		719087CD26891586005B96CE /* TwitterText in Frameworks */ = {isa = PBXBuildFile; productRef = 719087CC26891586005B96CE /* TwitterText */; };
 		719087CF26891C7F005B96CE /* Array.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 719087CE26891C7F005B96CE /* Array.extension.swift */; };
+		71AA4AC6268A032400B7B577 /* RemoteImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71AA4AC5268A032400B7B577 /* RemoteImage.swift */; };
 		71E36FFB2689EED40078D956 /* ShakeModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E36FFA2689EED40078D956 /* ShakeModifier.swift */; };
 /* End PBXBuildFile section */
 
@@ -63,6 +64,7 @@
 		7188E6662688B99E007CFD78 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
 		7188E66B2688DB44007CFD78 /* UIApplication.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.extension.swift; sourceTree = "<group>"; };
 		719087CE26891C7F005B96CE /* Array.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Array.extension.swift; sourceTree = "<group>"; };
+		71AA4AC5268A032400B7B577 /* RemoteImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImage.swift; sourceTree = "<group>"; };
 		71E36FFA2689EED40078D956 /* ShakeModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeModifier.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -137,6 +139,7 @@
 		7188E6402687B431007CFD78 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				7188E657268871DD007CFD78 /* TwitterClient.swift */,
 				7188E63E2687B41E007CFD78 /* URLRFC3986Support.swift */,
 				7188E6412687B444007CFD78 /* ParameterStringParser.swift */,
 				7188E6432687B488007CFD78 /* HMACSHA1Hash.swift */,
@@ -154,9 +157,9 @@
 				7188E6482687C0E0007CFD78 /* BroadcastButtonStyle.swift */,
 				7188E64E2687CCD0007CFD78 /* PhotoPicker.swift */,
 				7188E6522687D16C007CFD78 /* ThumbnailFilmstrip.swift */,
-				7188E657268871DD007CFD78 /* TwitterClient.swift */,
 				7188E65926887760007CFD78 /* NoShape.swift */,
 				7188E6662688B99E007CFD78 /* VisualEffectView.swift */,
+				71AA4AC5268A032400B7B577 /* RemoteImage.swift */,
 			);
 			path = "Helper Views";
 			sourceTree = "<group>";
@@ -262,6 +265,7 @@
 				71E36FFB2689EED40078D956 /* ShakeModifier.swift in Sources */,
 				719087CF26891C7F005B96CE /* Array.extension.swift in Sources */,
 				7188E64D2687C6A1007CFD78 /* Binding.extension.swift in Sources */,
+				71AA4AC6268A032400B7B577 /* RemoteImage.swift in Sources */,
 				7188E6672688B99E007CFD78 /* VisualEffectView.swift in Sources */,
 				7188E65F26889147007CFD78 /* SignOutView.swift in Sources */,
 			);
@@ -392,7 +396,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"Broadcast/Preview Content\"";
 				DEVELOPMENT_TEAM = YC249PY26F;
 				ENABLE_PREVIEWS = YES;
@@ -415,7 +419,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"Broadcast/Preview Content\"";
 				DEVELOPMENT_TEAM = YC249PY26F;
 				ENABLE_PREVIEWS = YES;
