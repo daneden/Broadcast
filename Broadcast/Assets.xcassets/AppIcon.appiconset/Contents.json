@@ -55,7 +55,7 @@
       "size" : "60x60"
     },
     {
-      "filename" : "app-icon-20@1x.png",
+      "filename" : "app-icon-20@1x-1.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "20x20"
@@ -79,7 +79,7 @@
       "size" : "29x29"
     },
     {
-      "filename" : "app-icon-40@1x.png",
+      "filename" : "app-icon-40@1x-1.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "40x40"
@@ -91,25 +91,25 @@
       "size" : "40x40"
     },
     {
-      "filename" : "app-icon-76@1x.png",
+      "filename" : "app-icon-76@1x-1.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "76x76"
     },
     {
-      "filename" : "app-icon-76@2x.png",
+      "filename" : "app-icon-76@2x-1.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "76x76"
     },
     {
-      "filename" : "app-icon-83.5@2x.png",
+      "filename" : "app-icon-83.5@2x-1.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "83.5x83.5"
     },
     {
-      "filename" : "app-icon-1024@1x.png",
+      "filename" : "app-icon-1024@1x-1.png",
       "idiom" : "ios-marketing",
       "scale" : "1x",
       "size" : "1024x1024"

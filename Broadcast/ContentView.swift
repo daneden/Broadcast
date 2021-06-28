@@ -72,6 +72,10 @@ struct ContentView: View {
     }
   }
   
+  private var imageHeightCompensation: CGFloat {
+    twitterClient.image == nil ? 0 : bottomPadding
+  }
+  
   var body: some View {
     GeometryReader { geom in
       ZStack(alignment: .bottom) {
@@ -88,13 +92,9 @@ struct ContentView: View {
                     .accessibility(hidden: true)
                   
                   TextEditor(text: Binding($twitterClient.tweet, replacingNilWith: ""))
-                    .frame(minHeight: geom.size.height / 2, alignment: .leading)
                     .foregroundColor(Color(.label))
                     .multilineTextAlignment(.leading)
                     .keyboardType(.twitter)
-                    .introspectTextView { textView in
-                      textView.isScrollEnabled = false
-                    }
                 }
                 .font(.broadcastTitle2)
                 
@@ -102,12 +102,13 @@ struct ContentView: View {
                 
                 Text("\(280 - charCount)\(tweetLengthWarning)")
                   .foregroundColor(charCount > 200 ? charCount >= 280 ? Color(.systemRed) : Color(.systemOrange) : .secondary)
-                  .font(.system(size: min(captionSize * max(CGFloat(charCount) / 280, 1), 80), weight: .bold, design: .rounded))
+                  .font(.system(size: min(captionSize * max(CGFloat(charCount) / 280, 1), 28), weight: .bold, design: .rounded))
                   .multilineTextAlignment(.trailing)
               }
               .padding()
               .background(Color(.tertiarySystemGroupedBackground))
               .cornerRadius(captionSize)
+              .frame(height: geom.size.height - (bottomPadding + (captionSize * 2)) - imageHeightCompensation, alignment: .topLeading)
               
               if case .error(let errorMessage) = twitterClient.state {
                 Text(errorMessage ?? "Some weird kind of error occurred; @_dte is probably to blame since he made this app.")
