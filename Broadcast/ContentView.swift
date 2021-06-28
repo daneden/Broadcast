@@ -14,6 +14,9 @@ let placeholderCandidates: [String] = [
   "Oh hey uh, what’s up",
   "What’s Twitter?",
   "Tweet away, sweet child",
+  "Say something nice",
+  "Cowabunga, dude",
+  "You’re doing a great job"
 ]
 
 struct ContentView: View {
@@ -193,6 +196,11 @@ struct ContentView: View {
       .onAppear {
         UITextView.appearance().backgroundColor = .clear
       }
+      .onShake {
+        rotatePlaceholder()
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
+      }
     }
   }
   
@@ -208,7 +216,17 @@ struct ContentView: View {
     
     twitterClient.sendTweet(tweet: tweetText ?? "")
     
-    placeholder = placeholderCandidates.randomElement()
+    rotatePlaceholder()
+  }
+  
+  func rotatePlaceholder() {
+    var newPlaceholder = placeholder
+    
+    while newPlaceholder == placeholder {
+      newPlaceholder = placeholderCandidates.randomElement()
+    }
+    
+    placeholder = newPlaceholder
   }
 }
 

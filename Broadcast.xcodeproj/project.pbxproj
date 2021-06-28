@@ -34,6 +34,7 @@
 		7188E66C2688DB44007CFD78 /* UIApplication.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E66B2688DB44007CFD78 /* UIApplication.extension.swift */; };
 		719087CD26891586005B96CE /* TwitterText in Frameworks */ = {isa = PBXBuildFile; productRef = 719087CC26891586005B96CE /* TwitterText */; };
 		719087CF26891C7F005B96CE /* Array.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 719087CE26891C7F005B96CE /* Array.extension.swift */; };
+		71E36FFB2689EED40078D956 /* ShakeModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E36FFA2689EED40078D956 /* ShakeModifier.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +63,7 @@
 		7188E6662688B99E007CFD78 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
 		7188E66B2688DB44007CFD78 /* UIApplication.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.extension.swift; sourceTree = "<group>"; };
 		719087CE26891C7F005B96CE /* Array.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Array.extension.swift; sourceTree = "<group>"; };
+		71E36FFA2689EED40078D956 /* ShakeModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeModifier.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,6 +142,7 @@
 				7188E6432687B488007CFD78 /* HMACSHA1Hash.swift */,
 				7188E64C2687C6A1007CFD78 /* Binding.extension.swift */,
 				7188E6642688A436007CFD78 /* ThemeHelper.swift */,
+				71E36FFA2689EED40078D956 /* ShakeModifier.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -256,6 +259,7 @@
 				7188E6422687B444007CFD78 /* ParameterStringParser.swift in Sources */,
 				7188E6532687D16C007CFD78 /* ThumbnailFilmstrip.swift in Sources */,
 				7188E64B2687C44D007CFD78 /* String.extension.swift in Sources */,
+				71E36FFB2689EED40078D956 /* ShakeModifier.swift in Sources */,
 				719087CF26891C7F005B96CE /* Array.extension.swift in Sources */,
 				7188E64D2687C6A1007CFD78 /* Binding.extension.swift in Sources */,
 				7188E6672688B99E007CFD78 /* VisualEffectView.swift in Sources */,
