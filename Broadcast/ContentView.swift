@@ -202,9 +202,14 @@ struct ContentView: View {
       }
       .onShake {
         rotatePlaceholder()
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.success)
+        Haptics.shared.sendStandardFeedback(feedbackType: .success)
       }
+      .onChange(of: validTweet) { isValid in
+        if !isValid && tweetText?.count != 0 {
+          Haptics.shared.sendStandardFeedback(feedbackType: .warning)
+        }
+      }
+      
     }
   }
   

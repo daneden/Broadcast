@@ -33,8 +33,7 @@ struct WelcomeView: View {
           )
           .onTapGesture {
             themeHelper.rotateTheme()
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.success)
+            Haptics.shared.sendStandardFeedback(feedbackType: .success)
             
             withAnimation(animation) {
               rotation = Double.random(in: -7...7)

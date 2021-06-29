@@ -18,8 +18,6 @@ struct BroadcastButtonStyle: ButtonStyle {
   var isFullWidth = true
   var isLoading = false
   
-  @State private var engine: CHHapticEngine?
-  
   var backgroundColor: some View {
     Group {
       switch prominence {
@@ -68,34 +66,11 @@ struct BroadcastButtonStyle: ButtonStyle {
     .clipShape(Capsule())
     .scaleEffect(configuration.isPressed ? 0.95 : 1)
     .animation(.interactiveSpring(), value: configuration.isPressed)
-    .onAppear { prepareHaptics() }
     .onChange(of: configuration.isPressed) { isPressed in
-      guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-      var events = [CHHapticEvent]()
-      
-      let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: isPressed ? 0.8 : 0.4)
-      let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: isPressed ? 1 : 0.7)
-      let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 0)
-      events.append(event)
-      
-      do {
-        let pattern = try CHHapticPattern(events: events, parameters: [])
-        let player = try engine?.makePlayer(with: pattern)
-        try player?.start(atTime: 0)
-      } catch {
-        print("Failed to play pattern: \(error.localizedDescription).")
-      }
-    }
-  }
-  
-  func prepareHaptics() {
-    guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-    
-    do {
-      self.engine = try CHHapticEngine()
-      try engine?.start()
-    } catch {
-      print("There was an error creating the engine: \(error.localizedDescription)")
+      Haptics.shared.sendFeedback(
+        intensity: isPressed ? 0.8 : 0.4,
+        sharpness: isPressed ? 1 : 0.7
+      )
     }
   }
 }

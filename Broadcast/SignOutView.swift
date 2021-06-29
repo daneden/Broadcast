@@ -15,7 +15,6 @@ struct SignOutView: View {
   
   @State private var offset = CGSize.zero
   @State private var willDelete = false
-  @State private var engine: CHHapticEngine?
   
   @ScaledMetric var size: CGFloat = 88
   
@@ -51,8 +50,7 @@ struct SignOutView: View {
           .clipShape(Circle())
           .onTapGesture {
             themeHelper.rotateTheme()
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.success)
+            Haptics.shared.sendStandardFeedback(feedbackType: .success)
           }
         .offset(offset)
         .highPriorityGesture(
@@ -94,40 +92,15 @@ struct SignOutView: View {
       .opacity(labelOpacity)
     }
     .padding()
-    .onAppear { prepareHaptics() }
     .onChange(of: willDelete) { willDelete in
-      guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-      var events = [CHHapticEvent]()
-      
-      let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: willDelete ? 1 : 0.3)
-      let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: willDelete ? 1 : 0.3)
-      let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 0)
-      events.append(event)
-      
-      do {
-        let pattern = try CHHapticPattern(events: events, parameters: [])
-        let player = try engine?.makePlayer(with: pattern)
-        try player?.start(atTime: 0)
-      } catch {
-        print("Failed to play pattern: \(error.localizedDescription).")
-      }
+      let v: Float = willDelete ? 1 : 0.3
+      Haptics.shared.sendFeedback(intensity: v, sharpness: v)
     }.accentColor(themeHelper.color)
   }
   
   func startSignOut() {
     twitterClient.signOut()
     presentationMode.wrappedValue.dismiss()
-  }
-  
-  func prepareHaptics() {
-    guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-    
-    do {
-      self.engine = try CHHapticEngine()
-      try engine?.start()
-    } catch {
-      print("There was an error creating the engine: \(error.localizedDescription)")
-    }
   }
 }
 
