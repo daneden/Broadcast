@@ -18,8 +18,6 @@ struct BroadcastButtonStyle: ButtonStyle {
   var isFullWidth = true
   var isLoading = false
   
-  @State var hapticError = false
-  
   var backgroundColor: some View {
     Group {
       switch prominence {
@@ -49,14 +47,11 @@ struct BroadcastButtonStyle: ButtonStyle {
   func makeBody(configuration: Configuration) -> some View {
     HStack {
       if isFullWidth { Spacer(minLength: 0) }
+      
       configuration.label
         .font(.broadcastBody.bold())
         .opacity(configuration.isPressed ? 0.8 : 1)
         .opacity(isLoading ? 0 : 1)
-      
-      if hapticError {
-        Image(systemName: "ant.fill")
-      }
       
       if isFullWidth { Spacer(minLength: 0) }
     }
