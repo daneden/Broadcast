@@ -84,11 +84,26 @@ struct ContentView: View {
       ZStack(alignment: .bottom) {
         ScrollView {
           VStack {
+            if case .error(let errorMessage) = twitterClient.state {
+              Text(errorMessage ?? "Some weird kind of error occurred; @_dte is probably to blame since he made this app.")
+                .font(.broadcastFootnote.weight(.semibold))
+                .foregroundColor(Color(.systemRed))
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color(.systemRed).opacity(0.2))
+                .cornerRadius(captionSize)
+                .onTapGesture {
+                  withAnimation {
+                    twitterClient.state = .idle
+                  }
+                }
+            }
+            
             if $twitterClient.user.wrappedValue != nil {
               VStack(alignment: .trailing) {
                 HStack(alignment: .top) {
                   if let profileImageURL = twitterClient.profileImageURL {
-                    RemoteImage(url: profileImageURL.absoluteString)
+                    RemoteImage(url: profileImageURL, placeholder: { ProgressView() })
                       .frame(width: 36, height: 36)
                       .cornerRadius(36)
                       .onTapGesture {
@@ -125,21 +140,6 @@ struct ContentView: View {
               .background(Color(.tertiarySystemGroupedBackground))
               .cornerRadius(captionSize)
               .frame(height: geom.size.height - (bottomPadding + (captionSize * 2)) - imageHeightCompensation, alignment: .topLeading)
-              
-              if case .error(let errorMessage) = twitterClient.state {
-                Text(errorMessage ?? "Some weird kind of error occurred; @_dte is probably to blame since he made this app.")
-                  .font(.broadcastFootnote.weight(.semibold))
-                  .foregroundColor(Color(.systemRed))
-                  .padding()
-                  .frame(maxWidth: .infinity)
-                  .background(Color(.systemRed).opacity(0.2))
-                  .cornerRadius(captionSize)
-                  .onTapGesture {
-                    withAnimation {
-                      twitterClient.state = .idle
-                    }
-                  }
-              }
               
               AttachmentThumbnail(image: $twitterClient.image)
             } else {
@@ -205,7 +205,7 @@ struct ContentView: View {
         Haptics.shared.sendStandardFeedback(feedbackType: .success)
       }
       .onChange(of: validTweet) { isValid in
-        if !isValid && tweetText?.count != 0 {
+        if !isValid && charCount > 280 {
           Haptics.shared.sendStandardFeedback(feedbackType: .warning)
         }
       }

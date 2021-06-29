@@ -6,78 +6,59 @@
 //
 
 import SwiftUI
+import Combine
+import UIKit
 
-#if os(macOS)
-typealias NativeImage = NSImage
-#else
-typealias NativeImage = UIImage
-#endif
-
-import SwiftUI
-
-struct RemoteImage: View {
-  private enum LoadState {
-    case loading, success, failure
+class ImageLoader: ObservableObject {
+  @Published var image: UIImage?
+  private let url: URL
+  
+  init(url: URL) {
+    self.url = url
   }
   
-  private class Loader: ObservableObject {
-    var data = Data()
-    var state = LoadState.loading
-    
-    init(url: String) {
-      guard let parsedURL = URL(string: url) else {
-        fatalError("Invalid URL: \(url)")
+  deinit {
+    cancel()
+  }
+  
+  private var cancellable: AnyCancellable?
+  
+  func load() {
+    cancellable = URLSession.shared.dataTaskPublisher(for: url)
+      .map { UIImage(data: $0.data) }
+      .replaceError(with: nil)
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] image in
+        withAnimation { self?.image = image }
       }
-      
-      URLSession.shared.dataTask(with: parsedURL) { data, _, _ in
-        if let data = data, !data.isEmpty {
-          self.data = data
-          self.state = .success
-        } else {
-          self.state = .failure
-        }
-        
-        DispatchQueue.main.async {
-          self.objectWillChange.send()
-        }
-      }.resume()
-    }
   }
   
-  @StateObject private var loader: Loader
-  var loading: Image
-  var failure: Image
+  func cancel() {
+    cancellable?.cancel()
+  }
+}
+
+struct RemoteImage<Placeholder: View>: View {
+  @StateObject private var loader: ImageLoader
+  private let placeholder: Placeholder
+  
+  init(url: URL, @ViewBuilder placeholder: () -> Placeholder) {
+    self.placeholder = placeholder()
+    _loader = StateObject(wrappedValue: ImageLoader(url: url))
+  }
   
   var body: some View {
-    selectImage()
-      .resizable()
-      .foregroundColor(.accentColor)
-      .opacity(loader.state == .loading ? 0 : 1)
+    content
+      .onAppear(perform: loader.load)
   }
   
-  init(url: String,
-       loading: Image = Image(systemName: "person.crop.circle"),
-       failure: Image = Image(systemName: "person.crop.circle")) {
-    _loader = StateObject(wrappedValue: Loader(url: url))
-    self.loading = loading
-    self.failure = failure
-  }
-  
-  private func selectImage() -> Image {
-    switch loader.state {
-    case .loading:
-      return loading
-    case .failure:
-      return failure
-    default:
-      if let image = NativeImage(data: loader.data) {
-        #if os(macOS)
-        return Image(nsImage: image)
-        #else
-        return Image(uiImage: image)
-        #endif
+  private var content: some View {
+    Group {
+      if loader.image != nil {
+        Image(uiImage: loader.image!)
+          .resizable()
       } else {
-        return failure
+        placeholder
       }
     }
   }

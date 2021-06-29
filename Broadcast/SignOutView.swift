@@ -35,8 +35,8 @@ struct SignOutView: View {
       
       VStack {
         Group {
-          if let profileImageURL = twitterClient.profileImageURL?.absoluteString {
-            RemoteImage(url: profileImageURL)
+          if let profileImageURL = twitterClient.profileImageURL {
+            RemoteImage(url: profileImageURL, placeholder: { ProgressView() })
               .cornerRadius(size)
           } else {
             Image("person.fill")
