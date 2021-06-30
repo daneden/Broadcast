@@ -19,7 +19,7 @@ struct ContentView: View {
   @State var sendingTweet = false
   
   private var imageHeightCompensation: CGFloat {
-    twitterClient.image == nil ? 0 : bottomPadding
+    twitterClient.draft.media == nil ? 0 : bottomPadding
   }
   
   var body: some View {
@@ -49,7 +49,7 @@ struct ContentView: View {
                   alignment: .topLeading
                 )
               
-              AttachmentThumbnail(image: $twitterClient.image)
+              AttachmentThumbnail(image: $twitterClient.draft.media)
             } else {
               WelcomeView()
             }
@@ -70,7 +70,7 @@ struct ContentView: View {
                   .font(.broadcastHeadline)
               }
               .buttonStyle(BroadcastButtonStyle(isLoading: twitterClient.state == .busy))
-              .disabled(!twitterClient.tweetIsValid)
+              .disabled(!twitterClient.draft.isValid)
               
               Button(action: {
                 photoPickerIsPresented.toggle()
@@ -100,7 +100,7 @@ struct ContentView: View {
         .gesture(DragGesture().onEnded({ _ in UIApplication.shared.endEditing() }))
       }
       .sheet(isPresented: $photoPickerIsPresented) {
-        ImagePicker(image: $twitterClient.image)
+        ImagePicker(image: $twitterClient.draft.media)
       }
       .sheet(isPresented: $signOutScreenIsPresented) {
         SignOutView()

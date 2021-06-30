@@ -30,7 +30,7 @@ struct ComposerView: View {
   @State private var placeholder: String = placeholderCandidates.randomElement()
   
   private var tweetText: String? {
-    twitterClient.tweet
+    twitterClient.draft.text
   }
   
   private var charCount: Int {
@@ -65,7 +65,7 @@ struct ComposerView: View {
   var body: some View {
     VStack(alignment: .trailing) {
       HStack(alignment: .top) {
-        if let profileImageURL = twitterClient.profileImageURL {
+        if let profileImageURL = twitterClient.user?.profileImageURL {
           RemoteImage(url: profileImageURL, placeholder: { ProgressView() })
             .frame(width: 36, height: 36)
             .cornerRadius(36)
@@ -83,7 +83,7 @@ struct ComposerView: View {
             .opacity(tweetText == nil ? 1 : 0)
             .accessibility(hidden: true)
           
-          TextEditor(text: Binding($twitterClient.tweet, replacingNilWith: ""))
+          TextEditor(text: Binding($twitterClient.draft.text, replacingNilWith: ""))
             .foregroundColor(Color(.label))
             .multilineTextAlignment(.leading)
             .keyboardType(.twitter)
@@ -106,7 +106,7 @@ struct ComposerView: View {
       rotatePlaceholder()
       Haptics.shared.sendStandardFeedback(feedbackType: .success)
     }
-    .onChange(of: twitterClient.tweetIsValid) { isValid in
+    .onChange(of: twitterClient.draft.isValid) { isValid in
       if !isValid && charCount > 280 {
         Haptics.shared.sendStandardFeedback(feedbackType: .warning)
       }
