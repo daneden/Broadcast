@@ -33,6 +33,7 @@
 		71A1088A268B073B007E1FFB /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A10889268B073B007E1FFB /* Haptics.swift */; };
 		71AA4AC6268A032400B7B577 /* RemoteImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71AA4AC5268A032400B7B577 /* RemoteImage.swift */; };
 		71BBAAE9268CF1BD004048A0 /* ComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71BBAAE8268CF1BD004048A0 /* ComposerView.swift */; };
+		71BBAAEB268CF532004048A0 /* TwitterAPI-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 71BBAAEA268CF532004048A0 /* TwitterAPI-Info.plist */; };
 		71E36FFB2689EED40078D956 /* ShakeModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E36FFA2689EED40078D956 /* ShakeModifier.swift */; };
 /* End PBXBuildFile section */
 
@@ -61,6 +62,7 @@
 		71A10889268B073B007E1FFB /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		71AA4AC5268A032400B7B577 /* RemoteImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImage.swift; sourceTree = "<group>"; };
 		71BBAAE8268CF1BD004048A0 /* ComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposerView.swift; sourceTree = "<group>"; };
+		71BBAAEA268CF532004048A0 /* TwitterAPI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TwitterAPI-Info.plist"; sourceTree = "<group>"; };
 		71E36FFA2689EED40078D956 /* ShakeModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeModifier.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -108,6 +110,7 @@
 				7188E6452687B6AF007CFD78 /* Helper Views */,
 				7188E6402687B431007CFD78 /* Helpers */,
 				7188E62E2687B0FF007CFD78 /* Preview Content */,
+				71BBAAEA268CF532004048A0 /* TwitterAPI-Info.plist */,
 			);
 			path = Broadcast;
 			sourceTree = "<group>";
@@ -228,6 +231,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7188E6302687B0FF007CFD78 /* Preview Assets.xcassets in Resources */,
+				71BBAAEB268CF532004048A0 /* TwitterAPI-Info.plist in Resources */,
 				7188E62D2687B0FF007CFD78 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
