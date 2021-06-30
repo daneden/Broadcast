@@ -17,20 +17,21 @@ class Haptics {
     CHHapticEngine.capabilitiesForHardware().supportsHaptics
   }
   
+  init() {
+    prepareHaptics()
+  }
+  
   deinit {
     engine?.stop()
   }
   
-  func sendFeedback(intensity: Float, sharpness: Float) {
+  func sendFeedback(
+    intensity: Float,
+    sharpness: Float
+  ) {
+    try? engine?.start()
+    
     guard Haptics.isSupported else { return }
-    
-    do {
-      try engine = CHHapticEngine()
-      try engine?.start()
-    } catch let error {
-      print(error.localizedDescription)
-    }
-    
     var events = [CHHapticEvent]()
     
     let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: intensity)
@@ -45,12 +46,22 @@ class Haptics {
     } catch {
       print("Failed to play pattern: \(error.localizedDescription).")
     }
-    
-    engine?.stop()
   }
   
   func sendStandardFeedback(feedbackType: UINotificationFeedbackGenerator.FeedbackType) {
     let generator = UINotificationFeedbackGenerator()
     generator.notificationOccurred(feedbackType)
+  }
+  
+  func prepareHaptics() {
+    guard Haptics.isSupported else { return }
+    
+    do {
+      self.engine = try CHHapticEngine()
+      
+      try engine?.start()
+    } catch {
+      print("There was an error creating the engine: \(error.localizedDescription)")
+    }
   }
 }
