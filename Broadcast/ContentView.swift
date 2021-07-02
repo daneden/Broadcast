@@ -18,11 +18,13 @@ struct ContentView: View {
   @State var signOutScreenIsPresented = false
   @State var sendingTweet = false
   @State var replying = false
+  @State var replyBoxHeight: CGFloat = 0
   
   private var coordinateSpaceName = "mainViewCoordinateSpace"
   
   private var imageHeightCompensation: CGFloat {
-    twitterClient.draft.media == nil ? 0 : bottomPadding
+    (twitterClient.draft.media == nil ? 0 : bottomPadding) +
+      (replying ? replyBoxHeight : 0)
   }
   
   var body: some View {
@@ -30,28 +32,18 @@ struct ContentView: View {
       ZStack(alignment: .bottom) {
         ScrollView { ScrollViewReader { proxy in
           VStack {
-            Group {
-              if let lastTweet = twitterClient.lastTweet {
-                if !replying {
-                  PullDownControlView(
-                    coordinateSpace: .named(coordinateSpaceName),
-                    onPullDown: {
-                      replying = true
-                    },
-                    content: {
-                      LastTweetReplyView(lastTweet: lastTweet, replying: replying)
-                    })
-                    .onAppear {
-                      proxy.scrollTo("composer", anchor: .top)
-                    }
-                } else {
-                  LastTweetReplyView(lastTweet: lastTweet, replying: replying)
-                    .onTapGesture {
-                      withAnimation { replying = false }
-                    }
+            if replying, let lastTweet = twitterClient.lastTweet {
+              LastTweetReplyView(lastTweet: lastTweet, replying: replying)
+                .onTapGesture {
+                  withAnimation {
+                    replying = false
+                    proxy.scrollTo("composer", anchor: .top)
+                  }
                 }
-              }
-            }.animation(.default, value: replying)
+                .onAppear {
+                  replyBoxHeight = geom.frame(in: .global).minY
+                }
+            }
             
             if case .error(let errorMessage) = twitterClient.state {
               Text(errorMessage ?? "Some weird kind of error occurred; @_dte is probably to blame since he made this app.")
@@ -97,15 +89,51 @@ struct ContentView: View {
                 if replying, let replyId = twitterClient.lastTweet?.id {
                   twitterClient.sendReply(to: replyId)
                 } else {
-                  twitterClient.sendTweet()
+                  withAnimation(.spring()) { replying = true }
                 }
-                UIApplication.shared.endEditing()
               }) {
-                Label("Send Tweet", systemImage: "paperplane.fill")
-                  .font(.broadcastHeadline)
+                if replying {
+                  Label("Send Reply", systemImage: "arrowshape.turn.up.left.fill")
+                    .font(.broadcastHeadline)
+                } else {
+                  Label("Send Reply", systemImage: "arrowshape.turn.up.left.fill")
+                    .font(.broadcastHeadline)
+                    .labelStyle(IconOnlyLabelStyle())
+                }
               }
-              .buttonStyle(BroadcastButtonStyle(isLoading: twitterClient.state == .busy))
-              .disabled(!twitterClient.draft.isValid)
+              .buttonStyle(
+                BroadcastButtonStyle(
+                  prominence: replying ? .primary : .secondary,
+                  isFullWidth: replying,
+                  isLoading: twitterClient.state == .busy && replying
+                )
+              )
+              .disabled(replying && !twitterClient.draft.isValid)
+              
+              Button(action: {
+                if !replying {
+                  twitterClient.sendTweet()
+                } else {
+                  withAnimation(.spring()) { replying = false }
+                }
+              }) {
+                if !replying {
+                  Label("Send Tweet", systemImage: "paperplane.fill")
+                    .font(.broadcastHeadline)
+                } else {
+                  Label("Send Tweet", systemImage: "paperplane.fill")
+                    .font(.broadcastHeadline)
+                    .labelStyle(IconOnlyLabelStyle())
+                }
+              }
+              .buttonStyle(
+                BroadcastButtonStyle(
+                  prominence: !replying ? .primary : .secondary,
+                  isFullWidth: !replying,
+                  isLoading: twitterClient.state == .busy && !replying
+                )
+              )
+              .disabled(!replying && !twitterClient.draft.isValid)
               
               Button(action: {
                 photoPickerIsPresented.toggle()
