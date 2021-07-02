@@ -37,7 +37,7 @@ struct BroadcastButtonStyle: ButtonStyle {
   var isFullWidth = true
   var isLoading = false
   
-  var backgroundColor: some View {
+  var background: some View {
     Group {
       switch prominence {
       case .primary:
@@ -75,7 +75,7 @@ struct BroadcastButtonStyle: ButtonStyle {
       if isFullWidth { Spacer(minLength: 0) }
     }
     .padding(paddingSize)
-    .background(backgroundColor.padding(-paddingSize))
+    .background(background.padding(-paddingSize))
     .foregroundColor(foregroundColor)
     .overlay(
       Group {

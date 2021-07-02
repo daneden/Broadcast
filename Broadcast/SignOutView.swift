@@ -9,6 +9,7 @@ import SwiftUI
 import CoreHaptics
 
 struct SignOutView: View {
+  @Environment(\.colorScheme) var colorScheme
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject var twitterClient: TwitterClient
   @EnvironmentObject var themeHelper: ThemeHelper
@@ -21,6 +22,8 @@ struct SignOutView: View {
   var labelOpacity: Double {
     Double(1 - abs(offset.height) / 200)
   }
+  
+  @State private var animating = false
   
   var body: some View {
     VStack {
@@ -38,21 +41,28 @@ struct SignOutView: View {
           if let profileImageURL = twitterClient.user?.profileImageURL {
             RemoteImage(url: profileImageURL, placeholder: { ProgressView() })
               .aspectRatio(contentMode: .fill)
-              .cornerRadius(size)
+              .clipShape(Circle())
           } else {
             Image(systemName: "person.crop.circle.fill")
               .resizable()
           }
         }
-          .foregroundColor(.white)
-          .padding(8)
-          .frame(width: size, height: size)
-          .background(willDelete ? Color(.secondarySystemBackground) : .accentColor)
-          .clipShape(Circle())
-          .onTapGesture {
-            themeHelper.rotateTheme()
-            Haptics.shared.sendStandardFeedback(feedbackType: .success)
-          }
+        .shadow(
+          color: (willDelete || colorScheme == .dark) ? .black.opacity(0.2) : .accentColor,
+          radius: 8, x: 0, y: 4
+        )
+        .foregroundColor(.white)
+        .padding(8)
+        .frame(width: size, height: size)
+        .background(willDelete
+                      ? Color(.secondarySystemBackground)
+                      : .accentColor.opacity(colorScheme == .dark ? 0.9 : 0.5)
+        )
+        .clipShape(Circle())
+        .onTapGesture {
+          themeHelper.rotateTheme()
+          Haptics.shared.sendStandardFeedback(feedbackType: .success)
+        }
         .offset(offset)
         .highPriorityGesture(
           DragGesture()
@@ -96,7 +106,8 @@ struct SignOutView: View {
     .onChange(of: willDelete) { willDelete in
       let v: Float = willDelete ? 1 : 0.3
       Haptics.shared.sendFeedback(intensity: v, sharpness: v)
-    }.accentColor(themeHelper.color)
+    }
+    .accentColor(themeHelper.color)
   }
   
   func startSignOut() {
@@ -106,7 +117,7 @@ struct SignOutView: View {
 }
 
 struct SignOutView_Previews: PreviewProvider {
-    static var previews: some View {
-        SignOutView()
-    }
+  static var previews: some View {
+    SignOutView()
+  }
 }
