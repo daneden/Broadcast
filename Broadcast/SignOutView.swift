@@ -37,6 +37,7 @@ struct SignOutView: View {
         Group {
           if let profileImageURL = twitterClient.user?.profileImageURL {
             RemoteImage(url: profileImageURL, placeholder: { ProgressView() })
+              .aspectRatio(contentMode: .fill)
               .cornerRadius(size)
           } else {
             Image("person")
