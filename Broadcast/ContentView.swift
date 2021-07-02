@@ -30,15 +30,12 @@ struct ContentView: View {
   var body: some View {
     GeometryReader { geom in
       ZStack(alignment: .bottom) {
-        ScrollView { ScrollViewReader { proxy in
+        ScrollView {
           VStack {
             if replying, let lastTweet = twitterClient.lastTweet {
               LastTweetReplyView(lastTweet: lastTweet, replying: replying)
                 .onTapGesture {
-                  withAnimation {
-                    replying = false
-                    proxy.scrollTo("composer", anchor: .top)
-                  }
+                  withAnimation { replying = false }
                 }
                 .onAppear {
                   replyBoxHeight = geom.frame(in: .global).minY
@@ -66,10 +63,6 @@ struct ContentView: View {
                   height: geom.size.height - (bottomPadding + (captionSize * 2)) - imageHeightCompensation,
                   alignment: .topLeading
                 )
-                .id("composer")
-                .onAppear {
-                  withAnimation { proxy.scrollTo("composer", anchor: .top) }
-                }
               
               AttachmentThumbnail(image: $twitterClient.draft.media)
             } else {
@@ -79,36 +72,38 @@ struct ContentView: View {
           .padding()
           .padding(.bottom, bottomPadding)
           .frame(maxWidth: geom.size.width)
-        }}
+        }
         .coordinateSpace(name: coordinateSpaceName)
         
         VStack {
           if twitterClient.user != nil {
             HStack {
-              Button(action: {
-                if replying, let replyId = twitterClient.lastTweet?.id {
-                  twitterClient.sendReply(to: replyId)
-                } else {
-                  withAnimation(.spring()) { replying = true }
+              if let replyId = twitterClient.lastTweet?.id {
+                Button(action: {
+                  if replying {
+                    twitterClient.sendReply(to: replyId)
+                  } else {
+                    withAnimation(.spring()) { replying = true }
+                  }
+                }) {
+                  if replying {
+                    Label("Send Reply", systemImage: "arrowshape.turn.up.left.fill")
+                      .font(.broadcastHeadline)
+                  } else {
+                    Label("Send Reply", systemImage: "arrowshape.turn.up.left.fill")
+                      .font(.broadcastHeadline)
+                      .labelStyle(IconOnlyLabelStyle())
+                  }
                 }
-              }) {
-                if replying {
-                  Label("Send Reply", systemImage: "arrowshape.turn.up.left.fill")
-                    .font(.broadcastHeadline)
-                } else {
-                  Label("Send Reply", systemImage: "arrowshape.turn.up.left.fill")
-                    .font(.broadcastHeadline)
-                    .labelStyle(IconOnlyLabelStyle())
-                }
-              }
-              .buttonStyle(
-                BroadcastButtonStyle(
-                  prominence: replying ? .primary : .secondary,
-                  isFullWidth: replying,
-                  isLoading: twitterClient.state == .busy && replying
+                .buttonStyle(
+                  BroadcastButtonStyle(
+                    prominence: replying ? .primary : .secondary,
+                    isFullWidth: replying,
+                    isLoading: twitterClient.state == .busy && replying
+                  )
                 )
-              )
-              .disabled(replying && !twitterClient.draft.isValid)
+                .disabled(replying && !twitterClient.draft.isValid)
+              }
               
               Button(action: {
                 if !replying {
