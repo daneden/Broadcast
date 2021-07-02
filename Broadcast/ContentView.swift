@@ -166,6 +166,9 @@ struct ContentView: View {
       .onAppear {
         UITextView.appearance().backgroundColor = .clear
       }
+      .onChange(of: replying) { _ in
+        twitterClient.revalidateAccount()
+      }
     }
   }
 }

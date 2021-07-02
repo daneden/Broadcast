@@ -67,6 +67,7 @@ struct ComposerView: View {
       HStack(alignment: .top) {
         if let profileImageURL = twitterClient.user?.profileImageURL {
           RemoteImage(url: profileImageURL, placeholder: { ProgressView() })
+            .aspectRatio(contentMode: .fill)
             .frame(width: 36, height: 36)
             .cornerRadius(36)
             .onTapGesture {

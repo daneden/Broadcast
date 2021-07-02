@@ -85,6 +85,7 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   func signOut() {
     self.user = nil
     self.draft = .init()
+    self.lastTweet = nil
     KeychainWrapper.standard.remove(forKey: "broadcast-credentials")
   }
   
