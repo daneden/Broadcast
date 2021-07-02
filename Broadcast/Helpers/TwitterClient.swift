@@ -12,6 +12,7 @@ import TwitterText
 import UIKit
 import AuthenticationServices
 import SwiftKeychainWrapper
+import SwiftUI
 
 class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
   func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
@@ -21,6 +22,7 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   @Published var user: User?
   @Published var draft = Tweet()
   @Published var state: State = .idle
+  @Published var lastTweet: Tweet?
   
   private var client = Swifter.init(consumerKey: ClientCredentials.apiKey, consumerSecret: ClientCredentials.apiSecret)
   
@@ -31,10 +33,8 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
       self.client.client.credential = .init(accessToken: storedCredentials)
       if let userId = storedCredentials.userID,
          let screenName = storedCredentials.screenName {
-        DispatchQueue.main.async {
-          self.user = .init(id: userId, screenName: screenName)
-          self.revalidateAccount()
-        }
+        self.user = .init(id: userId, screenName: screenName)
+        self.revalidateAccount()
       }
     }
   }
@@ -60,27 +60,25 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   }
   
   func revalidateAccount() {
-    DispatchQueue.main.async {
-      self.state = .busy
-    }
-    
     guard let userId = user?.id else {
       self.signOut()
       return
     }
     
     client.showUser(.id(userId)) { json in
-      print(json)
+      /** If the `showUser` call was successful, we can reuse the result to update the user’s profile photo */
       guard let urlString = json["profile_image_url_https"].string else {
         return
       }
       
-      self.user?.profileImageURL = URL(string: urlString.replacingOccurrences(of: "_normal", with: ""))
+      withAnimation {
+        self.user?.profileImageURL = URL(string: urlString.replacingOccurrences(of: "_normal", with: ""))
+      }
+      
+      self.updateLastTweet(from: json["status"])
     } failure: { error in
       self.signOut()
-      DispatchQueue.main.async {
-        self.state = .error("Oh man, there was a problem signing in to Twitter. Maybe try it again.")
-      }
+      self.updateState(.error("Yikes; there was a problem signing in to Twitter. You’ll have to try signing in again."))
     }
   }
   
@@ -106,15 +104,89 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
     return .init(from: data)
   }
   
+  private func sendTweetCallback(response: JSON? = nil, error: Error? = nil, hasMedia: Bool = false) {
+    if let json = response {
+      self.updateLastTweet(from: json)
+      self.updateState(.idle)
+      self.draft = .init()
+      Haptics.shared.sendStandardFeedback(feedbackType: .success)
+    } else {
+      if let error = error {
+        print(error.localizedDescription)
+      }
+      
+      if hasMedia {
+        self.updateState(.genericTextAndMediaError)
+      } else {
+        self.updateState(.genericTextError)
+      }
+      
+      Haptics.shared.sendStandardFeedback(feedbackType: .error)
+    }
+  }
+  
   func sendTweet() {
-    // TODO
+    updateState(.busy)
+    
+    if let media = draft.media,
+       let mediaData = media.jpegData(compressionQuality: 80) {
+      client.postTweet(status: draft.text ?? "", media: mediaData) { json in
+        self.sendTweetCallback(response: json)
+      } failure: { error in
+        print(error.localizedDescription)
+        self.sendTweetCallback(hasMedia: true)
+      }
+    } else if let status = draft.text {
+      client.postTweet(status: status) { json in
+        self.sendTweetCallback(response: json)
+      } failure: { error in
+        print(error.localizedDescription)
+        self.sendTweetCallback()
+      }
+    }
+  }
+  
+  func sendReply(to id: String) {
+    updateState(.busy)
+    
+    if let mediaData = draft.mediaData {
+      client.postTweet(status: draft.text ?? "", media: mediaData, inReplyToStatusID: id) { json in
+        self.sendTweetCallback(response: json)
+      } failure: { error in
+        self.sendTweetCallback(error: error, hasMedia: false)
+      }
+    } else if let status = draft.text {
+      client.postTweet(status: status, inReplyToStatusID: id) { json in
+        self.sendTweetCallback(response: json)
+        Haptics.shared.sendStandardFeedback(feedbackType: .success)
+      } failure: { error in
+        self.sendTweetCallback(error: error, hasMedia: false)
+      }
+    }
+  }
+  
+  private func updateLastTweet(from json: JSON) {
+    guard let id = json["id_str"].string else { return }
+    var lastTweet = Tweet(id: id)
+    lastTweet.text = json["text"].string
+    
+    self.lastTweet = lastTweet
+  }
+  
+  private func updateState(_ newState: State) {
+    DispatchQueue.main.async {
+      self.state = newState
+    }
   }
 }
 
 extension TwitterClient {
   enum State: Equatable {
     case idle, busy
-    case error(_: String?)
+    case error(_: String? = nil)
+    
+    static var genericTextError = State.error("Oh man, something went wrong sending that tweet. It might be too long.")
+    static var genericTextAndMediaError = State.error("Oh man, something went wrong sending that tweet. Maybe it’s too long, or your chosen media is causing a problem.")
   }
   
   struct ClientCredentials {
@@ -155,15 +227,24 @@ extension TwitterClient {
   }
   
   struct Tweet {
+    var id: String?
     var text: String?
     var media: UIImage?
+    
+    var mediaData: Data? {
+      return media?.jpegData(compressionQuality: 80)
+    }
     
     var length: Int {
       TwitterText.tweetLength(text: text ?? "")
     }
     
     var isValid: Bool {
-      length <= 280
+      if media != nil {
+        return true
+      }
+      
+      return 1...280 ~= length
     }
   }
 }

@@ -17,6 +17,9 @@ struct ContentView: View {
   @State var photoPickerIsPresented = false
   @State var signOutScreenIsPresented = false
   @State var sendingTweet = false
+  @State var replying = false
+  
+  private var coordinateSpaceName = "mainViewCoordinateSpace"
   
   private var imageHeightCompensation: CGFloat {
     twitterClient.draft.media == nil ? 0 : bottomPadding
@@ -25,8 +28,31 @@ struct ContentView: View {
   var body: some View {
     GeometryReader { geom in
       ZStack(alignment: .bottom) {
-        ScrollView {
+        ScrollView { ScrollViewReader { proxy in
           VStack {
+            Group {
+              if let lastTweet = twitterClient.lastTweet {
+                if !replying {
+                  PullDownControlView(
+                    coordinateSpace: .named(coordinateSpaceName),
+                    onPullDown: {
+                      replying = true
+                    },
+                    content: {
+                      LastTweetReplyView(lastTweet: lastTweet, replying: replying)
+                    })
+                    .onAppear {
+                      proxy.scrollTo("composer", anchor: .top)
+                    }
+                } else {
+                  LastTweetReplyView(lastTweet: lastTweet, replying: replying)
+                    .onTapGesture {
+                      withAnimation { replying = false }
+                    }
+                }
+              }
+            }.animation(.default, value: replying)
+            
             if case .error(let errorMessage) = twitterClient.state {
               Text(errorMessage ?? "Some weird kind of error occurred; @_dte is probably to blame since he made this app.")
                 .font(.broadcastFootnote.weight(.semibold))
@@ -48,6 +74,10 @@ struct ContentView: View {
                   height: geom.size.height - (bottomPadding + (captionSize * 2)) - imageHeightCompensation,
                   alignment: .topLeading
                 )
+                .id("composer")
+                .onAppear {
+                  withAnimation { proxy.scrollTo("composer", anchor: .top) }
+                }
               
               AttachmentThumbnail(image: $twitterClient.draft.media)
             } else {
@@ -57,13 +87,18 @@ struct ContentView: View {
           .padding()
           .padding(.bottom, bottomPadding)
           .frame(maxWidth: geom.size.width)
-        }
+        }}
+        .coordinateSpace(name: coordinateSpaceName)
         
         VStack {
           if twitterClient.user != nil {
             HStack {
               Button(action: {
-                twitterClient.sendTweet()
+                if replying, let replyId = twitterClient.lastTweet?.id {
+                  twitterClient.sendReply(to: replyId)
+                } else {
+                  twitterClient.sendTweet()
+                }
                 UIApplication.shared.endEditing()
               }) {
                 Label("Send Tweet", systemImage: "paperplane.fill")
