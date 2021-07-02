@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		711F3FFA268F50C800605C89 /* Animation.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711F3FF9268F50C800605C89 /* Animation.extension.swift */; };
 		7188E6292687B0FE007CFD78 /* BroadcastApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6282687B0FE007CFD78 /* BroadcastApp.swift */; };
 		7188E62B2687B0FE007CFD78 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E62A2687B0FE007CFD78 /* ContentView.swift */; };
 		7188E62D2687B0FF007CFD78 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7188E62C2687B0FF007CFD78 /* Assets.xcassets */; };
@@ -39,6 +40,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		711F3FF9268F50C800605C89 /* Animation.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.extension.swift; sourceTree = "<group>"; };
 		7188E6252687B0FE007CFD78 /* Broadcast.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Broadcast.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7188E6282687B0FE007CFD78 /* BroadcastApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastApp.swift; sourceTree = "<group>"; };
 		7188E62A2687B0FE007CFD78 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 		7188E6392687B192007CFD78 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				711F3FF9268F50C800605C89 /* Animation.extension.swift */,
 				719087CE26891C7F005B96CE /* Array.extension.swift */,
 				7188E6602688A01F007CFD78 /* Font.extension.swift */,
 				7188E63A2687B19D007CFD78 /* Notification.extension.swift */,
@@ -284,6 +287,7 @@
 				71E36FFB2689EED40078D956 /* ShakeModifier.swift in Sources */,
 				719087CF26891C7F005B96CE /* Array.extension.swift in Sources */,
 				7188E64D2687C6A1007CFD78 /* Binding.extension.swift in Sources */,
+				711F3FFA268F50C800605C89 /* Animation.extension.swift in Sources */,
 				71AA4AC6268A032400B7B577 /* RemoteImage.swift in Sources */,
 				7188E6672688B99E007CFD78 /* VisualEffectView.swift in Sources */,
 				7188E65F26889147007CFD78 /* SignOutView.swift in Sources */,
@@ -417,7 +421,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 26;
 				DEVELOPMENT_ASSET_PATHS = "\"Broadcast/Preview Content\"";
 				DEVELOPMENT_TEAM = YC249PY26F;
 				ENABLE_PREVIEWS = YES;
@@ -440,7 +444,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 26;
 				DEVELOPMENT_ASSET_PATHS = "\"Broadcast/Preview Content\"";
 				DEVELOPMENT_TEAM = YC249PY26F;
 				ENABLE_PREVIEWS = YES;

@@ -40,7 +40,7 @@ struct SignOutView: View {
               .aspectRatio(contentMode: .fill)
               .cornerRadius(size)
           } else {
-            Image("person")
+            Image(systemName: "person.crop.circle.fill")
               .resizable()
           }
         }

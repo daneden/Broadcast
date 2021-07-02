@@ -83,17 +83,17 @@ struct ContentView: View {
                   if replying {
                     twitterClient.sendReply(to: replyId)
                   } else {
-                    withAnimation(.spring()) { replying = true }
+                    withAnimation(.springAnimation) { replying = true }
                   }
                 }) {
-                  if replying {
-                    Label("Send Reply", systemImage: "arrowshape.turn.up.left.fill")
-                      .font(.broadcastHeadline)
-                  } else {
-                    Label("Send Reply", systemImage: "arrowshape.turn.up.left.fill")
-                      .font(.broadcastHeadline)
-                      .labelStyle(IconOnlyLabelStyle())
-                  }
+                  Label("Send Reply", systemImage: "arrowshape.turn.up.left.fill")
+                    .font(.broadcastHeadline)
+                    .labelStyle(
+                      BroadcastLabelStyle(
+                        appearance: !replying ? .iconOnly : .normal,
+                        accessibilityLabel: "Send Reply"
+                      )
+                    )
                 }
                 .buttonStyle(
                   BroadcastButtonStyle(
@@ -109,17 +109,17 @@ struct ContentView: View {
                 if !replying {
                   twitterClient.sendTweet()
                 } else {
-                  withAnimation(.spring()) { replying = false }
+                  withAnimation(.springAnimation) { replying = false }
                 }
               }) {
-                if !replying {
-                  Label("Send Tweet", systemImage: "paperplane.fill")
-                    .font(.broadcastHeadline)
-                } else {
-                  Label("Send Tweet", systemImage: "paperplane.fill")
-                    .font(.broadcastHeadline)
-                    .labelStyle(IconOnlyLabelStyle())
-                }
+                Label("Send Tweet", systemImage: "paperplane.fill")
+                  .font(.broadcastHeadline)
+                  .labelStyle(
+                    BroadcastLabelStyle(
+                      appearance: replying ? .iconOnly : .normal,
+                      accessibilityLabel: "Send Tweet"
+                    )
+                  )
               }
               .buttonStyle(
                 BroadcastButtonStyle(
@@ -149,7 +149,7 @@ struct ContentView: View {
           }
         }
         .padding()
-        .animation(.spring())
+        .animation(.springAnimation)
         .background(
           VisualEffectView(effect: UIBlurEffect(style: .regular))
             .ignoresSafeArea()

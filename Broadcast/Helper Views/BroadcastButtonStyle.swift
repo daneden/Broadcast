@@ -8,13 +8,32 @@
 import SwiftUI
 import CoreHaptics
 
-enum BroadcastButtonProminence {
-  case primary, secondary, tertiary, destructive
+struct BroadcastLabelStyle: LabelStyle {
+  enum Appearance {
+    case iconOnly, normal
+  }
+  
+  var appearance: Appearance = .normal
+  var accessibilityLabel: String
+  
+  func makeBody(configuration: Configuration) -> some View {
+    HStack(alignment: .firstTextBaseline) {
+      configuration.icon
+      if appearance == .normal {
+        configuration.title
+          .accessibility(hidden: true)
+      }
+    }.accessibilityLabel(accessibilityLabel)
+  }
 }
 
 struct BroadcastButtonStyle: ButtonStyle {
+  enum Prominence {
+    case primary, secondary, tertiary, destructive
+  }
+  
   @ScaledMetric var paddingSize: CGFloat = 16
-  var prominence: BroadcastButtonProminence = .primary
+  var prominence: Prominence = .primary
   var isFullWidth = true
   var isLoading = false
   
@@ -56,7 +75,7 @@ struct BroadcastButtonStyle: ButtonStyle {
       if isFullWidth { Spacer(minLength: 0) }
     }
     .padding(paddingSize)
-    .background(backgroundColor)
+    .background(backgroundColor.padding(-paddingSize))
     .foregroundColor(foregroundColor)
     .overlay(
       Group {
