@@ -90,6 +90,7 @@ struct ContentView: View {
             .buttonStyle(BroadcastButtonStyle())
           }
         }
+        .padding()
         .animation(.springAnimation)
         .background(
           VisualEffectView(effect: UIBlurEffect(style: .regular))

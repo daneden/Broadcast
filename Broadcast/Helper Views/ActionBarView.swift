@@ -13,22 +13,13 @@ struct ActionBarView: View {
   @Binding var replying: Bool
   
   @State private var photoPickerIsPresented = false
-  @State private var draftsListIsPresented = false
   
   var body: some View {
-    TabView {
-      publishingActions
-        .padding()
-        .disabled(twitterClient.state == .busy)
-      
-      draftingActions
-        .padding()
-    }
-    .frame(height: barHeight)
-    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-    .sheet(isPresented: $photoPickerIsPresented) {
-      ImagePicker(imageData: $twitterClient.draft.media)
-    }
+    publishingActions
+      .disabled(twitterClient.state == .busy)
+      .sheet(isPresented: $photoPickerIsPresented) {
+        ImagePicker(imageData: $twitterClient.draft.media)
+      }
   }
   
   var publishingActions: some View {
@@ -94,25 +85,5 @@ struct ActionBarView: View {
       }
       .buttonStyle(BroadcastButtonStyle(prominence: .tertiary, isFullWidth: false))
     }
-  }
-  
-  var draftingActions: some View {
-    HStack {
-      Button(action: { twitterClient.saveDraft() }) {
-        Label("Save Draft", systemImage: "arrow.down.doc.fill")
-      }.buttonStyle(BroadcastButtonStyle(prominence: .primary))
-      .disabled(!twitterClient.draft.isValid)
-      
-      Button(action: { draftsListIsPresented = true }) {
-        Label("\(twitterClient.drafts.count) \(draftNoun)", systemImage: "doc.on.doc")
-      }.buttonStyle(BroadcastButtonStyle(prominence: .tertiary))
-    }
-    .sheet(isPresented: $draftsListIsPresented) {
-      DraftsListView()
-    }
-  }
-  
-  var draftNoun: String {
-    twitterClient.drafts.count == 1 ? "Draft" : "Drafts"
   }
 }

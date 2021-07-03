@@ -28,6 +28,7 @@ struct ComposerView: View {
   @ScaledMetric private var verticalPadding: CGFloat = 6
   
   @State private var placeholder: String = placeholderCandidates.randomElement()
+  @State private var draftListVisible = false
   
   private var tweetText: String? {
     twitterClient.draft.text
@@ -95,10 +96,28 @@ struct ComposerView: View {
       
       Divider()
       
-      Text("\(280 - charCount)\(tweetLengthWarning)")
-        .foregroundColor(charCount > 200 ? charCount >= 280 ? Color(.systemRed) : Color(.systemOrange) : .secondary)
-        .font(.system(size: min(captionSize * max(CGFloat(charCount) / 280, 1), 28), weight: .bold, design: .rounded))
-        .multilineTextAlignment(.trailing)
+      HStack(alignment: .top) {
+        Button(action: {
+          if twitterClient.draft.isValid {
+            twitterClient.saveDraft()
+          } else {
+            draftListVisible = true
+          }
+        }) {
+          Label(
+            twitterClient.draft.isValid ? "Save Draft" : "Drafts",
+            systemImage: twitterClient.draft.isValid ? "arrow.down.doc" : "doc.on.doc"
+          )
+            .font(.broadcastFootnote.weight(.semibold))
+        }
+        
+        Spacer()
+        
+        Text("\(280 - charCount)\(tweetLengthWarning)")
+          .foregroundColor(charCount > 200 ? charCount >= 280 ? Color(.systemRed) : Color(.systemOrange) : .secondary)
+          .font(.system(size: min(captionSize * max(CGFloat(charCount) / 280, 1), 28), weight: .bold, design: .rounded))
+          .multilineTextAlignment(.trailing)
+      }
     }
     .padding()
     .background(Color(.tertiarySystemGroupedBackground))
@@ -111,6 +130,9 @@ struct ComposerView: View {
       if !isValid && charCount > 280 {
         Haptics.shared.sendStandardFeedback(feedbackType: .warning)
       }
+    }
+    .sheet(isPresented: $draftListVisible) {
+      DraftsListView()
     }
   }
   
