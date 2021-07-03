@@ -41,7 +41,7 @@ struct DraftsListView: View {
             if let mediaData = draft.media {
               Image(uiImage: UIImage(data: mediaData)!)
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .aspectRatio(contentMode: .fill)
                 .frame(width: thumbnailSize, height: thumbnailSize)
                 .cornerRadius(8)
             }

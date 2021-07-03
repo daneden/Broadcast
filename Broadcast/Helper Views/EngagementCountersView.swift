@@ -8,13 +8,25 @@
 import SwiftUI
 
 struct EngagementCountersView: View {
-  var likes: Int = 0
-  var retweets: Int = 0
+  var tweet: TwitterClient.Tweet
+  
+  var likes: Int {
+    tweet.likes ?? 0
+  }
+  
+  var retweets: Int {
+    tweet.retweets ?? 0
+  }
+  
+  var replies: Int {
+    tweet.replies?.count ?? 0
+  }
   
   var body: some View {
     HStack {
-      Label("\(likes)", systemImage: "heart")
+      Label("\(replies)", systemImage: "arrowshape.turn.up.left")
       Label("\(retweets)", systemImage: "repeat")
+      Label("\(likes)", systemImage: "heart")
     }
     .font(.broadcastCaption)
     .foregroundColor(.accentColor)
@@ -23,6 +35,6 @@ struct EngagementCountersView: View {
 
 struct EngagementCountersView_Previews: PreviewProvider {
     static var previews: some View {
-        EngagementCountersView()
+      EngagementCountersView(tweet: TwitterClient.Tweet(likes: 420, retweets: 69, replies: []))
     }
 }

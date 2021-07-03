@@ -24,10 +24,7 @@ struct LastTweetReplyView: View {
                 .foregroundColor(.secondary)
             }
             
-            if let likes = lastTweet.likes,
-               let retweets = lastTweet.retweets {
-              EngagementCountersView(likes: likes, retweets: retweets)
-            }
+            EngagementCountersView(tweet: lastTweet)
           }
         }, icon: {
           Image(systemName: "arrowshape.turn.up.left.fill")

@@ -161,17 +161,17 @@
 		7188E6452687B6AF007CFD78 /* Helper Views */ = {
 			isa = PBXGroup;
 			children = (
+				71800BF126906721009D11A1 /* ActionBarView.swift */,
 				7188E6522687D16C007CFD78 /* AttachmentThumbnail.swift */,
 				7188E6482687C0E0007CFD78 /* BroadcastButtonStyle.swift */,
 				71BBAAE8268CF1BD004048A0 /* ComposerView.swift */,
+				71800BF326906BC0009D11A1 /* DraftsListView.swift */,
+				71800BEF26905DB3009D11A1 /* EngagementCountersView.swift */,
 				71B8290F268F2195002AEE72 /* LastTweetReplyView.swift */,
 				7188E64E2687CCD0007CFD78 /* PhotoPicker.swift */,
 				71AA4AC5268A032400B7B577 /* RemoteImage.swift */,
 				7188E6462687B6C2007CFD78 /* SafariView.swift */,
 				7188E6662688B99E007CFD78 /* VisualEffectView.swift */,
-				71800BEF26905DB3009D11A1 /* EngagementCountersView.swift */,
-				71800BF126906721009D11A1 /* ActionBarView.swift */,
-				71800BF326906BC0009D11A1 /* DraftsListView.swift */,
 			);
 			path = "Helper Views";
 			sourceTree = "<group>";
@@ -433,7 +433,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"Broadcast/Preview Content\"";
 				DEVELOPMENT_TEAM = YC249PY26F;
 				ENABLE_PREVIEWS = YES;
@@ -457,7 +457,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"Broadcast/Preview Content\"";
 				DEVELOPMENT_TEAM = YC249PY26F;
 				ENABLE_PREVIEWS = YES;

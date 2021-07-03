@@ -23,13 +23,7 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   @Published var user: User?
   @Published var draft = Tweet()
   @Published var state: State = .idle
-  @Published var lastTweet: Tweet? {
-    didSet {
-      if let id = lastTweet?.id {
-        self.getRepliesForTweet(id: id)
-      }
-    }
-  }
+  @Published var lastTweet: Tweet?
   
   private var client = Swifter.init(consumerKey: ClientCredentials.apiKey, consumerSecret: ClientCredentials.apiSecret)
   
@@ -178,6 +172,10 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
     lastTweet.retweets = json["retweet_count"].integer
     
     self.lastTweet = lastTweet
+    
+    self.getReplies(for: lastTweet) { replies in
+      self.lastTweet?.replies = replies
+    }
   }
   
   private func updateState(_ newState: State) {
@@ -195,11 +193,30 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
     }
   }
   
-  private func getRepliesForTweet(id: String) {
-    client.getMentionsTimelineTweets(sinceID: id, contributorDetails: true, includeEntities: true) { json in
-      print(json)
+  private func getReplies(for tweet: Tweet, completion: @escaping ([Tweet]) -> Void = { _ in }) {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "EE MMM dd hh:mm:ss Z yyyy"
+    
+    guard let tweetId = tweet.id else { return }
+    client.getMentionsTimelineTweets(count: 200, sinceID: tweetId) { json in
+      guard let replies = json.array else { return }
+      let repliesToThisTweet: [Tweet?] = replies.filter { json in
+        json["in_reply_to_status_id"].string == tweetId
+      }.map { json in
+        guard let id = json["id_str"].string,
+              let text = json["text"].string,
+              let dateString = json["created_at"].string,
+              let date = formatter.date(from: dateString) else {
+          return nil
+        }
+        
+        return Tweet(id: id, text: text, date: date)
+      }
+      
+      completion(repliesToThisTweet.compactMap { $0 })
+      
     } failure: { error in
-      print("Error fetching replies for Tweet with ID \(id)")
+      print("Error fetching replies for Tweet with ID \(tweetId)")
       print(error.localizedDescription)
     }
   }
@@ -297,7 +314,7 @@ extension TwitterClient {
     
     var likes: Int?
     var retweets: Int?
-    var replies: Int?
+    var replies: [Tweet]?
     
     var date: Date?
     
