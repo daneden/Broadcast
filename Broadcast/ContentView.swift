@@ -33,9 +33,13 @@ struct ContentView: View {
         ScrollView {
           VStack {
             if replying, let lastTweet = twitterClient.lastTweet {
-              LastTweetReplyView(lastTweet: lastTweet, replying: replying)
+              LastTweetReplyView(lastTweet: lastTweet)
                 .onTapGesture {
-                  withAnimation { replying = false }
+                  guard let screenName = twitterClient.user?.screenName,
+                        let tweetId = lastTweet.id else { return }
+                  let url = URL(string: "https://twitter.com/\(screenName)/status/\(tweetId)")
+                  
+                  UIApplication.shared.open(url!)
                 }
                 .onAppear {
                   replyBoxHeight = geom.frame(in: .global).minY
@@ -64,7 +68,7 @@ struct ContentView: View {
                   alignment: .topLeading
                 )
               
-              AttachmentThumbnail(image: $twitterClient.draft.media)
+              AttachmentThumbnail(imageData: $twitterClient.draft.media)
             } else {
               WelcomeView()
             }
@@ -77,69 +81,7 @@ struct ContentView: View {
         
         VStack {
           if twitterClient.user != nil {
-            HStack {
-              if let replyId = twitterClient.lastTweet?.id {
-                Button(action: {
-                  if replying {
-                    twitterClient.sendReply(to: replyId)
-                  } else {
-                    withAnimation(.springAnimation) { replying = true }
-                  }
-                }) {
-                  Label("Send Reply", systemImage: "arrowshape.turn.up.left.fill")
-                    .font(.broadcastHeadline)
-                    .labelStyle(
-                      BroadcastLabelStyle(
-                        appearance: !replying ? .iconOnly : .normal,
-                        accessibilityLabel: "Send Reply"
-                      )
-                    )
-                }
-                .buttonStyle(
-                  BroadcastButtonStyle(
-                    prominence: replying ? .primary : .secondary,
-                    isFullWidth: replying,
-                    isLoading: twitterClient.state == .busy && replying
-                  )
-                )
-                .disabled(replying && !twitterClient.draft.isValid)
-              }
-              
-              Button(action: {
-                if !replying {
-                  twitterClient.sendTweet()
-                } else {
-                  withAnimation(.springAnimation) { replying = false }
-                }
-              }) {
-                Label("Send Tweet", systemImage: "paperplane.fill")
-                  .font(.broadcastHeadline)
-                  .labelStyle(
-                    BroadcastLabelStyle(
-                      appearance: replying ? .iconOnly : .normal,
-                      accessibilityLabel: "Send Tweet"
-                    )
-                  )
-              }
-              .buttonStyle(
-                BroadcastButtonStyle(
-                  prominence: !replying ? .primary : .secondary,
-                  isFullWidth: !replying,
-                  isLoading: twitterClient.state == .busy && !replying
-                )
-              )
-              .disabled(!replying && !twitterClient.draft.isValid)
-              
-              Button(action: {
-                photoPickerIsPresented.toggle()
-                UIApplication.shared.endEditing()
-              }) {
-                Label("Add Media", systemImage: "photo.on.rectangle.angled")
-                  .labelStyle(IconOnlyLabelStyle())
-              }
-              .buttonStyle(BroadcastButtonStyle(prominence: .tertiary, isFullWidth: false))
-            }
-            .disabled(twitterClient.state == .busy)
+            ActionBarView(replying: $replying)
           } else {
             Button(action: { twitterClient.signIn() }) {
               Label("Sign In With Twitter", image: "twitter.fill")
@@ -148,7 +90,6 @@ struct ContentView: View {
             .buttonStyle(BroadcastButtonStyle())
           }
         }
-        .padding()
         .animation(.springAnimation)
         .background(
           VisualEffectView(effect: UIBlurEffect(style: .regular))
@@ -156,9 +97,6 @@ struct ContentView: View {
             .opacity(twitterClient.user == nil ? 0 : 1)
         )
         .gesture(DragGesture().onEnded({ _ in UIApplication.shared.endEditing() }))
-      }
-      .sheet(isPresented: $photoPickerIsPresented) {
-        ImagePicker(image: $twitterClient.draft.media)
       }
       .sheet(isPresented: $signOutScreenIsPresented) {
         SignOutView()

@@ -19,10 +19,17 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
     return ASPresentationAnchor()
   }
   
+  @AppStorage("drafts") var drafts: Drafts = []
   @Published var user: User?
   @Published var draft = Tweet()
   @Published var state: State = .idle
-  @Published var lastTweet: Tweet?
+  @Published var lastTweet: Tweet? {
+    didSet {
+      if let id = lastTweet?.id {
+        self.getRepliesForTweet(id: id)
+      }
+    }
+  }
   
   private var client = Swifter.init(consumerKey: ClientCredentials.apiKey, consumerSecret: ClientCredentials.apiSecret)
   
@@ -105,18 +112,16 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
     return .init(from: data)
   }
   
-  private func sendTweetCallback(response: JSON? = nil, error: Error? = nil, hasMedia: Bool = false) {
+  private func sendTweetCallback(response: JSON? = nil, error: Error? = nil) {
     if let json = response {
       self.updateLastTweet(from: json)
       self.updateState(.idle)
       self.draft = .init()
       Haptics.shared.sendStandardFeedback(feedbackType: .success)
-    } else {
-      if let error = error {
-        print(error.localizedDescription)
-      }
+    } else if let error = error {
+      print(error.localizedDescription)
       
-      if hasMedia {
+      if draft.media != nil {
         self.updateState(.genericTextAndMediaError)
       } else {
         self.updateState(.genericTextError)
@@ -129,20 +134,19 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   func sendTweet() {
     updateState(.busy)
     
-    if let media = draft.media,
-       let mediaData = media.jpegData(compressionQuality: 80) {
+    if let mediaData = draft.media {
       client.postTweet(status: draft.text ?? "", media: mediaData) { json in
         self.sendTweetCallback(response: json)
       } failure: { error in
         print(error.localizedDescription)
-        self.sendTweetCallback(hasMedia: true)
+        self.sendTweetCallback(error: error)
       }
     } else if let status = draft.text {
       client.postTweet(status: status) { json in
         self.sendTweetCallback(response: json)
       } failure: { error in
         print(error.localizedDescription)
-        self.sendTweetCallback()
+        self.sendTweetCallback(error: error)
       }
     }
   }
@@ -150,18 +154,18 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   func sendReply(to id: String) {
     updateState(.busy)
     
-    if let mediaData = draft.mediaData {
+    if let mediaData = draft.media {
       client.postTweet(status: draft.text ?? "", media: mediaData, inReplyToStatusID: id) { json in
         self.sendTweetCallback(response: json)
       } failure: { error in
-        self.sendTweetCallback(error: error, hasMedia: false)
+        self.sendTweetCallback(error: error)
       }
     } else if let status = draft.text {
       client.postTweet(status: status, inReplyToStatusID: id) { json in
         self.sendTweetCallback(response: json)
         Haptics.shared.sendStandardFeedback(feedbackType: .success)
       } failure: { error in
-        self.sendTweetCallback(error: error, hasMedia: false)
+        self.sendTweetCallback(error: error)
       }
     }
   }
@@ -170,6 +174,8 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
     guard let id = json["id_str"].string else { return }
     var lastTweet = Tweet(id: id)
     lastTweet.text = json["text"].string
+    lastTweet.likes = json["favorite_count"].integer
+    lastTweet.retweets = json["retweet_count"].integer
     
     self.lastTweet = lastTweet
   }
@@ -179,8 +185,65 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
       self.state = newState
     }
   }
+  
+  private func getUserTimeline() {
+    guard let userId = user?.id else { return }
+    client.getTimeline(for: .id(userId)) { json in
+      print(json)
+    } failure: { error in
+      print(error.localizedDescription)
+    }
+  }
+  
+  private func getRepliesForTweet(id: String) {
+    client.getMentionsTimelineTweets(sinceID: id, contributorDetails: true, includeEntities: true) { json in
+      print(json)
+    } failure: { error in
+      print("Error fetching replies for Tweet with ID \(id)")
+      print(error.localizedDescription)
+    }
+  }
 }
 
+/* MARK: Drafts */
+typealias Drafts = Set<TwitterClient.Tweet>
+
+extension Drafts: RawRepresentable {
+  public init?(rawValue: String) {
+    guard let data = rawValue.data(using: .utf8),
+          let result = try? JSONDecoder().decode(Drafts.self, from: data)
+    else {
+      return nil
+    }
+    self = result
+  }
+  
+  public var rawValue: String {
+    guard let data = try? JSONEncoder().encode(self),
+          let result = String(data: data, encoding: .utf8)
+    else {
+      return "[]"
+    }
+    return result
+  }
+}
+
+extension TwitterClient {
+  func saveDraft() {
+    guard draft.isValid else { return }
+    draft.date = Date()
+    
+    drafts.insert(draft)
+    draft = .init()
+  }
+  
+  func retreiveDraft(draft: Tweet) {
+    drafts.remove(draft)
+    self.draft = draft
+  }
+}
+
+// MARK: Models
 extension TwitterClient {
   enum State: Equatable {
     case idle, busy
@@ -227,13 +290,20 @@ extension TwitterClient {
     var profileImageURL: URL?
   }
   
-  struct Tweet {
+  struct Tweet: Hashable, Codable {
     var id: String?
     var text: String?
-    var media: UIImage?
+    var media: Data?
     
-    var mediaData: Data? {
-      return media?.jpegData(compressionQuality: 80)
+    var likes: Int?
+    var retweets: Int?
+    var replies: Int?
+    
+    var date: Date?
+    
+    var mediaAsUIImage: UIImage? {
+      guard let data = media else { return nil }
+      return UIImage(data: data)
     }
     
     var length: Int {
