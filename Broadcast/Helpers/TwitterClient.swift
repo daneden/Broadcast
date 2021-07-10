@@ -228,12 +228,13 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
 extension TwitterClient {
   func saveDraft() {
     guard draft.isValid else { return }
+    let copy = draft
     
     DispatchQueue.global(qos: .default).async {
       let newDraft = Draft.init(context: self.draftsStore.context)
       newDraft.date = Date()
-      newDraft.text = self.draft.text
-      newDraft.media = self.draft.media?.pngData()
+      newDraft.text = copy.text
+      newDraft.media = copy.media?.pngData()
       newDraft.id = UUID()
       
       self.draftsStore.save()
