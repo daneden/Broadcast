@@ -19,7 +19,7 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
     return ASPresentationAnchor()
   }
   
-  @AppStorage("drafts") var drafts: Drafts = []
+  let draftsStore = PersistanceController.shared
   @Published var user: User?
   @Published var draft = Tweet()
   @Published var state: State = .idle
@@ -128,7 +128,7 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   func sendTweet() {
     updateState(.busy)
     
-    if let mediaData = draft.media {
+    if let mediaData = draft.media?.jpegData(compressionQuality: 0.8) {
       client.postTweet(status: draft.text ?? "", media: mediaData) { json in
         self.sendTweetCallback(response: json)
       } failure: { error in
@@ -148,7 +148,7 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   func sendReply(to id: String) {
     updateState(.busy)
     
-    if let mediaData = draft.media {
+    if let mediaData = draft.media?.jpegData(compressionQuality: 0.8) {
       client.postTweet(status: draft.text ?? "", media: mediaData, inReplyToStatusID: id) { json in
         self.sendTweetCallback(response: json)
       } failure: { error in
@@ -170,11 +170,11 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
     lastTweet.text = json["text"].string
     lastTweet.likes = json["favorite_count"].integer
     lastTweet.retweets = json["retweet_count"].integer
-    
-    self.lastTweet = lastTweet
+    lastTweet.numericId = json["id"].integer
     
     self.getReplies(for: lastTweet) { replies in
-      self.lastTweet?.replies = replies
+      lastTweet.replies = replies
+      self.lastTweet = lastTweet
     }
   }
   
@@ -186,8 +186,8 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   
   private func getUserTimeline() {
     guard let userId = user?.id else { return }
-    client.getTimeline(for: .id(userId)) { json in
-      print(json)
+    client.getTimeline(for: .id(userId)) { _ in
+      
     } failure: { error in
       print(error.localizedDescription)
     }
@@ -198,10 +198,12 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
     formatter.dateFormat = "EE MMM dd hh:mm:ss Z yyyy"
     
     guard let tweetId = tweet.id else { return }
+    
     client.getMentionsTimelineTweets(count: 200, sinceID: tweetId) { json in
-      guard let replies = json.array else { return }
-      let repliesToThisTweet: [Tweet?] = replies.filter { json in
-        json["in_reply_to_status_id"].string == tweetId
+      guard let repliesResult = json.array else { return }
+      let repliesToThisTweet: [Tweet?] = repliesResult.filter { json in
+        guard let replyId = json["in_reply_to_status_id"].integer else { return false }
+        return replyId == tweet.numericId
       }.map { json in
         guard let id = json["id_str"].string,
               let text = json["text"].string,
@@ -223,40 +225,39 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
 }
 
 /* MARK: Drafts */
-typealias Drafts = Set<TwitterClient.Tweet>
-
-extension Drafts: RawRepresentable {
-  public init?(rawValue: String) {
-    guard let data = rawValue.data(using: .utf8),
-          let result = try? JSONDecoder().decode(Drafts.self, from: data)
-    else {
-      return nil
-    }
-    self = result
-  }
-  
-  public var rawValue: String {
-    guard let data = try? JSONEncoder().encode(self),
-          let result = String(data: data, encoding: .utf8)
-    else {
-      return "[]"
-    }
-    return result
-  }
-}
-
 extension TwitterClient {
   func saveDraft() {
     guard draft.isValid else { return }
-    draft.date = Date()
     
-    drafts.insert(draft)
-    draft = .init()
+    DispatchQueue.global(qos: .default).async {
+      let newDraft = Draft.init(context: self.draftsStore.context)
+      newDraft.date = Date()
+      newDraft.text = self.draft.text
+      newDraft.media = self.draft.media?.pngData()
+      newDraft.id = UUID()
+      
+      self.draftsStore.save()
+    }
+    
+    withAnimation {
+      self.draft = .init()
+      self.state = .idle
+    }
   }
   
-  func retreiveDraft(draft: Tweet) {
-    drafts.remove(draft)
-    self.draft = draft
+  func retreiveDraft(draft: Draft) {
+    withAnimation {
+      self.draft = Tweet(text: draft.text)
+      
+      if let media = draft.media {
+        self.draft.media = UIImage(data: media)
+      }
+    }
+    
+    let managedObjectContext = PersistanceController.shared.context
+    managedObjectContext.delete(draft)
+
+    PersistanceController.shared.save()
   }
 }
 
@@ -307,21 +308,17 @@ extension TwitterClient {
     var profileImageURL: URL?
   }
   
-  struct Tweet: Hashable, Codable {
+  struct Tweet {
+    var numericId: Int?
     var id: String?
     var text: String?
-    var media: Data?
+    var media: UIImage?
     
     var likes: Int?
     var retweets: Int?
     var replies: [Tweet]?
     
     var date: Date?
-    
-    var mediaAsUIImage: UIImage? {
-      guard let data = media else { return nil }
-      return UIImage(data: data)
-    }
     
     var length: Int {
       TwitterText.tweetLength(text: text ?? "")

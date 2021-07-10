@@ -35,6 +35,8 @@ extension Color: RawRepresentable {
 }
 
 class ThemeHelper: ObservableObject {
+  static let shared = ThemeHelper()
+  
   @AppStorage("themeColor") var color = Color("twitterBrandColor")
   
   @AppStorage("themeColorIndex") private var currentColorIndex = 0 {

@@ -68,7 +68,7 @@ struct ContentView: View {
                   alignment: .topLeading
                 )
               
-              AttachmentThumbnail(imageData: $twitterClient.draft.media)
+              AttachmentThumbnail(image: $twitterClient.draft.media)
             } else {
               WelcomeView()
             }

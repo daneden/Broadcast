@@ -97,18 +97,17 @@ struct ComposerView: View {
       Divider()
       
       HStack(alignment: .top) {
-        Button(action: {
-          if twitterClient.draft.isValid {
-            twitterClient.saveDraft()
-          } else {
-            draftListVisible = true
+        Menu {
+          Button(action: { twitterClient.saveDraft() }) {
+            Label("Save Draft", systemImage: "square.and.pencil")
+          }.disabled(!twitterClient.draft.isValid)
+          
+          Button(action: { draftListVisible = true }) {
+            Label("View Drafts", systemImage: "doc.on.doc")
           }
-        }) {
-          Label(
-            twitterClient.draft.isValid ? "Save Draft" : "Drafts",
-            systemImage: twitterClient.draft.isValid ? "arrow.down.doc" : "doc.on.doc"
-          )
-            .font(.broadcastFootnote.weight(.semibold))
+        } label: {
+          Label("Drafts", systemImage: "doc.on.doc")
+            .font(.broadcastFootnote)
         }
         
         Spacer()
@@ -119,6 +118,7 @@ struct ComposerView: View {
           .multilineTextAlignment(.trailing)
       }
     }
+    .disabled(twitterClient.state == .busy)
     .padding()
     .background(Color(.tertiarySystemGroupedBackground))
     .cornerRadius(captionSize)
@@ -133,6 +133,8 @@ struct ComposerView: View {
     }
     .sheet(isPresented: $draftListVisible) {
       DraftsListView()
+        .environmentObject(ThemeHelper.shared)
+        .environment(\.managedObjectContext, PersistanceController.shared.context)
     }
   }
   

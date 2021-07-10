@@ -11,6 +11,9 @@
 		71800BF026905DB3009D11A1 /* EngagementCountersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71800BEF26905DB3009D11A1 /* EngagementCountersView.swift */; };
 		71800BF226906721009D11A1 /* ActionBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71800BF126906721009D11A1 /* ActionBarView.swift */; };
 		71800BF426906BC0009D11A1 /* DraftsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71800BF326906BC0009D11A1 /* DraftsListView.swift */; };
+		71800BF8269998BF009D11A1 /* UIImage.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71800BF7269998BF009D11A1 /* UIImage.extension.swift */; };
+		71800BFD26999B1B009D11A1 /* DraftsModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 71800BFB26999B1B009D11A1 /* DraftsModel.xcdatamodeld */; };
+		71800BFF26999BA6009D11A1 /* PersistanceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71800BFE26999BA6009D11A1 /* PersistanceController.swift */; };
 		7188E6292687B0FE007CFD78 /* BroadcastApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6282687B0FE007CFD78 /* BroadcastApp.swift */; };
 		7188E62B2687B0FE007CFD78 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E62A2687B0FE007CFD78 /* ContentView.swift */; };
 		7188E62D2687B0FF007CFD78 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7188E62C2687B0FF007CFD78 /* Assets.xcassets */; };
@@ -47,6 +50,9 @@
 		71800BEF26905DB3009D11A1 /* EngagementCountersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngagementCountersView.swift; sourceTree = "<group>"; };
 		71800BF126906721009D11A1 /* ActionBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionBarView.swift; sourceTree = "<group>"; };
 		71800BF326906BC0009D11A1 /* DraftsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraftsListView.swift; sourceTree = "<group>"; };
+		71800BF7269998BF009D11A1 /* UIImage.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.extension.swift; sourceTree = "<group>"; };
+		71800BFC26999B1B009D11A1 /* DraftsModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DraftsModel.xcdatamodel; sourceTree = "<group>"; };
+		71800BFE26999BA6009D11A1 /* PersistanceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistanceController.swift; sourceTree = "<group>"; };
 		7188E6252687B0FE007CFD78 /* Broadcast.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Broadcast.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7188E6282687B0FE007CFD78 /* BroadcastApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastApp.swift; sourceTree = "<group>"; };
 		7188E62A2687B0FE007CFD78 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -121,6 +127,7 @@
 				7188E6402687B431007CFD78 /* Helpers */,
 				7188E62E2687B0FF007CFD78 /* Preview Content */,
 				71BBAAEA268CF532004048A0 /* TwitterAPI-Info.plist */,
+				71800BFB26999B1B009D11A1 /* DraftsModel.xcdatamodeld */,
 			);
 			path = Broadcast;
 			sourceTree = "<group>";
@@ -142,6 +149,7 @@
 				7188E63A2687B19D007CFD78 /* Notification.extension.swift */,
 				7188E64A2687C44D007CFD78 /* String.extension.swift */,
 				7188E66B2688DB44007CFD78 /* UIApplication.extension.swift */,
+				71800BF7269998BF009D11A1 /* UIImage.extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -154,6 +162,7 @@
 				71E36FFA2689EED40078D956 /* ShakeModifier.swift */,
 				7188E6642688A436007CFD78 /* ThemeHelper.swift */,
 				71B8290B268D0AC6002AEE72 /* TwitterClient.swift */,
+				71800BFE26999BA6009D11A1 /* PersistanceController.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -292,11 +301,14 @@
 				71800BF226906721009D11A1 /* ActionBarView.swift in Sources */,
 				7188E64F2687CCD0007CFD78 /* PhotoPicker.swift in Sources */,
 				7188E66C2688DB44007CFD78 /* UIApplication.extension.swift in Sources */,
+				71800BFD26999B1B009D11A1 /* DraftsModel.xcdatamodeld in Sources */,
 				7188E6532687D16C007CFD78 /* AttachmentThumbnail.swift in Sources */,
 				7188E64B2687C44D007CFD78 /* String.extension.swift in Sources */,
+				71800BFF26999BA6009D11A1 /* PersistanceController.swift in Sources */,
 				71B82910268F2195002AEE72 /* LastTweetReplyView.swift in Sources */,
 				71800BF426906BC0009D11A1 /* DraftsListView.swift in Sources */,
 				71E36FFB2689EED40078D956 /* ShakeModifier.swift in Sources */,
+				71800BF8269998BF009D11A1 /* UIImage.extension.swift in Sources */,
 				719087CF26891C7F005B96CE /* Array.extension.swift in Sources */,
 				7188E64D2687C6A1007CFD78 /* Binding.extension.swift in Sources */,
 				711F3FFA268F50C800605C89 /* Animation.extension.swift in Sources */,
@@ -433,7 +445,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 28;
 				DEVELOPMENT_ASSET_PATHS = "\"Broadcast/Preview Content\"";
 				DEVELOPMENT_TEAM = YC249PY26F;
 				ENABLE_PREVIEWS = YES;
@@ -443,7 +455,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = me.daneden.Broadcast;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -457,7 +469,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 28;
 				DEVELOPMENT_ASSET_PATHS = "\"Broadcast/Preview Content\"";
 				DEVELOPMENT_TEAM = YC249PY26F;
 				ENABLE_PREVIEWS = YES;
@@ -467,7 +479,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = me.daneden.Broadcast;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -555,6 +567,19 @@
 			productName = TwitterText;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		71800BFB26999B1B009D11A1 /* DraftsModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				71800BFC26999B1B009D11A1 /* DraftsModel.xcdatamodel */,
+			);
+			currentVersion = 71800BFC26999B1B009D11A1 /* DraftsModel.xcdatamodel */;
+			path = DraftsModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 7188E61D2687B0FE007CFD78 /* Project object */;
 }

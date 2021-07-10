@@ -10,17 +10,22 @@ import SwiftUI
 struct DraftsListView: View {
   @ScaledMetric var thumbnailSize: CGFloat = 56
   @Environment(\.presentationMode) var presentationMode
+  @Environment(\.managedObjectContext) var managedObjectContext
+  
+  @FetchRequest(entity: Draft.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Draft.date, ascending: true)])
+  var drafts: FetchedResults<Draft>
+  
   @EnvironmentObject var twitterClient: TwitterClient
   @EnvironmentObject var themeHelper: ThemeHelper
   
   var body: some View {
     NavigationView {
       List {
-        if twitterClient.drafts.isEmpty {
+        if drafts.isEmpty {
           Text("No Saved Drafts").foregroundColor(.secondary)
         }
         
-        ForEach(Array(twitterClient.drafts), id: \.self) { draft in
+        ForEach(drafts) { draft in
           HStack {
             VStack(alignment: .leading) {
               if let date = draft.date {
@@ -38,8 +43,9 @@ struct DraftsListView: View {
             
             Spacer()
             
-            if let mediaData = draft.media {
-              Image(uiImage: UIImage(data: mediaData)!)
+            if let imageData = draft.media,
+               let image = UIImage(data: imageData) {
+              Image(uiImage: image)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: thumbnailSize, height: thumbnailSize)
@@ -54,6 +60,8 @@ struct DraftsListView: View {
         }.onDelete(perform: deleteDrafts)
       }
       .toolbar {
+        EditButton()
+        
         Button(action: { presentationMode.wrappedValue.dismiss() }) {
           Text("Close")
         }
@@ -64,9 +72,12 @@ struct DraftsListView: View {
   }
   
   func deleteDrafts(at offsets: IndexSet) {
-    var collection = Array(twitterClient.drafts)
-    collection.remove(atOffsets: offsets)
-    twitterClient.drafts = Set(collection)
+    for index in offsets {
+      let draft = drafts[index]
+      managedObjectContext.delete(draft)
+    }
+    
+    PersistanceController.shared.save()
   }
 }
 

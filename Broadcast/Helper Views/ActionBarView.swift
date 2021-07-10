@@ -18,7 +18,7 @@ struct ActionBarView: View {
     publishingActions
       .disabled(twitterClient.state == .busy)
       .sheet(isPresented: $photoPickerIsPresented) {
-        ImagePicker(imageData: $twitterClient.draft.media)
+        ImagePicker(chosenImage: $twitterClient.draft.media)
       }
   }
   

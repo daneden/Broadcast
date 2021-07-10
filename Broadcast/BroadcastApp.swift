@@ -9,8 +9,10 @@ import SwiftUI
 
 @main
 struct BroadcastApp: App {
-  @StateObject var themeHelper = ThemeHelper()
+  @Environment(\.scenePhase) var scenePhase
+  @StateObject var themeHelper = ThemeHelper.shared
   @StateObject var twitterClient = TwitterClient()
+  let persistenceController = PersistanceController.shared
   
   var body: some Scene {
     WindowGroup {
@@ -19,9 +21,14 @@ struct BroadcastApp: App {
           ContentView()
             .environmentObject(twitterClient)
             .environmentObject(themeHelper)
+            .environment(\.managedObjectContext, persistenceController.container.viewContext)
             .accentColor(themeHelper.color)
-            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-              twitterClient.revalidateAccount()
+            .onChange(of: scenePhase) { newPhase in
+              if newPhase == .active {
+                twitterClient.revalidateAccount()
+              }
+              
+              persistenceController.save()
             }
           
           VisualEffectView(effect: UIBlurEffect(style: .regular))

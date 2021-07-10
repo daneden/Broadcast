@@ -8,12 +8,7 @@
 import SwiftUI
 
 struct AttachmentThumbnail: View {
-  @Binding var imageData: Data?
-  
-  var image: UIImage? {
-    guard let data = imageData else { return nil }
-    return UIImage(data: data)
-  }
+  @Binding var image: UIImage?
 
   var body: some View {
     Group {
@@ -41,12 +36,12 @@ struct AttachmentThumbnail: View {
   }
 
   func removeImage() {
-    withAnimation { imageData = nil }
+    withAnimation { image = nil }
   }
 }
 
 struct ThumbnailFilmstrip_Previews: PreviewProvider {
   static var previews: some View {
-    AttachmentThumbnail(imageData: .constant(nil))
+    AttachmentThumbnail(image: .constant(nil))
   }
 }

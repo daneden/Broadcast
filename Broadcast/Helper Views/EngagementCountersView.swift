@@ -23,7 +23,7 @@ struct EngagementCountersView: View {
   }
   
   var body: some View {
-    HStack {
+    HStack(spacing: 16) {
       Label("\(replies)", systemImage: "arrowshape.turn.up.left")
       Label("\(retweets)", systemImage: "repeat")
       Label("\(likes)", systemImage: "heart")
