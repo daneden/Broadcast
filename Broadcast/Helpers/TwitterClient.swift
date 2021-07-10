@@ -234,7 +234,7 @@ extension TwitterClient {
       let newDraft = Draft.init(context: self.draftsStore.context)
       newDraft.date = Date()
       newDraft.text = copy.text
-      newDraft.media = copy.media?.pngData()
+      newDraft.media = copy.media?.fixedOrientation.pngData()
       newDraft.id = UUID()
       
       self.draftsStore.save()
