@@ -14,11 +14,14 @@ struct ContentView: View {
   @ScaledMetric private var bottomPadding: CGFloat = 80
   
   @EnvironmentObject var twitterClient: TwitterClient
-  @State var photoPickerIsPresented = false
-  @State var signOutScreenIsPresented = false
-  @State var sendingTweet = false
-  @State var replying = false
-  @State var replyBoxHeight: CGFloat = 0
+  
+  @State private var photoPickerIsPresented = false
+  @State private var signOutScreenIsPresented = false
+  @State private var repliesSheetIsPresented = false
+  
+  @State private var sendingTweet = false
+  @State private var replying = false
+  @State private var replyBoxHeight: CGFloat = 0
   
   private var coordinateSpaceName = "mainViewCoordinateSpace"
   
@@ -35,11 +38,7 @@ struct ContentView: View {
             if replying, let lastTweet = twitterClient.lastTweet {
               LastTweetReplyView(lastTweet: lastTweet)
                 .onTapGesture {
-                  guard let screenName = twitterClient.user?.screenName,
-                        let tweetId = lastTweet.id else { return }
-                  let url = URL(string: "https://twitter.com/\(screenName)/status/\(tweetId)")
-                  
-                  UIApplication.shared.open(url!)
+                  repliesSheetIsPresented = true
                 }
                 .onAppear {
                   replyBoxHeight = geom.frame(in: .global).minY
@@ -101,6 +100,11 @@ struct ContentView: View {
       }
       .sheet(isPresented: $signOutScreenIsPresented) {
         SignOutView()
+      }
+      .sheet(isPresented: $repliesSheetIsPresented) {
+        RepliesListView(tweet: twitterClient.lastTweet)
+          .accentColor(ThemeHelper.shared.color)
+          .font(.broadcastBody)
       }
       .onAppear {
         UITextView.appearance().backgroundColor = .clear

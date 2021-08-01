@@ -195,11 +195,11 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   
   private func getReplies(for tweet: Tweet, completion: @escaping ([Tweet]) -> Void = { _ in }) {
     let formatter = DateFormatter()
-    formatter.dateFormat = "EE MMM dd hh:mm:ss Z yyyy"
+    formatter.dateFormat = "EE MMM dd HH:mm:ss Z yyyy"
     
     guard let tweetId = tweet.id else { return }
     
-    client.getMentionsTimelineTweets(count: 200, sinceID: tweetId) { json in
+    client.getMentionsTimelineTweets(count: 200) { json in
       guard let repliesResult = json.array else { return }
       let repliesToThisTweet: [Tweet?] = repliesResult.filter { json in
         guard let replyId = json["in_reply_to_status_id"].integer else { return false }
@@ -212,7 +212,8 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
           return nil
         }
         
-        return Tweet(id: id, text: text, date: date)
+        let user = User(from: json["user"])
+        return Tweet(id: id, text: text, date: date, author: user)
       }
       
       completion(repliesToThisTweet.compactMap { $0 })
@@ -306,6 +307,7 @@ extension TwitterClient {
   struct User {
     var id: String
     var screenName: String
+    var name: String?
     var profileImageURL: URL?
   }
   
@@ -332,6 +334,18 @@ extension TwitterClient {
       
       return 1...280 ~= length
     }
+    
+    var author: User?
+  }
+}
+
+extension TwitterClient.User {
+  init(from json: JSON) {
+    self.name = json["name"].string
+    self.screenName = json["screen_name"].string ?? "TwitterUser"
+    self.id = json["id_str"].string ?? ""
+    let imageUrlString = json["profile_image_url_https"].string ?? ""
+    self.profileImageURL = URL(string: imageUrlString.replacingOccurrences(of: "_normal", with: ""))
   }
 }
 

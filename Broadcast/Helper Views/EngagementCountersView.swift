@@ -10,26 +10,22 @@ import SwiftUI
 struct EngagementCountersView: View {
   var tweet: TwitterClient.Tweet
   
-  var likes: Int {
-    tweet.likes ?? 0
-  }
-  
-  var retweets: Int {
-    tweet.retweets ?? 0
-  }
-  
-  var replies: Int {
-    tweet.replies?.count ?? 0
+  var repliesString: String {
+    let replyCount = tweet.replies?.count ?? 0
+    switch replyCount {
+    case 0:
+      return "No replies"
+    case 1:
+      return "1 Reply"
+    default:
+      return "\(replyCount) Replies"
+    }
   }
   
   var body: some View {
-    HStack(spacing: 16) {
-      Label("\(replies)", systemImage: "arrowshape.turn.up.left")
-      Label("\(retweets)", systemImage: "repeat")
-      Label("\(likes)", systemImage: "heart")
-    }
-    .font(.broadcastCaption)
-    .foregroundColor(.accentColor)
+    Label(repliesString, systemImage: "arrowshape.turn.up.left")
+      .font(.broadcastCaption)
+      .foregroundColor(.accentColor)
   }
 }
 
