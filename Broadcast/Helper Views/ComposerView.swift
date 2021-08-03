@@ -19,6 +19,7 @@ fileprivate let placeholderCandidates: [String] = [
 ]
 
 struct ComposerView: View {
+  let debouncer = Debouncer(timeInterval: 0.4)
   @Binding var signOutScreenIsPresented: Bool
   
   @EnvironmentObject var twitterClient: TwitterClient
@@ -30,13 +31,21 @@ struct ComposerView: View {
   @State private var placeholder: String = placeholderCandidates.randomElement()
   @State private var draftListVisible = false
   
+  private let mentioningRegex = NSRegularExpression("@[a-z0-9_]+$", options: .caseInsensitive)
+  
   private var tweetText: String? {
     twitterClient.draft.text
+  }
+  
+  private var mentionString: String? {
+    mentioningRegex.firstMatchAsString(tweetText ?? "")
   }
   
   private var charCount: Int {
     TwitterText.tweetLength(text: tweetText ?? "")
   }
+  
+  @State private var mentionCandidates: [TwitterClient.User]?
   
   private var tweetLengthWarning: String {
     switch charCount {
@@ -64,78 +73,108 @@ struct ComposerView: View {
   }
   
   var body: some View {
-    VStack(alignment: .trailing) {
-      HStack(alignment: .top) {
-        if let profileImageURL = twitterClient.user?.profileImageURL {
-          RemoteImage(url: profileImageURL, placeholder: { ProgressView() })
-            .aspectRatio(contentMode: .fill)
-            .frame(width: 36, height: 36)
-            .cornerRadius(36)
-            .onTapGesture {
-              signOutScreenIsPresented = true
-              UIApplication.shared.endEditing()
-            }
-        }
-        
-        ZStack(alignment: .topLeading) {
-          Text(tweetText ?? placeholder)
-            .padding(.leading, leftOffset)
-            .padding(.vertical, verticalPadding)
-            .foregroundColor(Color(.placeholderText))
-            .opacity(tweetText == nil ? 1 : 0)
-            .accessibility(hidden: true)
-          
-          TextEditor(text: Binding($twitterClient.draft.text, replacingNilWith: ""))
-            .foregroundColor(Color(.label))
-            .multilineTextAlignment(.leading)
-            .keyboardType(.twitter)
-            .padding(.top, (verticalPadding / 3) * -1)
-        }
-        .font(.broadcastTitle3)
-      }.transition(.scale)
-      
-      Divider()
-      
-      HStack(alignment: .top) {
-        Menu {
-          Button(action: { twitterClient.saveDraft() }) {
-            Label("Save Draft", systemImage: "square.and.pencil")
-          }.disabled(!twitterClient.draft.isValid)
-          
-          Button(action: { draftListVisible = true }) {
-            Label("View Drafts", systemImage: "doc.on.doc")
+    ZStack(alignment: .bottom) {
+      VStack(alignment: .trailing) {
+        HStack(alignment: .top) {
+          if let profileImageURL = twitterClient.user?.profileImageURL {
+            RemoteImage(url: profileImageURL, placeholder: { ProgressView() })
+              .aspectRatio(contentMode: .fill)
+              .frame(width: 36, height: 36)
+              .cornerRadius(36)
+              .onTapGesture {
+                signOutScreenIsPresented = true
+                UIApplication.shared.endEditing()
+              }
           }
-        } label: {
-          Label("Drafts", systemImage: "doc.on.doc")
-            .font(.broadcastFootnote)
+          
+          ZStack(alignment: .topLeading) {
+            Text(tweetText ?? placeholder)
+              .padding(.leading, leftOffset)
+              .padding(.vertical, verticalPadding)
+              .foregroundColor(Color(.placeholderText))
+              .opacity(tweetText == nil ? 1 : 0)
+              .accessibility(hidden: true)
+            
+            TextEditor(text: Binding($twitterClient.draft.text, replacingNilWith: ""))
+              .foregroundColor(Color(.label))
+              .multilineTextAlignment(.leading)
+              .keyboardType(.twitter)
+              .padding(.top, (verticalPadding / 3) * -1)
+          }
+          .font(.broadcastTitle3)
+        }.transition(.scale)
+        
+        Divider()
+        
+        HStack(alignment: .top) {
+          Menu {
+            Button(action: { twitterClient.saveDraft() }) {
+              Label("Save Draft", systemImage: "square.and.pencil")
+            }.disabled(!twitterClient.draft.isValid)
+            
+            Button(action: { draftListVisible = true }) {
+              Label("View Drafts", systemImage: "doc.on.doc")
+            }
+          } label: {
+            Label("Drafts", systemImage: "doc.on.doc")
+              .font(.broadcastFootnote)
+          }
+          
+          Spacer()
+          
+          Text("\(280 - charCount)\(tweetLengthWarning)")
+            .foregroundColor(charCount > 200 ? charCount >= 280 ? Color(.systemRed) : Color(.systemOrange) : .secondary)
+            .font(.system(size: min(captionSize * max(CGFloat(charCount) / 280, 1), 28), weight: .bold, design: .rounded))
+            .multilineTextAlignment(.trailing)
         }
-        
-        Spacer()
-        
-        Text("\(280 - charCount)\(tweetLengthWarning)")
-          .foregroundColor(charCount > 200 ? charCount >= 280 ? Color(.systemRed) : Color(.systemOrange) : .secondary)
-          .font(.system(size: min(captionSize * max(CGFloat(charCount) / 280, 1), 28), weight: .bold, design: .rounded))
-          .multilineTextAlignment(.trailing)
+      }
+      .disabled(twitterClient.state == .busy)
+      .padding()
+      .background(Color(.tertiarySystemGroupedBackground))
+      .cornerRadius(captionSize)
+      .onShake {
+        rotatePlaceholder()
+        Haptics.shared.sendStandardFeedback(feedbackType: .success)
+      }
+      .onChange(of: twitterClient.draft.isValid) { isValid in
+        if !isValid && charCount > 280 {
+          Haptics.shared.sendStandardFeedback(feedbackType: .warning)
+        }
+      }
+      .sheet(isPresented: $draftListVisible) {
+        DraftsListView()
+          .environmentObject(ThemeHelper.shared)
+          .environment(\.managedObjectContext, PersistanceController.shared.context)
+      }
+      .onChange(of: mentionString) { value in
+        if let screenName = value {
+          debouncer.renewInterval()
+          debouncer.handler = {
+            self.twitterClient.searchScreenNames(screenName) { users in
+              withAnimation {
+                self.mentionCandidates = users
+              }
+            }
+          }
+        } else {
+          withAnimation {
+            self.mentionCandidates = nil
+          }
+        }
+      }
+      
+      if let users = mentionCandidates {
+        MentionBar(users: users) { user in
+          completeMention(user)
+        }
       }
     }
-    .disabled(twitterClient.state == .busy)
-    .padding()
-    .background(Color(.tertiarySystemGroupedBackground))
-    .cornerRadius(captionSize)
-    .onShake {
-      rotatePlaceholder()
-      Haptics.shared.sendStandardFeedback(feedbackType: .success)
-    }
-    .onChange(of: twitterClient.draft.isValid) { isValid in
-      if !isValid && charCount > 280 {
-        Haptics.shared.sendStandardFeedback(feedbackType: .warning)
-      }
-    }
-    .sheet(isPresented: $draftListVisible) {
-      DraftsListView()
-        .environmentObject(ThemeHelper.shared)
-        .environment(\.managedObjectContext, PersistanceController.shared.context)
-    }
+  }
+  
+  func completeMention(_ user: TwitterClient.User) {
+    let textToComplete = mentioningRegex.firstMatchAsString(tweetText ?? "") ?? ""
+    let draft = twitterClient.draft.text?.replacingOccurrences(of: textToComplete, with: "@\(user.screenName) ")
+    twitterClient.draft.text = draft
   }
   
   func rotatePlaceholder() {

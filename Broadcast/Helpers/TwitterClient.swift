@@ -184,6 +184,16 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
     }
   }
   
+  func searchScreenNames(_ screenName: String, completion: @escaping ([User]) -> Void = { _ in }) {
+    client.searchUsers(using: screenName.replacingOccurrences(of: "@", with: ""), count: 20, includeEntities: false) { result in
+      if let users = result.array?.map({ User(from: $0) }) {
+        completion(users)
+      }
+    } failure: { error in
+      print(error.localizedDescription)
+    }
+  }
+  
   private func getUserTimeline() {
     guard let userId = user?.id else { return }
     client.getTimeline(for: .id(userId)) { _ in
