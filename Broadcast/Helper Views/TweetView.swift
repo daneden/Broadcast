@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TweetView: View {
-  @ScaledMetric private var avatarSize: CGFloat = 40
+  @ScaledMetric private var avatarSize: CGFloat = 36
   @ScaledMetric private var padding: CGFloat = 4
   var tweet: TwitterClient.Tweet
   
@@ -30,28 +30,24 @@ struct TweetView: View {
           .cornerRadius(36)
       }
       
-      VStack(alignment: .leading) {
+      VStack(alignment: .leading, spacing: 4) {
         HStack {
-          if let tweetAuthorName = tweet.author?.name {
-            Text(tweetAuthorName).font(.headline)
+          if let tweetAuthorName = tweet.author?.name,
+             let screenName = tweet.author?.screenName,
+             let date = tweet.date {
+            Text("\(Text(tweetAuthorName).fontWeight(.bold).foregroundColor(.primary)) \(Text("@\(screenName)")) • \(Text(formatter.localizedString(for: date, relativeTo: Date())))")
+              .foregroundColor(.secondary)
           }
-          
-          Group {
-            if let tweetAuthorScreenName = tweet.author?.screenName {
-              Text("@\(tweetAuthorScreenName)")
-            }
-            
-            if let date = tweet.date {
-              Text("• \(formatter.localizedString(for: date, relativeTo: Date()))")
-            }
-          }.foregroundColor(.secondary)
         }
+        .lineLimit(1)
         
         if let tweetText = tweet.text {
-          Text(tweetText)
+          Text(tweetText).lineSpacing(0)
         }
       }
-    }.padding(.vertical, padding)
+    }
+    .font(.broadcastFootnote)
+    .padding(.vertical, padding)
   }
 }
 
