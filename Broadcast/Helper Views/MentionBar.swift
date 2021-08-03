@@ -17,15 +17,16 @@ struct MentionBar: View {
         ForEach(users, id: \.id) { user in
           UserView(user: user)
             .padding(8)
-            .background(VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial)))
+            .background(VisualEffectView(effect: UIBlurEffect(style: .systemMaterial)))
             .cornerRadius(6)
-            .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+            .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 6)
             .onTapGesture {
               tapHandler(user)
             }
         }
       }.padding(12)
     }
+    .background(VisualEffectView(effect: UIBlurEffect(style: .prominent)))
   }
 }
 

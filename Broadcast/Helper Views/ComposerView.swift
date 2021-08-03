@@ -19,7 +19,7 @@ fileprivate let placeholderCandidates: [String] = [
 ]
 
 struct ComposerView: View {
-  let debouncer = Debouncer(timeInterval: 0.4)
+  let debouncer = Debouncer(timeInterval: 0.3)
   @Binding var signOutScreenIsPresented: Bool
   
   @EnvironmentObject var twitterClient: TwitterClient
@@ -131,7 +131,6 @@ struct ComposerView: View {
       .disabled(twitterClient.state == .busy)
       .padding()
       .background(Color(.tertiarySystemGroupedBackground))
-      .cornerRadius(captionSize)
       .onShake {
         rotatePlaceholder()
         Haptics.shared.sendStandardFeedback(feedbackType: .success)
@@ -163,12 +162,14 @@ struct ComposerView: View {
         }
       }
       
-      if let users = mentionCandidates {
+      if let users = mentionCandidates,
+         let mentionString = mentionString,
+         !mentionString.isEmpty {
         MentionBar(users: users) { user in
           completeMention(user)
         }
       }
-    }
+    }.cornerRadius(captionSize)
   }
   
   func completeMention(_ user: TwitterClient.User) {
