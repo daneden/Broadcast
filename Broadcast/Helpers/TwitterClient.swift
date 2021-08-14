@@ -14,6 +14,8 @@ import AuthenticationServices
 import SwiftKeychainWrapper
 import SwiftUI
 
+let typeaheadToken = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
+
 class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
   func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
     return ASPresentationAnchor()
@@ -24,6 +26,8 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   @Published var draft = Tweet()
   @Published var state: State = .idle
   @Published var lastTweet: Tweet?
+  
+  private var searchTick = Date()
   
   private var client = Swifter.init(consumerKey: ClientCredentials.apiKey, consumerSecret: ClientCredentials.apiSecret)
   
@@ -185,13 +189,61 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   }
   
   func searchScreenNames(_ screenName: String, completion: @escaping ([User]) -> Void = { _ in }) {
+    let now = Date()
+    self.searchTick = now
     client.searchUsers(using: screenName.replacingOccurrences(of: "@", with: ""), count: 20, includeEntities: false) { result in
+      // This helps to avoid race conditions
+      if self.searchTick != now {
+        return
+      }
+      
       if let users = result.array?.map({ User(from: $0) }) {
         completion(users)
       }
     } failure: { error in
       print(error.localizedDescription)
     }
+  }
+  
+  @Published var userSearchResults: [User]?
+  private var userSearchCancellables = [AnyCancellable]()
+  func searchScreenNames(_ screenName: String) {
+    let url = URL(string: "https://twitter.com/i/search/typeahead.json?count=10&q=%23\(screenName)&result_type=users")!
+    
+    var headers = [
+      "Authorization": typeaheadToken
+    ]
+    
+    if let userId = user?.id,
+       let token = client.client.credential?.accessToken?.key {
+      headers["Cookie"] = "twid=u%3D\(userId);auth_token=\(token)"
+    }
+    
+    var request = URLRequest(url: url)
+    request.allHTTPHeaderFields = headers
+    request.httpShouldHandleCookies = true
+    
+    URLSession.shared.dataTaskPublisher(for: request)
+      .tryMap() { element -> Data in
+        guard let httpResponse = element.response as? HTTPURLResponse,
+              httpResponse.statusCode == 200 else {
+          throw URLError(.badServerResponse)
+        }
+        return element.data
+      }
+      .decode(type: TypeaheadResponse.self, decoder: JSONDecoder())
+      .sink { completion in
+        switch completion {
+        case .failure(let error):
+          print(error.localizedDescription)
+        default:
+          return
+        }
+      } receiveValue: { result in
+        DispatchQueue.main.async {
+          self.userSearchResults = result.users
+        }
+      }.store(in: &userSearchCancellables)
   }
   
   private func getUserTimeline() {
@@ -314,11 +366,18 @@ extension TwitterClient {
     }
   }
   
-  struct User {
+  struct User: Decodable {
     var id: String
     var screenName: String
     var name: String?
     var profileImageURL: URL?
+    
+    enum CodingKeys: String, CodingKey {
+      case screenName = "screen_name"
+      case profileImageURL = "profile_image_url_https"
+      case id = "id_str"
+      case name
+    }
   }
   
   struct Tweet {
@@ -342,7 +401,7 @@ extension TwitterClient {
         return true
       }
       
-      return 1...280 ~= length
+      return 1...280 ~= length && !(text ?? "").isBlank
     }
     
     var author: User?
@@ -390,4 +449,9 @@ extension Credential.OAuthAccessToken {
       return nil
     }
   }
+}
+
+struct TypeaheadResponse: Decodable {
+  var num_results: Int
+  var users: [TwitterClient.User]?
 }

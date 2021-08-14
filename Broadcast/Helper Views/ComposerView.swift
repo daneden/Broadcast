@@ -33,19 +33,21 @@ struct ComposerView: View {
   
   private let mentioningRegex = NSRegularExpression("@[a-z0-9_]+$", options: .caseInsensitive)
   
-  private var tweetText: String? {
-    twitterClient.draft.text
+  private var tweetText: String {
+    twitterClient.draft.text ?? ""
   }
   
   private var mentionString: String? {
-    mentioningRegex.firstMatchAsString(tweetText ?? "")
+    mentioningRegex.firstMatchAsString(tweetText)
   }
   
   private var charCount: Int {
-    TwitterText.tweetLength(text: tweetText ?? "")
+    TwitterText.tweetLength(text: tweetText)
   }
   
-  @State private var mentionCandidates: [TwitterClient.User]?
+  private var mentionCandidates: [TwitterClient.User]? {
+    twitterClient.userSearchResults
+  }
   
   private var tweetLengthWarning: String {
     switch charCount {
@@ -88,11 +90,11 @@ struct ComposerView: View {
           }
           
           ZStack(alignment: .topLeading) {
-            Text(tweetText ?? placeholder)
+            Text(tweetText.isEmpty ? placeholder : tweetText)
               .padding(.leading, leftOffset)
               .padding(.vertical, verticalPadding)
               .foregroundColor(Color(.placeholderText))
-              .opacity(tweetText == nil ? 1 : 0)
+              .opacity(tweetText.isEmpty ? 1 : 0)
               .accessibility(hidden: true)
             
             TextEditor(text: Binding($twitterClient.draft.text, replacingNilWith: ""))
@@ -149,20 +151,13 @@ struct ComposerView: View {
         if let screenName = value {
           debouncer.renewInterval()
           debouncer.handler = {
-            self.twitterClient.searchScreenNames(screenName) { users in
-              withAnimation {
-                self.mentionCandidates = users
-              }
-            }
-          }
-        } else {
-          withAnimation {
-            self.mentionCandidates = nil
+            self.twitterClient.searchScreenNames(screenName)
           }
         }
       }
       
       if let users = mentionCandidates,
+         !users.isEmpty,
          let mentionString = mentionString,
          !mentionString.isEmpty {
         MentionBar(users: users) { user in
@@ -173,7 +168,7 @@ struct ComposerView: View {
   }
   
   func completeMention(_ user: TwitterClient.User) {
-    let textToComplete = mentioningRegex.firstMatchAsString(tweetText ?? "") ?? ""
+    let textToComplete = mentioningRegex.firstMatchAsString(tweetText) ?? ""
     let draft = twitterClient.draft.text?.replacingOccurrences(of: textToComplete, with: "@\(user.screenName) ")
     twitterClient.draft.text = draft
   }
