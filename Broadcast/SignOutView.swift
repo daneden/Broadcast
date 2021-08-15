@@ -83,6 +83,7 @@ struct SignOutView: View {
               }
             }
         )
+        .accessibilityIdentifier("logoutProfilePhotoHandle")
         
         Color.clear.frame(height: 180)
         
@@ -94,6 +95,7 @@ struct SignOutView: View {
           .background(willDelete ? Color(.systemRed) : Color(.secondarySystemBackground))
           .foregroundColor(willDelete ? .white : .primary)
           .clipShape(Circle())
+          .accessibilityIdentifier("logoutTarget")
       }
       Spacer()
       

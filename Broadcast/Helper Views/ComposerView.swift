@@ -87,6 +87,7 @@ struct ComposerView: View {
                 signOutScreenIsPresented = true
                 UIApplication.shared.endEditing()
               }
+              .accessibilityIdentifier("profilePhotoButton")
           }
           
           ZStack(alignment: .topLeading) {
@@ -102,6 +103,7 @@ struct ComposerView: View {
               .multilineTextAlignment(.leading)
               .keyboardType(.twitter)
               .padding(.top, (verticalPadding / 3) * -1)
+              .accessibilityIdentifier("tweetComposer")
           }
           .font(.broadcastTitle3)
         }.transition(.scale)

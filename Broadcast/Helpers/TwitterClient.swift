@@ -16,11 +16,7 @@ import SwiftUI
 
 let typeaheadToken = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
-class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
-  func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-    return ASPresentationAnchor()
-  }
-  
+class TwitterClient: NSObject, ObservableObject {
   let draftsStore = PersistanceController.shared
   @Published var user: User?
   @Published var draft = Tweet()
@@ -101,6 +97,10 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   }
   
   func retreiveCredentials() -> Credential.OAuthAccessToken? {
+    if isTestEnvironment {
+      return .init(queryString: ClientCredentials.__authQueryString)
+    }
+    
     guard let data = KeychainWrapper.standard.data(forKey: "broadcast-credentials") else {
       return nil
     }
@@ -174,9 +174,11 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
     lastTweet.retweets = json["retweet_count"].integer
     lastTweet.numericId = json["id"].integer
     
-    self.getReplies(for: lastTweet) { replies in
-      lastTweet.replies = replies
-      self.lastTweet = lastTweet
+    if !isTestEnvironment {
+      self.getReplies(for: lastTweet) { replies in
+        lastTweet.replies = replies
+        self.lastTweet = lastTweet
+      }
     }
   }
   
@@ -266,6 +268,12 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   }
 }
 
+extension TwitterClient: ASWebAuthenticationPresentationContextProviding {
+  func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+    return ASPresentationAnchor()
+  }
+}
+
 /* MARK: Drafts */
 extension TwitterClient {
   /// Saves the current draft to CoreData for later retrieval. This method also resets/clears the current draft.
@@ -337,6 +345,14 @@ extension TwitterClient {
     static var apiSecret: String {
       guard let value = plist?.object(forKey: "API_SECRET") as? String else {
         fatalError("Couldn't find key 'API_KEY' in 'TwitterAPI-Info.plist'.")
+      }
+      
+      return value
+    }
+    
+    static var __authQueryString: String {
+      guard let value = plist?.object(forKey: "__TEST_AUTH_QUERY_STRING") as? String else {
+        fatalError("Couldn't find key '__TEST_AUTH_QUERY_STRING' in 'TwitterAPI-Info.plist'.")
       }
       
       return value

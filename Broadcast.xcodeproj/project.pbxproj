@@ -8,8 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		7101073626C810AC00A713A5 /* NullStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7101073526C810AC00A713A5 /* NullStateView.swift */; };
+		711EF99426C959A700FD8A9F /* BroadcastUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711EF99326C959A700FD8A9F /* BroadcastUITests.swift */; };
 		711F3FFA268F50C800605C89 /* Animation.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711F3FF9268F50C800605C89 /* Animation.extension.swift */; };
 		715AAE0A26C923A1002BCEA1 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 715AAE0926C923A1002BCEA1 /* Swifter */; };
+		715AAE0C26C9589A002BCEA1 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 715AAE0B26C9589A002BCEA1 /* TestUtils.swift */; };
 		717041F326B6FFEA00001360 /* RepliesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717041F226B6FFEA00001360 /* RepliesListView.swift */; };
 		717041F526B7037300001360 /* TweetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717041F426B7037300001360 /* TweetView.swift */; };
 		717041F726B703A600001360 /* TwitterClient+MockTweet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717041F626B703A600001360 /* TwitterClient+MockTweet.swift */; };
@@ -53,9 +55,23 @@
 		71E36FFB2689EED40078D956 /* ShakeModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E36FFA2689EED40078D956 /* ShakeModifier.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		711EF99626C959A700FD8A9F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7188E61D2687B0FE007CFD78 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7188E6242687B0FE007CFD78;
+			remoteInfo = Broadcast;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		7101073526C810AC00A713A5 /* NullStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NullStateView.swift; sourceTree = "<group>"; };
+		711EF99126C959A700FD8A9F /* BroadcastUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BroadcastUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		711EF99326C959A700FD8A9F /* BroadcastUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastUITests.swift; sourceTree = "<group>"; };
+		711EF99526C959A700FD8A9F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		711F3FF9268F50C800605C89 /* Animation.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.extension.swift; sourceTree = "<group>"; };
+		715AAE0B26C9589A002BCEA1 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
 		717041F226B6FFEA00001360 /* RepliesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepliesListView.swift; sourceTree = "<group>"; };
 		717041F426B7037300001360 /* TweetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TweetView.swift; sourceTree = "<group>"; };
 		717041F626B703A600001360 /* TwitterClient+MockTweet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TwitterClient+MockTweet.swift"; sourceTree = "<group>"; };
@@ -99,6 +115,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		711EF98E26C959A700FD8A9F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7188E6222687B0FE007CFD78 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -113,10 +136,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		711EF99226C959A700FD8A9F /* BroadcastUITests */ = {
+			isa = PBXGroup;
+			children = (
+				711EF99326C959A700FD8A9F /* BroadcastUITests.swift */,
+				711EF99526C959A700FD8A9F /* Info.plist */,
+			);
+			path = BroadcastUITests;
+			sourceTree = "<group>";
+		};
 		7188E61C2687B0FE007CFD78 = {
 			isa = PBXGroup;
 			children = (
 				7188E6272687B0FE007CFD78 /* Broadcast */,
+				711EF99226C959A700FD8A9F /* BroadcastUITests */,
 				7188E6262687B0FE007CFD78 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -125,6 +158,7 @@
 			isa = PBXGroup;
 			children = (
 				7188E6252687B0FE007CFD78 /* Broadcast.app */,
+				711EF99126C959A700FD8A9F /* BroadcastUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -182,6 +216,7 @@
 				71B8290B268D0AC6002AEE72 /* TwitterClient.swift */,
 				71800BFE26999BA6009D11A1 /* PersistanceController.swift */,
 				7199AE7F26B9892E001DEB46 /* Debouncer.swift */,
+				715AAE0B26C9589A002BCEA1 /* TestUtils.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -212,6 +247,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		711EF99026C959A700FD8A9F /* BroadcastUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 711EF99A26C959A700FD8A9F /* Build configuration list for PBXNativeTarget "BroadcastUITests" */;
+			buildPhases = (
+				711EF98D26C959A700FD8A9F /* Sources */,
+				711EF98E26C959A700FD8A9F /* Frameworks */,
+				711EF98F26C959A700FD8A9F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				711EF99726C959A700FD8A9F /* PBXTargetDependency */,
+			);
+			name = BroadcastUITests;
+			productName = BroadcastUITests;
+			productReference = 711EF99126C959A700FD8A9F /* BroadcastUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		7188E6242687B0FE007CFD78 /* Broadcast */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7188E6342687B0FF007CFD78 /* Build configuration list for PBXNativeTarget "Broadcast" */;
@@ -245,6 +298,10 @@
 				LastSwiftUpdateCheck = 1250;
 				LastUpgradeCheck = 1250;
 				TargetAttributes = {
+					711EF99026C959A700FD8A9F = {
+						CreatedOnToolsVersion = 12.5.1;
+						TestTargetID = 7188E6242687B0FE007CFD78;
+					};
 					7188E6242687B0FE007CFD78 = {
 						CreatedOnToolsVersion = 12.5.1;
 					};
@@ -270,11 +327,19 @@
 			projectRoot = "";
 			targets = (
 				7188E6242687B0FE007CFD78 /* Broadcast */,
+				711EF99026C959A700FD8A9F /* BroadcastUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		711EF98F26C959A700FD8A9F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7188E6232687B0FE007CFD78 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -308,6 +373,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		711EF98D26C959A700FD8A9F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				711EF99426C959A700FD8A9F /* BroadcastUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7188E6212687B0FE007CFD78 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -349,12 +422,59 @@
 				7188E65F26889147007CFD78 /* SignOutView.swift in Sources */,
 				71A1088A268B073B007E1FFB /* Haptics.swift in Sources */,
 				71BBAAE9268CF1BD004048A0 /* ComposerView.swift in Sources */,
+				715AAE0C26C9589A002BCEA1 /* TestUtils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		711EF99726C959A700FD8A9F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7188E6242687B0FE007CFD78 /* Broadcast */;
+			targetProxy = 711EF99626C959A700FD8A9F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		711EF99826C959A700FD8A9F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YC249PY26F;
+				INFOPLIST_FILE = BroadcastUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = me.daneden.BroadcastUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Broadcast;
+			};
+			name = Debug;
+		};
+		711EF99926C959A700FD8A9F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YC249PY26F;
+				INFOPLIST_FILE = BroadcastUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = me.daneden.BroadcastUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Broadcast;
+			};
+			name = Release;
+		};
 		7188E6322687B0FF007CFD78 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -522,6 +642,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		711EF99A26C959A700FD8A9F /* Build configuration list for PBXNativeTarget "BroadcastUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				711EF99826C959A700FD8A9F /* Debug */,
+				711EF99926C959A700FD8A9F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		7188E6202687B0FE007CFD78 /* Build configuration list for PBXProject "Broadcast" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

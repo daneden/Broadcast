@@ -88,6 +88,7 @@ struct ContentView: View {
                 .font(.broadcastHeadline)
             }
             .buttonStyle(BroadcastButtonStyle())
+            .accessibilityIdentifier("loginButton")
           }
         }
         .padding()
