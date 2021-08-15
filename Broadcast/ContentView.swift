@@ -12,6 +12,7 @@ import TwitterText
 struct ContentView: View {
   @ScaledMetric private var captionSize: CGFloat = 14
   @ScaledMetric private var bottomPadding: CGFloat = 80
+  @ScaledMetric private var replyBoxLimit: CGFloat = 96
   
   @EnvironmentObject var twitterClient: TwitterClient
   
@@ -23,11 +24,9 @@ struct ContentView: View {
   @State private var replying = false
   @State private var replyBoxHeight: CGFloat = 0
   
-  private var coordinateSpaceName = "mainViewCoordinateSpace"
-  
   private var imageHeightCompensation: CGFloat {
     (twitterClient.draft.media == nil ? 0 : bottomPadding) +
-      (replying ? replyBoxHeight : 0)
+      (replying ? min(replyBoxHeight, replyBoxLimit) : 0)
   }
   
   var body: some View {
@@ -37,11 +36,14 @@ struct ContentView: View {
           VStack {
             if replying, let lastTweet = twitterClient.lastTweet {
               LastTweetReplyView(lastTweet: lastTweet)
+                .background(GeometryReader { geometry in
+                  Color.clear.preference(
+                    key: ReplyBoxSizePreferenceKey.self,
+                    value: geometry.size.height
+                  )
+                })
                 .onTapGesture {
                   repliesSheetIsPresented = true
-                }
-                .onAppear {
-                  replyBoxHeight = geom.frame(in: .global).minY
                 }
             }
             
@@ -76,7 +78,6 @@ struct ContentView: View {
           .padding(.bottom, bottomPadding)
           .frame(maxWidth: geom.size.width)
         }
-        .coordinateSpace(name: coordinateSpaceName)
         
         VStack {
           if twitterClient.user != nil {
@@ -112,6 +113,20 @@ struct ContentView: View {
       .onChange(of: replying) { _ in
         twitterClient.revalidateAccount()
       }
+      .onPreferenceChange(ReplyBoxSizePreferenceKey.self) { newValue in
+        withAnimation(.easeInOut(duration: 0.1)) { replyBoxHeight = newValue }
+      }
+    }
+  }
+}
+
+extension ContentView {
+  struct ReplyBoxSizePreferenceKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    
+    static func reduce(value: inout CGFloat,
+                       nextValue: () -> CGFloat) {
+      value = max(value, nextValue())
     }
   }
 }
