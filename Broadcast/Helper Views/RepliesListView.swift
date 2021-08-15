@@ -13,18 +13,22 @@ struct RepliesListView: View {
   
   var body: some View {
     NavigationView {
-      List {
-        if let tweet = tweet, let replies = tweet.replies {
-          ForEach(replies, id: \.id) { reply in
-            TweetView(tweet: reply)
-              .onTapGesture {
-                guard let screenName = reply.author?.screenName,
-                      let tweetId = reply.id else { return }
-                let url = URL(string: "https://twitter.com/\(screenName)/status/\(tweetId)")
-                
-                UIApplication.shared.open(url!)
-              }
+      Group {
+        if let tweet = tweet, let replies = tweet.replies, !replies.isEmpty {
+          List {
+            ForEach(replies, id: \.id) { reply in
+              TweetView(tweet: reply)
+                .onTapGesture {
+                  guard let screenName = reply.author?.screenName,
+                        let tweetId = reply.id else { return }
+                  let url = URL(string: "https://twitter.com/\(screenName)/status/\(tweetId)")
+                  
+                  UIApplication.shared.open(url!)
+                }
+            }
           }
+        } else {
+          NullStateView(type: .replies)
         }
       }.navigationTitle("Replies")
       .toolbar {
@@ -37,7 +41,7 @@ struct RepliesListView: View {
 }
 
 struct RepliesListView_Previews: PreviewProvider {
-    static var previews: some View {
-        RepliesListView()
-    }
+  static var previews: some View {
+    RepliesListView()
+  }
 }

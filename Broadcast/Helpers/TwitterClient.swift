@@ -27,8 +27,6 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   @Published var state: State = .idle
   @Published var lastTweet: Tweet?
   
-  private var searchTick = Date()
-  
   private var client = Swifter.init(consumerKey: ClientCredentials.apiKey, consumerSecret: ClientCredentials.apiSecret)
   
   override init() {
@@ -70,14 +68,14 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
       return
     }
     
-    client.showUser(.id(userId)) { json in
+    client.showUser(.id(userId), tweetMode: .extended) { json in
       /** If the `showUser` call was successful, we can reuse the result to update the user’s profile photo */
       guard let urlString = json["profile_image_url_https"].string else {
         return
       }
       
       withAnimation {
-        self.user?.profileImageURL = URL(string: urlString.replacingOccurrences(of: "_normal", with: ""))
+        self.user?.originalProfileImageURL = URL(string: urlString.replacingOccurrences(of: "_normal", with: ""))
       }
       
       self.updateLastTweet(from: json["status"])
@@ -171,7 +169,7 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
   private func updateLastTweet(from json: JSON) {
     guard let id = json["id_str"].string else { return }
     var lastTweet = Tweet(id: id)
-    lastTweet.text = json["text"].string
+    lastTweet.text = json["full_text"].string ?? json["text"].string
     lastTweet.likes = json["favorite_count"].integer
     lastTweet.retweets = json["retweet_count"].integer
     lastTweet.numericId = json["id"].integer
@@ -182,26 +180,11 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
     }
   }
   
+  /// Asynchronously update client state on the main thread
+  /// - Parameter newState: The new state for the client
   private func updateState(_ newState: State) {
     DispatchQueue.main.async {
       self.state = newState
-    }
-  }
-  
-  func searchScreenNames(_ screenName: String, completion: @escaping ([User]) -> Void = { _ in }) {
-    let now = Date()
-    self.searchTick = now
-    client.searchUsers(using: screenName.replacingOccurrences(of: "@", with: ""), count: 20, includeEntities: false) { result in
-      // This helps to avoid race conditions
-      if self.searchTick != now {
-        return
-      }
-      
-      if let users = result.array?.map({ User(from: $0) }) {
-        completion(users)
-      }
-    } failure: { error in
-      print(error.localizedDescription)
     }
   }
   
@@ -246,29 +229,25 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
       }.store(in: &userSearchCancellables)
   }
   
-  private func getUserTimeline() {
-    guard let userId = user?.id else { return }
-    client.getTimeline(for: .id(userId)) { _ in
-      
-    } failure: { error in
-      print(error.localizedDescription)
-    }
-  }
-  
+  /// Asynchronously provides up to 200 replies for the given tweet. This method works by fetching the
+  /// most recent 200 @mentions for the user and filters the result to those replying to the provided tweet.
+  /// - Parameters:
+  ///   - tweet: The tweet to fetch replies for
+  ///   - completion: A callback for handling the replies
   private func getReplies(for tweet: Tweet, completion: @escaping ([Tweet]) -> Void = { _ in }) {
     let formatter = DateFormatter()
     formatter.dateFormat = "EE MMM dd HH:mm:ss Z yyyy"
     
     guard let tweetId = tweet.id else { return }
     
-    client.getMentionsTimelineTweets(count: 200) { json in
+    client.getMentionsTimelineTweets(count: 200, tweetMode: .extended) { json in
       guard let repliesResult = json.array else { return }
       let repliesToThisTweet: [Tweet?] = repliesResult.filter { json in
         guard let replyId = json["in_reply_to_status_id"].integer else { return false }
         return replyId == tweet.numericId
       }.map { json in
         guard let id = json["id_str"].string,
-              let text = json["text"].string,
+              let text = json["full_text"].string,
               let dateString = json["created_at"].string,
               let date = formatter.date(from: dateString) else {
           return nil
@@ -289,6 +268,7 @@ class TwitterClient: NSObject, ObservableObject, ASWebAuthenticationPresentation
 
 /* MARK: Drafts */
 extension TwitterClient {
+  /// Saves the current draft to CoreData for later retrieval. This method also resets/clears the current draft.
   func saveDraft() {
     guard draft.isValid else { return }
     let copy = draft
@@ -309,6 +289,8 @@ extension TwitterClient {
     }
   }
   
+  /// Retrieve the specified draft from CoreData, storing it in memory and deleting it from the CoreData database
+  /// - Parameter draft: The chosen draft for retrieval and deletion
   func retreiveDraft(draft: Draft) {
     withAnimation {
       self.draft = Tweet(text: draft.text)
@@ -370,11 +352,18 @@ extension TwitterClient {
     var id: String
     var screenName: String
     var name: String?
-    var profileImageURL: URL?
+    var originalProfileImageURL: URL?
+    var profileImageURL: URL? {
+      if let urlString = originalProfileImageURL?.absoluteString.replacingOccurrences(of: "_normal", with: "_x96") {
+        return URL(string: urlString)
+      } else {
+        return originalProfileImageURL
+      }
+    }
     
     enum CodingKeys: String, CodingKey {
       case screenName = "screen_name"
-      case profileImageURL = "profile_image_url_https"
+      case originalProfileImageURL = "profile_image_url_https"
       case id = "id_str"
       case name
     }
@@ -414,7 +403,7 @@ extension TwitterClient.User {
     self.screenName = json["screen_name"].string ?? "TwitterUser"
     self.id = json["id_str"].string ?? ""
     let imageUrlString = json["profile_image_url_https"].string ?? ""
-    self.profileImageURL = URL(string: imageUrlString.replacingOccurrences(of: "_normal", with: ""))
+    self.originalProfileImageURL = URL(string: imageUrlString)
   }
 }
 

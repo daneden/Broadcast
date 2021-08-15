@@ -3,11 +3,11 @@
     "pins": [
       {
         "package": "Swifter",
-        "repositoryURL": "https://github.com/mattdonnelly/Swifter",
+        "repositoryURL": "https://github.com/daneden/Swifter",
         "state": {
           "branch": null,
-          "revision": "50682ebe64e4c08f18957ccfd16888f035c20755",
-          "version": "2.5.0"
+          "revision": "21a1cf736971d07dec56cf5cc0294f31a34ec528",
+          "version": "2.5.1"
         }
       },
       {

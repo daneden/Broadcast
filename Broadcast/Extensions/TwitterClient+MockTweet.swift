@@ -26,7 +26,7 @@ extension TwitterClient.User {
     TwitterClient.User(
       id: "0",
       screenName: "_dte",
-      profileImageURL: URL(string: "https://pbs.twimg.com/profile_images/1337359860409790469/javRMXyG_x96.jpg")!
+      originalProfileImageURL: URL(string: "https://pbs.twimg.com/profile_images/1337359860409790469/javRMXyG_x96.jpg")!
     )
   }
 }
