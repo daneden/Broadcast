@@ -30,6 +30,9 @@ struct BroadcastApp: App {
               
               persistenceController.save()
             }
+            .task {
+              await AuthenticationProvider().requestAuthentication()
+            }
           
           VisualEffectView(effect: UIBlurEffect(style: .regular))
             .frame(height: geom.safeAreaInsets.top)
