@@ -62,7 +62,7 @@ struct ContentView: View {
                 }
             }
             
-            if $twitterClient.user.wrappedValue != nil {
+            if twitterClient.user != nil {
               ComposerView(signOutScreenIsPresented: $signOutScreenIsPresented)
                 .frame(
                   height: geom.size.height - (bottomPadding + (captionSize * 2)) - imageHeightCompensation,
