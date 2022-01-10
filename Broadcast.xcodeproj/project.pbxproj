@@ -10,6 +10,7 @@
 		7101073626C810AC00A713A5 /* NullStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7101073526C810AC00A713A5 /* NullStateView.swift */; };
 		711EF99426C959A700FD8A9F /* BroadcastUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711EF99326C959A700FD8A9F /* BroadcastUITests.swift */; };
 		711F3FFA268F50C800605C89 /* Animation.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711F3FF9268F50C800605C89 /* Animation.extension.swift */; };
+		712EF6E0278C8B60007C09F6 /* URLRequest+OAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 712EF6DF278C8B60007C09F6 /* URLRequest+OAuth.swift */; };
 		715AAE0A26C923A1002BCEA1 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 715AAE0926C923A1002BCEA1 /* Swifter */; };
 		715AAE0C26C9589A002BCEA1 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 715AAE0B26C9589A002BCEA1 /* TestUtils.swift */; };
 		717041F326B6FFEA00001360 /* RepliesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717041F226B6FFEA00001360 /* RepliesListView.swift */; };
@@ -73,6 +74,7 @@
 		711EF99326C959A700FD8A9F /* BroadcastUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastUITests.swift; sourceTree = "<group>"; };
 		711EF99526C959A700FD8A9F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		711F3FF9268F50C800605C89 /* Animation.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.extension.swift; sourceTree = "<group>"; };
+		712EF6DF278C8B60007C09F6 /* URLRequest+OAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLRequest+OAuth.swift"; sourceTree = "<group>"; };
 		715AAE0B26C9589A002BCEA1 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
 		717041F226B6FFEA00001360 /* RepliesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepliesListView.swift; sourceTree = "<group>"; };
 		717041F426B7037300001360 /* TweetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TweetView.swift; sourceTree = "<group>"; };
@@ -208,6 +210,7 @@
 				71800BF7269998BF009D11A1 /* UIImage.extension.swift */,
 				717041F626B703A600001360 /* TwitterClient+MockTweet.swift */,
 				7199AE7926B96D0D001DEB46 /* NSRegularExpression+Convenience.swift */,
+				712EF6DF278C8B60007C09F6 /* URLRequest+OAuth.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -393,6 +396,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7188E6612688A01F007CFD78 /* Font.extension.swift in Sources */,
+				712EF6E0278C8B60007C09F6 /* URLRequest+OAuth.swift in Sources */,
 				7188E62B2687B0FE007CFD78 /* ContentView.swift in Sources */,
 				717041F526B7037300001360 /* TweetView.swift in Sources */,
 				7188E63B2687B19D007CFD78 /* Notification.extension.swift in Sources */,

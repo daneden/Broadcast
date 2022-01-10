@@ -8,6 +8,7 @@
 import Foundation
 import AuthenticationServices
 import Combine
+import CommonCrypto
 
 class AuthenticationProvider: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
   func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
@@ -16,45 +17,66 @@ class AuthenticationProvider: NSObject, ObservableObject, ASWebAuthenticationPre
   
   func requestAuthentication() async {
     let creds = TwitterClient.ClientCredentials.self
+    let callback = creds.callbackURL.absoluteString
     
-    guard let callbackURL = creds.callbackURL.absoluteString.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed) else {
-      return
-    }
+    var urlRequest = URLRequest(url: URL(string: "https://api.twitter.com/oauth/request_token")!)
     
-    var requestTokenComponents = URLComponents()
+    urlRequest.oAuthSign(method: "POST", urlFormParameters: ["oauth_callback" : callback], consumerCredentials: (key: creds.apiKey, secret: creds.apiSecret))
     
-    requestTokenComponents.scheme = "https"
-    requestTokenComponents.host = "api.twitter.com"
-    requestTokenComponents.path = "/2/oauth/request_token"
-    requestTokenComponents.queryItems = [
-      URLQueryItem(name: "oauth_callback", value: callbackURL)
-    ]
-    
-    guard let requestTokenURL = requestTokenComponents.url else {
-      return
-    }
-    
-    var requestTokenRequest = URLRequest(url: requestTokenURL)
-    
-    requestTokenRequest.httpMethod = "POST"
-    
-    let clientKey = creds.apiKey
-    let clientSecret = creds.apiSecret
-    let requestTokenAuthorizationHeader = """
-OAuth
-oauth_consumer_key="\(clientKey)"
-"""
-    
-    requestTokenRequest.setValue("", forHTTPHeaderField: "Authorization")
+    var oauthToken: String = ""
+    var oauthTokenSecret: String = ""
     
     do {
-      let (requestTokenData, _) = try await URLSession.shared.data(for: requestTokenRequest)
+      let (requestTokenData, _) = try await URLSession.shared.data(for: urlRequest)
       
-      let decoded = try JSONDecoder().decode(String.self, from: requestTokenData)
+      guard let response = String(data: requestTokenData, encoding: .utf8)?.urlQueryStringParameters,
+      let token = response["oauth_token"],
+      let tokenSecret = response["oauth_token_secret"] else {
+        return
+      }
       
-      print(decoded)
+      oauthToken = token
+      oauthTokenSecret = tokenSecret
     } catch {
       print(error.localizedDescription)
     }
+    
+    let authURL = URL(string: "https://api.twitter.com/oauth/authorize?oauth_token=\(oauthToken)")!
+    
+    let authSession = ASWebAuthenticationSession(url: authURL, callbackURLScheme: "https") { (url, error) in
+      if let error = error {
+        print(error.localizedDescription)
+      } else if let url = url {
+        print(url)
+      }
+    }
+    
+    authSession.presentationContextProvider = self
+    authSession.start()
+  }
+}
+
+extension String {
+  var urlEncoded: String {
+    var charset: CharacterSet = .urlQueryAllowed
+    charset.remove(charactersIn: "\n:#/?@!$&'()*+,;=")
+    return self.addingPercentEncoding(withAllowedCharacters: charset)!
+  }
+}
+
+extension String {
+  var urlQueryStringParameters: Dictionary<String, String> {
+    // breaks apart query string into a dictionary of values
+    var params = [String: String]()
+    let items = self.split(separator: "&")
+    for item in items {
+      let combo = item.split(separator: "=")
+      if combo.count == 2 {
+        let key = "\(combo[0])"
+        let val = "\(combo[1])"
+        params[key] = val
+      }
+    }
+    return params
   }
 }
