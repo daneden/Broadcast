@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>__TEST_AUTH_QUERY_STRING</key>
+	<string>Enter auth query string here (necessary for tests)</string>
+	<key>API_SECRET</key>
+	<string>Enter API Secret Here</string>
+	<key>API_KEY</key>
+	<string>Enter API Key Here</string>
+</dict>
+</plist>
