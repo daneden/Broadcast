@@ -29,6 +29,15 @@
         }
       },
       {
+        "package": "Twift",
+        "repositoryURL": "https://github.com/daneden/Twift.git",
+        "state": {
+          "branch": "main",
+          "revision": "0a620fb27248dae40f6b6b3aa2d3060a4d30a466",
+          "version": null
+        }
+      },
+      {
         "package": "twitter-text",
         "repositoryURL": "https://github.com/nysander/twitter-text.git",
         "state": {

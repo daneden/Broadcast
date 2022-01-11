@@ -10,7 +10,7 @@
 		7101073626C810AC00A713A5 /* NullStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7101073526C810AC00A713A5 /* NullStateView.swift */; };
 		711EF99426C959A700FD8A9F /* BroadcastUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711EF99326C959A700FD8A9F /* BroadcastUITests.swift */; };
 		711F3FFA268F50C800605C89 /* Animation.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711F3FF9268F50C800605C89 /* Animation.extension.swift */; };
-		712EF6E0278C8B60007C09F6 /* URLRequest+OAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 712EF6DF278C8B60007C09F6 /* URLRequest+OAuth.swift */; };
+		714782D5278D97AB00942618 /* Twift in Frameworks */ = {isa = PBXBuildFile; productRef = 714782D4278D97AB00942618 /* Twift */; };
 		715AAE0A26C923A1002BCEA1 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 715AAE0926C923A1002BCEA1 /* Swifter */; };
 		715AAE0C26C9589A002BCEA1 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 715AAE0B26C9589A002BCEA1 /* TestUtils.swift */; };
 		717041F326B6FFEA00001360 /* RepliesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717041F226B6FFEA00001360 /* RepliesListView.swift */; };
@@ -49,7 +49,6 @@
 		7199AE8026B9892E001DEB46 /* Debouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7199AE7F26B9892E001DEB46 /* Debouncer.swift */; };
 		71A1088A268B073B007E1FFB /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A10889268B073B007E1FFB /* Haptics.swift */; };
 		71A6A264278C73AD00BF2387 /* TwitterAPI-Info.example.plist in Resources */ = {isa = PBXBuildFile; fileRef = 71A6A263278C73AD00BF2387 /* TwitterAPI-Info.example.plist */; };
-		71A6A266278C784C00BF2387 /* TestAuthenticationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A6A265278C784C00BF2387 /* TestAuthenticationProvider.swift */; };
 		71AA4AC6268A032400B7B577 /* RemoteImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71AA4AC5268A032400B7B577 /* RemoteImage.swift */; };
 		71B8290C268D0AC6002AEE72 /* TwitterClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B8290B268D0AC6002AEE72 /* TwitterClient.swift */; };
 		71B82910268F2195002AEE72 /* LastTweetReplyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B8290F268F2195002AEE72 /* LastTweetReplyView.swift */; };
@@ -74,7 +73,6 @@
 		711EF99326C959A700FD8A9F /* BroadcastUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastUITests.swift; sourceTree = "<group>"; };
 		711EF99526C959A700FD8A9F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		711F3FF9268F50C800605C89 /* Animation.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.extension.swift; sourceTree = "<group>"; };
-		712EF6DF278C8B60007C09F6 /* URLRequest+OAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLRequest+OAuth.swift"; sourceTree = "<group>"; };
 		715AAE0B26C9589A002BCEA1 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
 		717041F226B6FFEA00001360 /* RepliesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepliesListView.swift; sourceTree = "<group>"; };
 		717041F426B7037300001360 /* TweetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TweetView.swift; sourceTree = "<group>"; };
@@ -111,7 +109,6 @@
 		7199AE7F26B9892E001DEB46 /* Debouncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debouncer.swift; sourceTree = "<group>"; };
 		71A10889268B073B007E1FFB /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		71A6A263278C73AD00BF2387 /* TwitterAPI-Info.example.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TwitterAPI-Info.example.plist"; sourceTree = "<group>"; };
-		71A6A265278C784C00BF2387 /* TestAuthenticationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestAuthenticationProvider.swift; sourceTree = "<group>"; };
 		71AA4AC5268A032400B7B577 /* RemoteImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImage.swift; sourceTree = "<group>"; };
 		71B8290B268D0AC6002AEE72 /* TwitterClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitterClient.swift; sourceTree = "<group>"; };
 		71B8290F268F2195002AEE72 /* LastTweetReplyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastTweetReplyView.swift; sourceTree = "<group>"; };
@@ -135,6 +132,7 @@
 				7188E65D26887DCD007CFD78 /* SwiftKeychainWrapper in Frameworks */,
 				7188E66A2688D7BA007CFD78 /* Introspect in Frameworks */,
 				719087CD26891586005B96CE /* TwitterText in Frameworks */,
+				714782D5278D97AB00942618 /* Twift in Frameworks */,
 				715AAE0A26C923A1002BCEA1 /* Swifter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -185,7 +183,6 @@
 				71BBAAEA268CF532004048A0 /* TwitterAPI-Info.plist */,
 				71A6A263278C73AD00BF2387 /* TwitterAPI-Info.example.plist */,
 				71800BFB26999B1B009D11A1 /* DraftsModel.xcdatamodeld */,
-				71A6A265278C784C00BF2387 /* TestAuthenticationProvider.swift */,
 			);
 			path = Broadcast;
 			sourceTree = "<group>";
@@ -210,7 +207,6 @@
 				71800BF7269998BF009D11A1 /* UIImage.extension.swift */,
 				717041F626B703A600001360 /* TwitterClient+MockTweet.swift */,
 				7199AE7926B96D0D001DEB46 /* NSRegularExpression+Convenience.swift */,
-				712EF6DF278C8B60007C09F6 /* URLRequest+OAuth.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -293,6 +289,7 @@
 				7188E6692688D7BA007CFD78 /* Introspect */,
 				719087CC26891586005B96CE /* TwitterText */,
 				715AAE0926C923A1002BCEA1 /* Swifter */,
+				714782D4278D97AB00942618 /* Twift */,
 			);
 			productName = Broadcast;
 			productReference = 7188E6252687B0FE007CFD78 /* Broadcast.app */;
@@ -330,6 +327,7 @@
 				7188E6682688D7BA007CFD78 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 				719087CB26891586005B96CE /* XCRemoteSwiftPackageReference "twitter-text" */,
 				715AAE0826C923A1002BCEA1 /* XCRemoteSwiftPackageReference "Swifter" */,
+				714782D3278D97AB00942618 /* XCRemoteSwiftPackageReference "Twift" */,
 			);
 			productRefGroup = 7188E6262687B0FE007CFD78 /* Products */;
 			projectDirPath = "";
@@ -396,13 +394,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				7188E6612688A01F007CFD78 /* Font.extension.swift in Sources */,
-				712EF6E0278C8B60007C09F6 /* URLRequest+OAuth.swift in Sources */,
 				7188E62B2687B0FE007CFD78 /* ContentView.swift in Sources */,
 				717041F526B7037300001360 /* TweetView.swift in Sources */,
 				7188E63B2687B19D007CFD78 /* Notification.extension.swift in Sources */,
 				717041F326B6FFEA00001360 /* RepliesListView.swift in Sources */,
 				7188E6292687B0FE007CFD78 /* BroadcastApp.swift in Sources */,
-				71A6A266278C784C00BF2387 /* TestAuthenticationProvider.swift in Sources */,
 				71B8290C268D0AC6002AEE72 /* TwitterClient.swift in Sources */,
 				7188E6632688A0FC007CFD78 /* WelcomeView.swift in Sources */,
 				7199AE7A26B96D0D001DEB46 /* NSRegularExpression+Convenience.swift in Sources */,
@@ -684,6 +680,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		714782D3278D97AB00942618 /* XCRemoteSwiftPackageReference "Twift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/daneden/Twift.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		715AAE0826C923A1002BCEA1 /* XCRemoteSwiftPackageReference "Swifter" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/daneden/Swifter";
@@ -719,6 +723,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		714782D4278D97AB00942618 /* Twift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 714782D3278D97AB00942618 /* XCRemoteSwiftPackageReference "Twift" */;
+			productName = Twift;
+		};
 		715AAE0926C923A1002BCEA1 /* Swifter */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 715AAE0826C923A1002BCEA1 /* XCRemoteSwiftPackageReference "Swifter" */;
