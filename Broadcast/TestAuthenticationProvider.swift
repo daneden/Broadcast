@@ -66,9 +66,23 @@ extension UserIDsArray: RawRepresentable {
   }
 }
 
+struct OAuthToken: Codable {
+  var key: String
+  var secret: String
+}
+
 @MainActor
-class AuthenticationProvider: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
-  private let creds = TwitterClient.ClientCredentials.self
+class Twift: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
+  var clientCredentials: OAuthToken
+  var userCredentials: OAuthToken?
+  var callbackURL: URL
+  
+  init(clientCredentials: OAuthToken, userCredentials: OAuthToken?, callbackURL: URL) {
+    self.clientCredentials = clientCredentials
+    self.userCredentials = userCredentials
+    self.callbackURL = callbackURL
+  }
+  
   @AppStorage("authenticatedUserIDs") var authenticatedUserIDs: UserIDsArray = []
   func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
     return ASPresentationAnchor()
@@ -77,7 +91,7 @@ class AuthenticationProvider: NSObject, ObservableObject, ASWebAuthenticationPre
   func userIsAuthorized(userID: UserCredentials.ID) async -> Bool {
     do {
       var urlRequest = URLRequest(url: URL(string: "https://api.twitter.com/2/users/me")!)
-      try signRequest(&urlRequest, userID: userID, method: "GET")
+      try signRequest(&urlRequest, method: "GET")
       
       let (data, _) = try await URLSession.shared.data(for: urlRequest)
       
@@ -98,31 +112,28 @@ class AuthenticationProvider: NSObject, ObservableObject, ASWebAuthenticationPre
   ///   - contentType: The content type for the request
   /// - Returns: The signed URL request
   func signRequest(_ urlRequest: inout URLRequest,
-                   userID: UserCredentials.ID,
                    method: String,
                    body: Data? = nil,
                    contentType: String? = nil
   ) throws {
-    guard let userCredentialData = KeychainWrapper.standard.data(forKey: userID.keychainIdentifier) else {
-      throw RequestSigningError.MissingCredentials(forUserID: userID)
+    guard let userCredentials = userCredentials else {
+      throw RequestSigningError.MissingCredentials
     }
-    
-    guard let user = try? JSONDecoder().decode(UserCredentials.self, from: userCredentialData) else {
-      throw RequestSigningError.DecodingError
-    }
-    
+
     urlRequest.oAuthSign(
       method: method,
       body: body,
       contentType: contentType,
-      consumerCredentials: (key: creds.apiKey, secret: creds.apiSecret),
-      userCredentials: (key: user.oauthToken, secret: user.oauthTokenSecret)
+      consumerCredentials: (key: clientCredentials.key, secret: clientCredentials.secret),
+      userCredentials: (key: userCredentials.key, secret: userCredentials.secret)
     )
   }
   
   /// Requests authorization via Twitter's three-step OAuth flow and stores user credentials for later use
-  func requestAuthentication() async {
-    let callback = creds.callbackURL.absoluteString
+  func requestAuthentication() async throws {
+    guard let callback = callbackURL.scheme else {
+      throw TwiftError.CallbackURLError
+    }
     
     // MARK:  Step one: Obtain a request token
     var stepOneRequest = URLRequest(url: URL(string: "https://api.twitter.com/oauth/request_token")!)
@@ -130,7 +141,7 @@ class AuthenticationProvider: NSObject, ObservableObject, ASWebAuthenticationPre
     stepOneRequest.oAuthSign(
       method: "POST",
       urlFormParameters: ["oauth_callback" : callback],
-      consumerCredentials: (key: creds.apiKey, secret: creds.apiSecret)
+      consumerCredentials: (key: clientCredentials.key, secret: clientCredentials.secret)
     )
     
     var oauthToken: String = ""
@@ -168,7 +179,7 @@ class AuthenticationProvider: NSObject, ObservableObject, ASWebAuthenticationPre
           stepThreeRequest.oAuthSign(
             method: "POST",
             urlFormParameters: ["oauth_token" : oauthToken],
-            consumerCredentials: (key: self.creds.apiKey, secret: self.creds.apiSecret)
+            consumerCredentials: (key: self.clientCredentials.key, secret: self.clientCredentials.secret)
           )
           
           let (data, _) = try await URLSession.shared.data(for: stepThreeRequest)
@@ -220,9 +231,13 @@ extension String {
   }
 }
 
-extension AuthenticationProvider {
+extension Twift {
   enum RequestSigningError: Error {
     case DecodingError
-    case MissingCredentials(forUserID: UserCredentials.ID)
+    case MissingCredentials
+  }
+  
+  enum TwiftError: Error {
+    case CallbackURLError
   }
 }
