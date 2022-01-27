@@ -49,8 +49,9 @@ class TwitterClient: NSObject, ObservableObject {
     }
   }
   
+  @MainActor
   func signIn() {
-    DispatchQueue.main.async { self.state = .busy }
+    self.state = .busy
     
     Twift.Authentication().requestUserCredentials(clientCredentials: ClientCredentials.credentials,
                                                   callbackURL: ClientCredentials.callbackURL) { (userCredentials, error) in

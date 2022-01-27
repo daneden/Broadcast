@@ -88,6 +88,9 @@ struct ComposerView: View {
             } placeholder: {
               ProgressView()
             }
+              .onTapGesture {
+                signOutScreenIsPresented = true
+              }
               .accessibilityIdentifier("profilePhotoButton")
           
           
