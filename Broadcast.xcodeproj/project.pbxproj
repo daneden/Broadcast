@@ -11,7 +11,6 @@
 		711EF99426C959A700FD8A9F /* BroadcastUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711EF99326C959A700FD8A9F /* BroadcastUITests.swift */; };
 		711F3FFA268F50C800605C89 /* Animation.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 711F3FF9268F50C800605C89 /* Animation.extension.swift */; };
 		714782D5278D97AB00942618 /* Twift in Frameworks */ = {isa = PBXBuildFile; productRef = 714782D4278D97AB00942618 /* Twift */; };
-		715AAE0A26C923A1002BCEA1 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 715AAE0926C923A1002BCEA1 /* Swifter */; };
 		715AAE0C26C9589A002BCEA1 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 715AAE0B26C9589A002BCEA1 /* TestUtils.swift */; };
 		717041F326B6FFEA00001360 /* RepliesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717041F226B6FFEA00001360 /* RepliesListView.swift */; };
 		717041F526B7037300001360 /* TweetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717041F426B7037300001360 /* TweetView.swift */; };
@@ -133,7 +132,6 @@
 				7188E66A2688D7BA007CFD78 /* Introspect in Frameworks */,
 				719087CD26891586005B96CE /* TwitterText in Frameworks */,
 				714782D5278D97AB00942618 /* Twift in Frameworks */,
-				715AAE0A26C923A1002BCEA1 /* Swifter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,7 +286,6 @@
 				7188E65C26887DCD007CFD78 /* SwiftKeychainWrapper */,
 				7188E6692688D7BA007CFD78 /* Introspect */,
 				719087CC26891586005B96CE /* TwitterText */,
-				715AAE0926C923A1002BCEA1 /* Swifter */,
 				714782D4278D97AB00942618 /* Twift */,
 			);
 			productName = Broadcast;
@@ -326,7 +323,6 @@
 				7188E65B26887DCD007CFD78 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				7188E6682688D7BA007CFD78 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 				719087CB26891586005B96CE /* XCRemoteSwiftPackageReference "twitter-text" */,
-				715AAE0826C923A1002BCEA1 /* XCRemoteSwiftPackageReference "Swifter" */,
 				714782D3278D97AB00942618 /* XCRemoteSwiftPackageReference "Twift" */,
 			);
 			productRefGroup = 7188E6262687B0FE007CFD78 /* Products */;
@@ -605,7 +601,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 38;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Broadcast/Preview Content\"";
 				DEVELOPMENT_TEAM = YC249PY26F;
 				ENABLE_PREVIEWS = YES;
@@ -615,7 +611,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = me.daneden.Broadcast;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -629,7 +625,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 38;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Broadcast/Preview Content\"";
 				DEVELOPMENT_TEAM = YC249PY26F;
 				ENABLE_PREVIEWS = YES;
@@ -639,7 +635,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = me.daneden.Broadcast;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -688,14 +684,6 @@
 				kind = branch;
 			};
 		};
-		715AAE0826C923A1002BCEA1 /* XCRemoteSwiftPackageReference "Swifter" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/daneden/Swifter";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.5.1;
-			};
-		};
 		7188E65B26887DCD007CFD78 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jrendel/SwiftKeychainWrapper";
@@ -727,11 +715,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 714782D3278D97AB00942618 /* XCRemoteSwiftPackageReference "Twift" */;
 			productName = Twift;
-		};
-		715AAE0926C923A1002BCEA1 /* Swifter */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 715AAE0826C923A1002BCEA1 /* XCRemoteSwiftPackageReference "Swifter" */;
-			productName = Swifter;
 		};
 		7188E65C26887DCD007CFD78 /* SwiftKeychainWrapper */ = {
 			isa = XCSwiftPackageProductDependency;
