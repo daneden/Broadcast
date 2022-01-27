@@ -115,6 +115,14 @@ struct ContentView: View {
       .onPreferenceChange(ReplyBoxSizePreferenceKey.self) { newValue in
         withAnimation(.springAnimation) { replyBoxHeight = newValue + 8 }
       }
+      .overlay {
+        if twitterClient.state == .initializing {
+          ZStack {
+            ProgressView()
+              .frame(maxWidth: .infinity, maxHeight: .infinity)
+          }.background(.background)
+        }
+      }
     }
   }
 }

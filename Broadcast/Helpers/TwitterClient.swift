@@ -16,33 +16,33 @@ import SwiftUI
 
 let typeaheadToken = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
-class TwitterClient: NSObject, ObservableObject {
+class TwitterClient: ObservableObject {
   let draftsStore = PersistanceController.shared
   @Published var user: User?
   @Published var draft: MutableTweet = .init()
-  @Published var state: State = .idle
+  @Published var state: State = .initializing
   @Published var lastTweet: Tweet?
   @Published var client: Twift?
   
-  override init() {
-    super.init()
-    
-    Task {
-      if let storedCredentials = self.retreiveCredentials() {
-        let newClient = await Twift(.userAccessTokens(
-          clientCredentials: ClientCredentials.credentials,
-          userCredentials: storedCredentials
-        ))
-        
+  @MainActor
+  init() {
+    if let storedCredentials = self.retreiveCredentials() {
+      let newClient = Twift(.userAccessTokens(
+        clientCredentials: ClientCredentials.credentials,
+        userCredentials: storedCredentials
+      ))
+      
+      Task(priority: .userInitiated) {
         await self.updateClient(newClient)
+        withAnimation(.springAnimation) { self.state = .idle }
       }
+    } else {
+      withAnimation(.springAnimation) { self.state = .idle }
     }
   }
   
   @MainActor
   private func updateClient(_ client: Twift?) async {
-    self.client = client
-    
     if let client = client {
       self.user = try? await client.getMe(fields: [\.profileImageUrl]).data
       self.lastTweet = try? await client.userTimeline(fields: [\.createdAt, \.publicMetrics]).data.first
@@ -241,7 +241,7 @@ extension TwitterClient {
 // MARK: Models
 extension TwitterClient {
   enum State: Equatable {
-    case idle, busy
+    case idle, busy, initializing
     case error(_: String? = nil)
     
     static var genericTextError = State.error("Oh man, something went wrong sending that tweet. It might be too long.")
