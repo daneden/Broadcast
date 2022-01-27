@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import Twift
 
 struct MentionBar: View {
-  var users: [TwitterClient.User]
-  var tapHandler: (TwitterClient.User) -> Void = { _ in }
+  var users: [User]
+  var tapHandler: (User) -> Void = { _ in }
   
   var body: some View {
     ScrollView(.horizontal) {
@@ -28,10 +29,4 @@ struct MentionBar: View {
     }
     .background(VisualEffectView(effect: UIBlurEffect(style: .prominent)))
   }
-}
-
-struct MentionBar_Previews: PreviewProvider {
-    static var previews: some View {
-      MentionBar(users: [.mockUser])
-    }
 }

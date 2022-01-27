@@ -17,17 +17,19 @@ struct ActionBarView: View {
   var body: some View {
     publishingActions
       .disabled(twitterClient.state == .busy)
-      .sheet(isPresented: $photoPickerIsPresented) {
-        ImagePicker(chosenImage: $twitterClient.draft.media)
-      }
+//      .sheet(isPresented: $photoPickerIsPresented) {
+//        ImagePicker(chosenImage: $twitterClient.draft.media)
+//      }
   }
   
   var publishingActions: some View {
     HStack {
-      if let replyId = twitterClient.lastTweet?.id {
+      if twitterClient.lastTweet != nil {
         Button(action: {
           if replying {
-            twitterClient.sendReply(to: replyId)
+            Task {
+              await twitterClient.sendTweet(asReply: true)
+            }
           } else {
             withAnimation(.springAnimation) { replying = true }
           }
@@ -48,12 +50,14 @@ struct ActionBarView: View {
             isLoading: twitterClient.state == .busy && replying
           )
         )
-        .disabled(replying && !twitterClient.draft.isValid)
+        .disabled(replying && !twitterClient.draftIsValid())
       }
       
       Button(action: {
         if !replying {
-          twitterClient.sendTweet()
+          Task {
+            await twitterClient.sendTweet()
+          }
         } else {
           withAnimation(.springAnimation) { replying = false }
         }
@@ -74,7 +78,7 @@ struct ActionBarView: View {
           isLoading: twitterClient.state == .busy && !replying
         )
       )
-      .disabled(!replying && !twitterClient.draft.isValid)
+      .disabled(!replying && !twitterClient.draftIsValid())
       .accessibilityIdentifier("sendTweetButton")
       
       Button(action: {

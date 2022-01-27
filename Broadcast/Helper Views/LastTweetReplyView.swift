@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import Twift
 
 struct LastTweetReplyView: View {
   @ScaledMetric var spacing: CGFloat = 4
-  var lastTweet: TwitterClient.Tweet
+  var lastTweet: Tweet
   
   var body: some View {
     VStack(alignment: .leading, spacing: spacing) {
@@ -41,8 +42,8 @@ struct LastTweetReplyView: View {
   }
 }
 
-struct LastTweetReplyView_Previews: PreviewProvider {
-    static var previews: some View {
-      LastTweetReplyView(lastTweet: TwitterClient.Tweet(text: "Example tweet"))
-    }
-}
+//struct LastTweetReplyView_Previews: PreviewProvider {
+//    static var previews: some View {
+//      LastTweetReplyView(lastTweet: TwitterClient.Tweet(text: "Example tweet"))
+//    }
+//}

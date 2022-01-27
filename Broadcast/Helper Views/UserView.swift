@@ -6,18 +6,22 @@
 //
 
 import SwiftUI
+import Twift
 
 struct UserView: View {
   @ScaledMetric var avatarSize: CGFloat = 24
   
-  var user: TwitterClient.User
+  var user: User
   var body: some View {
     HStack {
-      if let imageUrl = user.profileImageURL {
-        RemoteImage(url: imageUrl, placeholder: { ProgressView() })
+      AsyncImage(url: user.profileImageUrl) { image in
+        image
+          .resizable()
           .aspectRatio(contentMode: .fill)
           .frame(width: avatarSize, height: avatarSize)
           .cornerRadius(36)
+      } placeholder: {
+        ProgressView()
       }
       
       VStack(alignment: .leading) {
@@ -26,15 +30,15 @@ struct UserView: View {
             .fontWeight(.bold)
         }
         
-        Text("@\(user.screenName)")
+        Text("@\(user.username)")
           .foregroundColor(.secondary)
       }
     }.font(.broadcastFootnote)
   }
 }
 
-struct UserView_Previews: PreviewProvider {
-  static var previews: some View {
-    UserView(user: .mockUser)
-  }
-}
+//struct UserView_Previews: PreviewProvider {
+//  static var previews: some View {
+//    UserView(user: .mockUser)
+//  }
+//}

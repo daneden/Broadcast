@@ -24,10 +24,6 @@ struct BroadcastApp: App {
             .environment(\.managedObjectContext, persistenceController.container.viewContext)
             .accentColor(themeHelper.color)
             .onChange(of: scenePhase) { newPhase in
-              if newPhase == .active {
-                twitterClient.revalidateAccount()
-              }
-              
               persistenceController.save()
             }
           

@@ -28,7 +28,7 @@ struct SignOutView: View {
   var body: some View {
     VStack {
       Spacer()
-      if let screenName = twitterClient.user?.screenName {
+      if let screenName = twitterClient.user?.username {
         Label("Drag to sign out @\(screenName)", systemImage: "arrow.down.circle")
           .font(.broadcastBody.bold())
           .foregroundColor(.secondary)
@@ -38,11 +38,12 @@ struct SignOutView: View {
       
       VStack {
         Group {
-          if let profileImageURL = twitterClient.user?.profileImageURL {
-            RemoteImage(url: profileImageURL, placeholder: { ProgressView() })
+          AsyncImage(url: twitterClient.user?.profileImageUrl) { image in
+            image
+              .resizable()
               .aspectRatio(contentMode: .fill)
               .clipShape(Circle())
-          } else {
+          } placeholder: {
             Image(systemName: "person.crop.circle.fill")
               .resizable()
           }

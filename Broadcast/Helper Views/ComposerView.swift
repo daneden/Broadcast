@@ -7,6 +7,7 @@
 
 import SwiftUI
 import TwitterText
+import Twift
 
 fileprivate let placeholderCandidates: [String] = [
   "Wh—what’s going on?",
@@ -45,7 +46,7 @@ struct ComposerView: View {
     TwitterText.tweetLength(text: tweetText)
   }
   
-  private var mentionCandidates: [TwitterClient.User]? {
+  private var mentionCandidates: [User]? {
     twitterClient.userSearchResults
   }
   
@@ -78,17 +79,17 @@ struct ComposerView: View {
     ZStack(alignment: .bottom) {
       VStack(alignment: .trailing) {
         HStack(alignment: .top) {
-          if let profileImageURL = twitterClient.user?.profileImageURL {
-            RemoteImage(url: profileImageURL, placeholder: { ProgressView() })
-              .aspectRatio(contentMode: .fill)
-              .frame(width: 36, height: 36)
-              .cornerRadius(36)
-              .onTapGesture {
-                signOutScreenIsPresented = true
-                UIApplication.shared.endEditing()
-              }
+          AsyncImage(url: twitterClient.user?.profileImageUrl) { image in
+              image
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 36, height: 36)
+                .cornerRadius(36)
+            } placeholder: {
+              ProgressView()
+            }
               .accessibilityIdentifier("profilePhotoButton")
-          }
+          
           
           ZStack(alignment: .topLeading) {
             Text(tweetText.isEmpty ? placeholder : tweetText)
@@ -114,7 +115,7 @@ struct ComposerView: View {
           Menu {
             Button(action: { twitterClient.saveDraft() }) {
               Label("Save Draft", systemImage: "square.and.pencil")
-            }.disabled(!twitterClient.draft.isValid)
+            }.disabled(!twitterClient.draftIsValid())
             
             Button(action: { draftListVisible = true }) {
               Label("View Drafts", systemImage: "doc.on.doc")
@@ -139,7 +140,7 @@ struct ComposerView: View {
         rotatePlaceholder()
         Haptics.shared.sendStandardFeedback(feedbackType: .success)
       }
-      .onChange(of: twitterClient.draft.isValid) { isValid in
+      .onChange(of: twitterClient.draftIsValid()) { isValid in
         if !isValid && charCount > 280 {
           Haptics.shared.sendStandardFeedback(feedbackType: .warning)
         }
@@ -153,7 +154,9 @@ struct ComposerView: View {
         if let screenName = value {
           debouncer.renewInterval()
           debouncer.handler = {
-            self.twitterClient.searchScreenNames(screenName)
+            Task {
+              await self.twitterClient.searchScreenNames(screenName)
+            }
           }
         }
       }
@@ -169,9 +172,9 @@ struct ComposerView: View {
     }.cornerRadius(captionSize)
   }
   
-  func completeMention(_ user: TwitterClient.User) {
+  func completeMention(_ user: User) {
     let textToComplete = mentioningRegex.firstMatchAsString(tweetText) ?? ""
-    let draft = twitterClient.draft.text?.replacingOccurrences(of: textToComplete, with: "@\(user.screenName) ")
+    let draft = twitterClient.draft.text?.replacingOccurrences(of: textToComplete, with: "@\(user.username) ")
     twitterClient.draft.text = draft
   }
   

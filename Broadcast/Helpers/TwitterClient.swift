@@ -7,7 +7,7 @@
 
 import Foundation
 import Combine
-import Swifter
+import Twift
 import TwitterText
 import UIKit
 import AuthenticationServices
@@ -19,65 +19,53 @@ let typeaheadToken = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puT
 class TwitterClient: NSObject, ObservableObject {
   let draftsStore = PersistanceController.shared
   @Published var user: User?
-  @Published var draft = Tweet()
+  @Published var draft: MutableTweet = .init()
   @Published var state: State = .idle
   @Published var lastTweet: Tweet?
-  
-  private var client = Swifter.init(consumerKey: ClientCredentials.apiKey, consumerSecret: ClientCredentials.apiSecret)
+  @Published var client: Twift?
   
   override init() {
     super.init()
     
-    if let storedCredentials = retreiveCredentials() {
-      self.client.client.credential = .init(accessToken: storedCredentials)
-      if let userId = storedCredentials.userID,
-         let screenName = storedCredentials.screenName {
-        self.user = .init(id: userId, screenName: screenName)
-        self.revalidateAccount()
+    Task {
+      if let storedCredentials = self.retreiveCredentials() {
+        let newClient = await Twift(.userAccessTokens(
+          clientCredentials: ClientCredentials.credentials,
+          userCredentials: storedCredentials
+        ))
+        
+        await self.updateClient(newClient)
       }
+    }
+  }
+  
+  @MainActor
+  private func updateClient(_ client: Twift?) async {
+    self.client = client
+    
+    if let client = client {
+      self.user = try? await client.getMe(fields: [\.profileImageUrl]).data
+      self.lastTweet = try? await client.userTimeline(fields: [\.createdAt, \.publicMetrics]).data.first
     }
   }
   
   func signIn() {
     DispatchQueue.main.async { self.state = .busy }
-    client.authorize(withProvider: self, callbackURL: ClientCredentials.callbackURL) { credentials, response in
-      guard let credentials = credentials,
-            let id = credentials.userID,
-            let screenName = credentials.screenName else {
-        self.state = .error("Yikes, something when wrong when trying to sign in")
-        return
-      }
-      
-      self.storeCredentials(credentials: credentials)
-      
-      DispatchQueue.main.async {
-        self.state = .idle
-        self.user = User(id: id, screenName: screenName)
-        self.revalidateAccount()
-      }
-    }
-  }
-  
-  func revalidateAccount() {
-    guard let userId = user?.id else {
-      self.signOut()
-      return
-    }
     
-    client.showUser(.id(userId), tweetMode: .extended) { json in
-      /** If the `showUser` call was successful, we can reuse the result to update the user’s profile photo */
-      guard let urlString = json["profile_image_url_https"].string else {
-        return
+    Twift.Authentication().requestUserCredentials(clientCredentials: ClientCredentials.credentials,
+                                                  callbackURL: ClientCredentials.callbackURL) { (userCredentials, error) in
+      Task.detached {
+        if let userCredentials = userCredentials {
+          let newClient = await Twift(.userAccessTokens(clientCredentials: ClientCredentials.credentials, userCredentials: userCredentials))
+          await self.updateClient(newClient)
+          self.storeCredentials(credentials: userCredentials)
+        } else if let error = error {
+          print(error)
+        }
+        
+        
+        self.state = .idle
       }
-      
-      withAnimation {
-        self.user?.originalProfileImageURL = URL(string: urlString.replacingOccurrences(of: "_normal", with: ""))
-      }
-      
-      self.updateLastTweet(from: json["status"])
-    } failure: { error in
-      self.signOut()
-      self.updateState(.error("Yikes; there was a problem signing in to Twitter. You’ll have to try signing in again."))
     }
   }
   
@@ -88,29 +76,28 @@ class TwitterClient: NSObject, ObservableObject {
     KeychainWrapper.standard.remove(forKey: "broadcast-credentials")
   }
   
-  func storeCredentials(credentials: Credential.OAuthAccessToken) {
-    guard let data = credentials.data else {
+  func storeCredentials(credentials: OAuthCredentials) {
+    guard let data = try? JSONEncoder().encode(credentials) else {
       return
     }
     
     KeychainWrapper.standard.set(data, forKey: "broadcast-credentials")
   }
   
-  func retreiveCredentials() -> Credential.OAuthAccessToken? {
-    if isTestEnvironment {
-      return .init(queryString: ClientCredentials.__authQueryString)
-    }
-    
+  func retreiveCredentials() -> OAuthCredentials? {
+    // TODO: Fix test environment
+    //    if isTestEnvironment {
+    //      return .init(queryString: ClientCredentials.__authQueryString)
+    //    }
     guard let data = KeychainWrapper.standard.data(forKey: "broadcast-credentials") else {
       return nil
     }
     
-    return .init(from: data)
+    return try? JSONDecoder().decode(OAuthCredentials.self, from: data)
   }
   
-  private func sendTweetCallback(response: JSON? = nil, error: Error? = nil) {
-    if let json = response {
-      self.updateLastTweet(from: json)
+  private func sendTweetCallback(response: TwitterAPIData<PostTweetResponse>? = nil, error: Error? = nil) {
+    if response != nil {
       self.updateState(.idle)
       self.draft = .init()
       Haptics.shared.sendStandardFeedback(feedbackType: .success)
@@ -127,58 +114,19 @@ class TwitterClient: NSObject, ObservableObject {
     }
   }
   
-  func sendTweet() {
+  func sendTweet(asReply: Bool = false) async {
     updateState(.busy)
-    
-    if let mediaData = draft.media?.jpegData(compressionQuality: 0.8) {
-      client.postTweet(status: draft.text ?? "", media: mediaData) { json in
-        self.sendTweetCallback(response: json)
-      } failure: { error in
-        print(error.localizedDescription)
-        self.sendTweetCallback(error: error)
-      }
-    } else if let status = draft.text {
-      client.postTweet(status: status) { json in
-        self.sendTweetCallback(response: json)
-      } failure: { error in
-        print(error.localizedDescription)
-        self.sendTweetCallback(error: error)
-      }
+    if asReply, let lastTweet = lastTweet {
+      draft.reply = .init(inReplyToTweetId: lastTweet.id)
     }
-  }
-  
-  func sendReply(to id: String) {
-    updateState(.busy)
     
-    if let mediaData = draft.media?.jpegData(compressionQuality: 0.8) {
-      client.postTweet(status: draft.text ?? "", media: mediaData, inReplyToStatusID: id) { json in
-        self.sendTweetCallback(response: json)
-      } failure: { error in
-        self.sendTweetCallback(error: error)
-      }
-    } else if let status = draft.text {
-      client.postTweet(status: status, inReplyToStatusID: id) { json in
-        self.sendTweetCallback(response: json)
-        Haptics.shared.sendStandardFeedback(feedbackType: .success)
-      } failure: { error in
-        self.sendTweetCallback(error: error)
-      }
-    }
-  }
-  
-  private func updateLastTweet(from json: JSON) {
-    guard let id = json["id_str"].string else { return }
-    var lastTweet = Tweet(id: id)
-    lastTweet.text = json["full_text"].string ?? json["text"].string
-    lastTweet.likes = json["favorite_count"].integer
-    lastTweet.retweets = json["retweet_count"].integer
-    lastTweet.numericId = json["id"].integer
+    let result = try? await client?.postTweet(draft)
     
-    if !isTestEnvironment {
-      self.getReplies(for: lastTweet) { replies in
-        lastTweet.replies = replies
-        self.lastTweet = lastTweet
-      }
+    if let result = result {
+      self.lastTweet = try? await client?.getTweet(result.data.id).data
+      sendTweetCallback(response: result, error: nil)
+    } else {
+      sendTweetCallback(response: nil, error: nil)
     }
   }
   
@@ -191,44 +139,30 @@ class TwitterClient: NSObject, ObservableObject {
   }
   
   @Published var userSearchResults: [User]?
-  private var userSearchCancellables = [AnyCancellable]()
-  func searchScreenNames(_ screenName: String) {
+  func searchScreenNames(_ screenName: String) async {
     let url = URL(string: "https://twitter.com/i/search/typeahead.json?count=10&q=%23\(screenName)&result_type=users")!
     
     var headers = [
       "Authorization": typeaheadToken
     ]
     
-    if let userId = user?.id,
-       let token = client.client.credential?.accessToken?.key {
-      headers["Cookie"] = "twid=u%3D\(userId);auth_token=\(token)"
-    }
+    // TODO: Fix user auth for typeahead search
+//    if let userId = user?.id,
+//       let token = ClientCredentials.credentials.key {
+//      headers["Cookie"] = "twid=u%3D\(userId);auth_token=\(token)"
+//    }
     
     var request = URLRequest(url: url)
     request.allHTTPHeaderFields = headers
     request.httpShouldHandleCookies = true
     
-    URLSession.shared.dataTaskPublisher(for: request)
-      .tryMap() { element -> Data in
-        guard let httpResponse = element.response as? HTTPURLResponse,
-              httpResponse.statusCode == 200 else {
-          throw URLError(.badServerResponse)
-        }
-        return element.data
-      }
-      .decode(type: TypeaheadResponse.self, decoder: JSONDecoder())
-      .sink { completion in
-        switch completion {
-        case .failure(let error):
-          print(error.localizedDescription)
-        default:
-          return
-        }
-      } receiveValue: { result in
-        DispatchQueue.main.async {
-          self.userSearchResults = result.users
-        }
-      }.store(in: &userSearchCancellables)
+    do {
+      let (result, _) = try await URLSession.shared.data(for: request)
+      let decodedResult = try JSONDecoder().decode(TypeaheadResponse.self, from: result)
+      self.userSearchResults = decodedResult.users
+    } catch {
+      print(error)
+    }
   }
   
   /// Asynchronously provides up to 200 replies for the given tweet. This method works by fetching the
@@ -236,56 +170,43 @@ class TwitterClient: NSObject, ObservableObject {
   /// - Parameters:
   ///   - tweet: The tweet to fetch replies for
   ///   - completion: A callback for handling the replies
-  private func getReplies(for tweet: Tweet, completion: @escaping ([Tweet]) -> Void = { _ in }) {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "EE MMM dd HH:mm:ss Z yyyy"
+  private func getReplies(for tweetId: Tweet.ID) async -> [Tweet] {
+    let mentions = try? await client?.userMentions(fields: [\.authorId, \.publicMetrics, \.createdAt, \.referencedTweets],
+                                                   expansions: [.authorId(userFields: [\.profileImageUrl])],
+                                                   sinceId: tweetId,
+                                                   maxResults: 100)
     
-    guard let tweetId = tweet.id else { return }
+    let repliesToTweet = mentions?.data
+      .filter { $0.referencedTweets?.contains(where: { $0.id == tweetId }) ?? false } ?? []
+    let replyAuthors = mentions?.includes?.users?
+      .filter { user in repliesToTweet.contains(where: { $0.authorId == user.id }) } ?? []
     
-    client.getMentionsTimelineTweets(count: 200, tweetMode: .extended) { json in
-      guard let repliesResult = json.array else { return }
-      let repliesToThisTweet: [Tweet?] = repliesResult.filter { json in
-        guard let replyId = json["in_reply_to_status_id"].integer else { return false }
-        return replyId == tweet.numericId
-      }.map { json in
-        guard let id = json["id_str"].string,
-              let text = json["full_text"].string,
-              let dateString = json["created_at"].string,
-              let date = formatter.date(from: dateString) else {
-          return nil
-        }
-        
-        let user = User(from: json["user"])
-        return Tweet(id: id, text: text, date: date, author: user)
-      }
-      
-      completion(repliesToThisTweet.compactMap { $0 })
-      
-    } failure: { error in
-      print("Error fetching replies for Tweet with ID \(tweetId)")
-      print(error.localizedDescription)
-    }
-  }
-}
-
-extension TwitterClient: ASWebAuthenticationPresentationContextProviding {
-  func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-    return ASPresentationAnchor()
+    return repliesToTweet
   }
 }
 
 /* MARK: Drafts */
 extension TwitterClient {
+  public func draftIsValid() -> Bool {
+    if let text = draft.text, !text.isEmpty {
+      return TwitterText.remainingCharacterCount(text: text) >= 0
+    } else if draft.media != nil {
+      return true
+    } else {
+      return false
+    }
+  }
   /// Saves the current draft to CoreData for later retrieval. This method also resets/clears the current draft.
   func saveDraft() {
-    guard draft.isValid else { return }
-    let copy = draft
+    guard draftIsValid() else { return }
     
+    let copy = draft
     DispatchQueue.global(qos: .default).async {
       let newDraft = Draft.init(context: self.draftsStore.context)
       newDraft.date = Date()
       newDraft.text = copy.text
-      newDraft.media = copy.media?.fixedOrientation.pngData()
+      // TODO: Fix draft media
+      //newDraft.media = copy.media?.fixedOrientation.pngData()
       newDraft.id = UUID()
       
       self.draftsStore.save()
@@ -301,16 +222,17 @@ extension TwitterClient {
   /// - Parameter draft: The chosen draft for retrieval and deletion
   func retreiveDraft(draft: Draft) {
     withAnimation {
-      self.draft = Tweet(text: draft.text)
+      self.draft = MutableTweet(text: draft.text)
       
-      if let media = draft.media {
-        self.draft.media = UIImage(data: media)
-      }
+      // TODO: Fix draft media
+//      if let media = draft.media {
+//        self.draft.media = UIImage(data: media)
+//      }
     }
     
     let managedObjectContext = PersistanceController.shared.context
     managedObjectContext.delete(draft)
-
+    
     PersistanceController.shared.save()
   }
 }
@@ -350,6 +272,10 @@ extension TwitterClient {
       return value
     }
     
+    static var credentials: OAuthCredentials {
+      .init(key: apiKey, secret: apiSecret)
+    }
+    
     static var __authQueryString: String {
       guard let value = plist?.object(forKey: "__TEST_AUTH_QUERY_STRING") as? String else {
         fatalError("Couldn't find key '__TEST_AUTH_QUERY_STRING' in 'TwitterAPI-Info.plist'.")
@@ -363,100 +289,9 @@ extension TwitterClient {
       URL(string: callbackProtocol)!
     }
   }
-  
-  struct User: Decodable {
-    var id: String
-    var screenName: String
-    var name: String?
-    var originalProfileImageURL: URL?
-    var profileImageURL: URL? {
-      if let urlString = originalProfileImageURL?.absoluteString.replacingOccurrences(of: "_normal", with: "_x96") {
-        return URL(string: urlString)
-      } else {
-        return originalProfileImageURL
-      }
-    }
-    
-    enum CodingKeys: String, CodingKey {
-      case screenName = "screen_name"
-      case originalProfileImageURL = "profile_image_url_https"
-      case id = "id_str"
-      case name
-    }
-  }
-  
-  struct Tweet {
-    var numericId: Int?
-    var id: String?
-    var text: String?
-    var media: UIImage?
-    
-    var likes: Int?
-    var retweets: Int?
-    var replies: [Tweet]?
-    
-    var date: Date?
-    
-    var length: Int {
-      TwitterText.tweetLength(text: text ?? "")
-    }
-    
-    var isValid: Bool {
-      if media != nil {
-        return true
-      }
-      
-      return 1...280 ~= length && !(text ?? "").isBlank
-    }
-    
-    var author: User?
-  }
-}
-
-extension TwitterClient.User {
-  init(from json: JSON) {
-    self.name = json["name"].string
-    self.screenName = json["screen_name"].string ?? "TwitterUser"
-    self.id = json["id_str"].string ?? ""
-    let imageUrlString = json["profile_image_url_https"].string ?? ""
-    self.originalProfileImageURL = URL(string: imageUrlString)
-  }
-}
-
-extension Credential.OAuthAccessToken {
-  var data: Data? {
-    let dict = [
-      "key": key,
-      "secret": secret,
-      "userId": userID,
-      "screenName": screenName
-    ]
-    
-    return try? JSONSerialization.data(withJSONObject: dict, options: [])
-  }
-  
-  init?(from data: Data) {
-    do {
-      let dict = try JSONDecoder().decode([String: String].self, from: data)
-      guard let key = dict["key"],
-            let secret = dict["secret"] else {
-        return nil
-      }
-      
-      let screenName = dict["screenName"]
-      let userId = dict["userId"]
-      
-      let queryString = "oauth_token=\(key)&oauth_token_secret=\(secret)&screen_name=\(screenName ?? "")&user_id=\(userId ?? "")"
-      
-      self.init(queryString: queryString)
-    } catch let error {
-      print(error.localizedDescription)
-      return nil
-    }
-  }
 }
 
 struct TypeaheadResponse: Decodable {
   var num_results: Int
-  var users: [TwitterClient.User]?
+  var users: [User]?
 }

@@ -8,6 +8,7 @@
 import SwiftUI
 import Introspect
 import TwitterText
+import Twift
 
 struct ContentView: View {
   @ScaledMetric private var captionSize: CGFloat = 14
@@ -33,7 +34,7 @@ struct ContentView: View {
     GeometryReader { geom in
       ZStack(alignment: .bottom) {
         ScrollView {
-          VStack {
+          VStack(spacing: 8) {
             if replying, let lastTweet = twitterClient.lastTweet {
               LastTweetReplyView(lastTweet: lastTweet)
                 .background(GeometryReader { geometry in
@@ -69,7 +70,7 @@ struct ContentView: View {
                   alignment: .topLeading
                 )
               
-              AttachmentThumbnail(image: $twitterClient.draft.media)
+//              AttachmentThumbnail(image: $twitterClient.draft.media)
             } else {
               WelcomeView()
             }
@@ -111,11 +112,8 @@ struct ContentView: View {
       .onAppear {
         UITextView.appearance().backgroundColor = .clear
       }
-      .onChange(of: replying) { _ in
-        twitterClient.revalidateAccount()
-      }
       .onPreferenceChange(ReplyBoxSizePreferenceKey.self) { newValue in
-        withAnimation(.easeInOut(duration: 0.1)) { replyBoxHeight = newValue }
+        withAnimation(.springAnimation) { replyBoxHeight = newValue + 8 }
       }
     }
   }

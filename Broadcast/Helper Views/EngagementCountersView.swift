@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import Twift
 
 struct EngagementCountersView: View {
-  var tweet: TwitterClient.Tweet
+  var tweet: Tweet
   
   var repliesString: String {
-    let replyCount = tweet.replies?.count ?? 0
+    let replyCount = tweet.publicMetrics?.replyCount ?? 0
     switch replyCount {
     case 0:
       return "No replies"
@@ -27,10 +28,4 @@ struct EngagementCountersView: View {
       .font(.broadcastCaption)
       .foregroundColor(.accentColor)
   }
-}
-
-struct EngagementCountersView_Previews: PreviewProvider {
-    static var previews: some View {
-      EngagementCountersView(tweet: TwitterClient.Tweet(likes: 420, retweets: 69, replies: []))
-    }
 }
