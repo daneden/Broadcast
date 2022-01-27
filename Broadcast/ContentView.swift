@@ -15,7 +15,7 @@ struct ContentView: View {
   @ScaledMetric private var bottomPadding: CGFloat = 80
   @ScaledMetric private var replyBoxLimit: CGFloat = 96
   
-  @EnvironmentObject var twitterClient: TwitterClient
+  @EnvironmentObject var twitterClient: TwitterClientManager
   
   @State private var photoPickerIsPresented = false
   @State private var signOutScreenIsPresented = false
@@ -108,6 +108,7 @@ struct ContentView: View {
         RepliesListView(tweet: twitterClient.lastTweet)
           .accentColor(ThemeHelper.shared.color)
           .font(.broadcastBody)
+          .environmentObject(twitterClient)
       }
       .onAppear {
         UITextView.appearance().backgroundColor = .clear

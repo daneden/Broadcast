@@ -15,7 +15,7 @@ struct DraftsListView: View {
   @FetchRequest(entity: Draft.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Draft.date, ascending: true)])
   var drafts: FetchedResults<Draft>
   
-  @EnvironmentObject var twitterClient: TwitterClient
+  @EnvironmentObject var twitterClient: TwitterClientManager
   @EnvironmentObject var themeHelper: ThemeHelper
   
   var body: some View {

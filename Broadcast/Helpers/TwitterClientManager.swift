@@ -1,5 +1,5 @@
 //
-//  TwitterClient.swift
+//  TwitterClientManager.swift
 //  Broadcast
 //
 //  Created by Daniel Eden on 30/06/2021.
@@ -16,7 +16,7 @@ import SwiftUI
 
 let typeaheadToken = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
-class TwitterClient: ObservableObject {
+class TwitterClientManager: ObservableObject {
   let draftsStore = PersistanceController.shared
   @Published var user: User?
   @Published var draft: MutableTweet = .init()
@@ -70,6 +70,7 @@ class TwitterClient: ObservableObject {
     }
   }
   
+  @MainActor
   func signOut() {
     self.user = nil
     self.draft = .init()
@@ -148,10 +149,9 @@ class TwitterClient: ObservableObject {
     ]
     
     // TODO: Fix user auth for typeahead search
-//    if let userId = user?.id,
-//       let token = ClientCredentials.credentials.key {
-//      headers["Cookie"] = "twid=u%3D\(userId);auth_token=\(token)"
-//    }
+    if let userId = user?.id {
+      headers["Cookie"] = "twid=u%3D\(userId);auth_token=\(ClientCredentials.credentials.key)"
+    }
     
     var request = URLRequest(url: url)
     request.allHTTPHeaderFields = headers
@@ -171,7 +171,7 @@ class TwitterClient: ObservableObject {
   /// - Parameters:
   ///   - tweet: The tweet to fetch replies for
   ///   - completion: A callback for handling the replies
-  private func getReplies(for tweetId: Tweet.ID) async -> [Tweet] {
+  public func getReplies(for tweetId: Tweet.ID) async -> [(tweet: Tweet, author: User)] {
     let mentions = try? await client?.userMentions(fields: [\.authorId, \.publicMetrics, \.createdAt, \.referencedTweets],
                                                    expansions: [.authorId(userFields: [\.profileImageUrl])],
                                                    sinceId: tweetId,
@@ -182,12 +182,14 @@ class TwitterClient: ObservableObject {
     let replyAuthors = mentions?.includes?.users?
       .filter { user in repliesToTweet.contains(where: { $0.authorId == user.id }) } ?? []
     
-    return repliesToTweet
+    return repliesToTweet.map { tweet in
+      (tweet: tweet, author: replyAuthors.first(where: { $0.id == tweet.authorId! })!)
+    }
   }
 }
 
 /* MARK: Drafts */
-extension TwitterClient {
+extension TwitterClientManager {
   public func draftIsValid() -> Bool {
     if let text = draft.text, !text.isEmpty {
       return TwitterText.remainingCharacterCount(text: text) >= 0
@@ -239,7 +241,7 @@ extension TwitterClient {
 }
 
 // MARK: Models
-extension TwitterClient {
+extension TwitterClientManager {
   enum State: Equatable {
     case idle, busy, initializing
     case error(_: String? = nil)

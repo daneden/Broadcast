@@ -11,7 +11,7 @@ import SwiftUI
 struct BroadcastApp: App {
   @Environment(\.scenePhase) var scenePhase
   @StateObject var themeHelper = ThemeHelper.shared
-  @StateObject var twitterClient = TwitterClient()
+  @StateObject var twitterClient = TwitterClientManager()
   let persistenceController = PersistanceController.shared
   
   var body: some Scene {

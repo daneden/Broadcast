@@ -11,7 +11,7 @@ import CoreHaptics
 struct SignOutView: View {
   @Environment(\.colorScheme) var colorScheme
   @Environment(\.presentationMode) var presentationMode
-  @EnvironmentObject var twitterClient: TwitterClient
+  @EnvironmentObject var twitterClient: TwitterClientManager
   @EnvironmentObject var themeHelper: ThemeHelper
   
   @State private var offset = CGSize.zero

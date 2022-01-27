@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ActionBarView: View {
   @ScaledMetric var barHeight: CGFloat = 80
-  @EnvironmentObject var twitterClient: TwitterClient
+  @EnvironmentObject var twitterClient: TwitterClientManager
   @Binding var replying: Bool
   
   @State private var photoPickerIsPresented = false

@@ -49,7 +49,7 @@
 		71A1088A268B073B007E1FFB /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A10889268B073B007E1FFB /* Haptics.swift */; };
 		71A6A264278C73AD00BF2387 /* TwitterAPI-Info.example.plist in Resources */ = {isa = PBXBuildFile; fileRef = 71A6A263278C73AD00BF2387 /* TwitterAPI-Info.example.plist */; };
 		71AA4AC6268A032400B7B577 /* RemoteImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71AA4AC5268A032400B7B577 /* RemoteImage.swift */; };
-		71B8290C268D0AC6002AEE72 /* TwitterClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B8290B268D0AC6002AEE72 /* TwitterClient.swift */; };
+		71B8290C268D0AC6002AEE72 /* TwitterClientManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B8290B268D0AC6002AEE72 /* TwitterClientManager.swift */; };
 		71B82910268F2195002AEE72 /* LastTweetReplyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B8290F268F2195002AEE72 /* LastTweetReplyView.swift */; };
 		71BBAAE9268CF1BD004048A0 /* ComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71BBAAE8268CF1BD004048A0 /* ComposerView.swift */; };
 		71BBAAEB268CF532004048A0 /* TwitterAPI-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 71BBAAEA268CF532004048A0 /* TwitterAPI-Info.plist */; };
@@ -109,7 +109,7 @@
 		71A10889268B073B007E1FFB /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		71A6A263278C73AD00BF2387 /* TwitterAPI-Info.example.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TwitterAPI-Info.example.plist"; sourceTree = "<group>"; };
 		71AA4AC5268A032400B7B577 /* RemoteImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImage.swift; sourceTree = "<group>"; };
-		71B8290B268D0AC6002AEE72 /* TwitterClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitterClient.swift; sourceTree = "<group>"; };
+		71B8290B268D0AC6002AEE72 /* TwitterClientManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitterClientManager.swift; sourceTree = "<group>"; };
 		71B8290F268F2195002AEE72 /* LastTweetReplyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastTweetReplyView.swift; sourceTree = "<group>"; };
 		71BBAAE8268CF1BD004048A0 /* ComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposerView.swift; sourceTree = "<group>"; };
 		71BBAAEA268CF532004048A0 /* TwitterAPI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TwitterAPI-Info.plist"; sourceTree = "<group>"; };
@@ -216,7 +216,7 @@
 				71A10889268B073B007E1FFB /* Haptics.swift */,
 				71E36FFA2689EED40078D956 /* ShakeModifier.swift */,
 				7188E6642688A436007CFD78 /* ThemeHelper.swift */,
-				71B8290B268D0AC6002AEE72 /* TwitterClient.swift */,
+				71B8290B268D0AC6002AEE72 /* TwitterClientManager.swift */,
 				71800BFE26999BA6009D11A1 /* PersistanceController.swift */,
 				7199AE7F26B9892E001DEB46 /* Debouncer.swift */,
 				715AAE0B26C9589A002BCEA1 /* TestUtils.swift */,
@@ -395,7 +395,7 @@
 				7188E63B2687B19D007CFD78 /* Notification.extension.swift in Sources */,
 				717041F326B6FFEA00001360 /* RepliesListView.swift in Sources */,
 				7188E6292687B0FE007CFD78 /* BroadcastApp.swift in Sources */,
-				71B8290C268D0AC6002AEE72 /* TwitterClient.swift in Sources */,
+				71B8290C268D0AC6002AEE72 /* TwitterClientManager.swift in Sources */,
 				7188E6632688A0FC007CFD78 /* WelcomeView.swift in Sources */,
 				7199AE7A26B96D0D001DEB46 /* NSRegularExpression+Convenience.swift in Sources */,
 				717041F726B703A600001360 /* TwitterClient+MockTweet.swift in Sources */,

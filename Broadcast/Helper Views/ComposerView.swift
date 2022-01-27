@@ -23,7 +23,7 @@ struct ComposerView: View {
   let debouncer = Debouncer(timeInterval: 0.3)
   @Binding var signOutScreenIsPresented: Bool
   
-  @EnvironmentObject var twitterClient: TwitterClient
+  @EnvironmentObject var twitterClient: TwitterClientManager
   @ScaledMetric private var minComposerHeight: CGFloat = 120
   @ScaledMetric private var captionSize: CGFloat = 14
   @ScaledMetric private var leftOffset: CGFloat = 4
