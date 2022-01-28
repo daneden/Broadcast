@@ -136,13 +136,11 @@ class TwitterClientManager: ObservableObject {
            let mimeType = Media.MimeType(rawValue: mimeTypeString) {
           let result = try await client.upload(mediaData: data, mimeType: mimeType)
           
-          
-          
           if media.hasAltText {
             try await client.addAltText(to: result.mediaIdString, text: media.altText)
           }
           
-          if result.processingInfo?.state != .failed && result.processingInfo?.state != .succeeded {
+          if result.processingInfo != nil {
             _ = try await client.checkMediaUploadSuccessful(result.mediaIdString)
           }
           
