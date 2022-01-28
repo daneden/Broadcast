@@ -7,9 +7,14 @@
 
 import SwiftUI
 
+extension String: Identifiable {
+  public var id: String { self }
+}
+
 struct AttachmentThumbnail: View {
   @Binding var media: [UserSelectedMedia]
   @State private var altTextSheetIsPresented = false
+  @State private var selectedMediaId: String?
 
   var body: some View {
     VStack {
@@ -18,22 +23,22 @@ struct AttachmentThumbnail: View {
           if let previewData = item.thumbnailData,
              let image = UIImage(data: previewData) {
             ZStack(alignment: .top) {
-              Image(uiImage: image)
+              Image(uiImage: image.fixedOrientation)
                 .resizable()
                 .aspectRatio(image.size, contentMode: .fill)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
               
               HStack {
                 if item.canAddAltText {
-                  Button(action: { altTextSheetIsPresented = true }) {
+                  Button(action: { selectedMediaId = item.id }) {
                     Label("Edit Alt Text", systemImage: "captions.bubble")
                       .labelStyle(.iconOnly)
                   }
                   .buttonStyle(BroadcastButtonStyle(paddingSize: 8, prominence: item.hasAltText ? .primary : .tertiary, isFullWidth: false))
                   .clipShape(Circle())
                   .offset(x: 8, y: 8)
-                  .sheet(isPresented: $altTextSheetIsPresented) {
-                    AltTextSheet(mediaSet: $media, itemId: item.id)
+                  .sheet(item: $selectedMediaId) { id in
+                    AltTextSheet(mediaId: id)
                   }
                 }
               
@@ -55,7 +60,7 @@ struct AttachmentThumbnail: View {
     .transition(.opacity)
   }
 
-  func removeImage(_ id: UUID) {
+  func removeImage(_ id: String) {
     withAnimation {
       media.removeAll(where: { $0.id == id })
     }
@@ -63,12 +68,17 @@ struct AttachmentThumbnail: View {
 }
 
 fileprivate struct AltTextSheet: View {
+  @EnvironmentObject var twitterClient: TwitterClientManager
+  
   @Environment(\.presentationMode) var presentationMode
-  @Binding var mediaSet: [UserSelectedMedia]
-  var itemId: UUID
+  var mediaId: String
+  
+  var media: Binding<UserSelectedMedia> {
+    $twitterClient.selectedMedia.first(where: { $0.wrappedValue.id == mediaId })!
+  }
   
   var preview: UIImage? {
-    guard let data = mediaSet.first(where: { $0.id == itemId })?.thumbnailData,
+    guard let data = media.wrappedValue.thumbnailData,
           let image = UIImage(data: data) else {
             return nil
           }
@@ -95,7 +105,7 @@ fileprivate struct AltTextSheet: View {
         }
         
         Section(footer: Text("You can add a description, sometimes called alt-text, to your photos so they’re accessible to even more people, including people who are blind or have low vision. Good descriptions are concise, but present what’s in your photos accurately enough to understand their context.")) {
-          TextField("Enter Alt Text", text: $mediaSet.first(where: { $0.wrappedValue.id == itemId })!.altText)
+          TextField("Enter Alt Text", text: media.altText)
         }
       }
       .navigationTitle("Edit Alt Text")

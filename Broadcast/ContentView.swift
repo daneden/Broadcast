@@ -26,7 +26,7 @@ struct ContentView: View {
   @State private var replyBoxHeight: CGFloat = 0
   
   private var imageHeightCompensation: CGFloat {
-    (twitterClient.draft.media == nil ? 0 : bottomPadding) +
+    (twitterClient.selectedMedia.isEmpty ? 0 : bottomPadding) +
       (replying ? min(replyBoxHeight, replyBoxLimit) : 0)
   }
   
@@ -69,6 +69,7 @@ struct ContentView: View {
                   height: geom.size.height - (bottomPadding + (captionSize * 2)) - imageHeightCompensation,
                   alignment: .topLeading
                 )
+                .animation(.springAnimation, value: imageHeightCompensation)
               
               AttachmentThumbnail(media: $twitterClient.selectedMedia)
             } else {
@@ -88,7 +89,7 @@ struct ContentView: View {
               Label("Sign In With Twitter", image: "twitter.fill")
                 .font(.broadcastHeadline)
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(BroadcastButtonStyle())
             .accessibilityIdentifier("loginButton")
           }
         }

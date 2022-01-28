@@ -48,26 +48,23 @@ class TwitterClientManager: ObservableObject {
       self.user = try? await client.getMe(fields: [\.profileImageUrl]).data
       self.lastTweet = try? await client.userTimeline(fields: [\.createdAt, \.publicMetrics]).data.first
     }
+    self.client = client
   }
   
   @MainActor
   func signIn() {
     self.state = .busy
-    
     Twift.Authentication().requestUserCredentials(clientCredentials: ClientCredentials.credentials,
                                                   callbackURL: ClientCredentials.callbackURL) { (userCredentials, error) in
-      Task.detached {
+      
         if let userCredentials = userCredentials {
-          let newClient = await Twift(.userAccessTokens(clientCredentials: ClientCredentials.credentials, userCredentials: userCredentials))
-          await self.updateClient(newClient)
+          let newClient = Twift(.userAccessTokens(clientCredentials: ClientCredentials.credentials, userCredentials: userCredentials))
+          self.client = newClient
           self.storeCredentials(credentials: userCredentials)
         } else if let error = error {
           print(error)
         }
-        
-        
         self.state = .idle
-      }
     }
   }
   
@@ -76,6 +73,7 @@ class TwitterClientManager: ObservableObject {
     self.user = nil
     self.draft = .init()
     self.lastTweet = nil
+    self.client = nil
     KeychainWrapper.standard.remove(forKey: "broadcast-credentials")
   }
   
@@ -103,6 +101,7 @@ class TwitterClientManager: ObservableObject {
     if response != nil {
       self.updateState(.idle)
       self.draft = .init()
+      self.selectedMedia = []
       Haptics.shared.sendStandardFeedback(feedbackType: .success)
     } else if let error = error {
       print(error.localizedDescription)
@@ -117,49 +116,53 @@ class TwitterClientManager: ObservableObject {
     }
   }
   
+  @MainActor
   func sendTweet(asReply: Bool = false) async {
+    guard let client = self.client else {
+      return
+    }
+
     updateState(.busy)
-    if asReply, let lastTweet = lastTweet {
-      draft.reply = .init(inReplyToTweetId: lastTweet.id)
-    }
-    
-    var mediaStrings: [String] = []
-    for media in selectedMedia {
-      if let data = media.data,
-         let mimeTypeString = media.mimeType,
-         let mimeType = Media.MimeType(rawValue: mimeTypeString) {
-        let result = try? await client?.upload(mediaData: data, mimeType: mimeType)
-        
-        guard let result = result else {
-          self.state = .genericTextAndMediaError
-          print(result?.processingInfo?.error)
-          return
-        }
-        
-        if media.hasAltText {
-          try? await client?.addAltText(to: result.mediaIdString, text: media.altText)
-        }
-        
-        if result.processingInfo?.state != .failed && result.processingInfo?.state != .succeeded {
-          _ = try? await client?.checkMediaUploadSuccessful(result.mediaIdString)
-        }
-        
-        mediaStrings.append(result.mediaIdString)
+
+    do {
+      if asReply, let lastTweet = lastTweet {
+        draft.reply = .init(inReplyToTweetId: lastTweet.id)
       }
-    }
-    
-    if !mediaStrings.isEmpty {
-      draft.media = MutableMedia(mediaIds: mediaStrings)
-    }
-    
-    let result = try? await client?.postTweet(draft)
-    
-    if let result = result {
-      self.lastTweet = try? await client?.getTweet(result.data.id).data
+      
+      var mediaStrings: [String] = []
+      for media in selectedMedia {
+        if let data = media.data,
+           let mimeTypeString = media.mimeType,
+           let mimeType = Media.MimeType(rawValue: mimeTypeString) {
+          let result = try await client.upload(mediaData: data, mimeType: mimeType)
+          
+          
+          
+          if media.hasAltText {
+            try await client.addAltText(to: result.mediaIdString, text: media.altText)
+          }
+          
+          if result.processingInfo?.state != .failed && result.processingInfo?.state != .succeeded {
+            _ = try await client.checkMediaUploadSuccessful(result.mediaIdString)
+          }
+          
+          mediaStrings.append(result.mediaIdString)
+        }
+      }
+      
+      if !mediaStrings.isEmpty {
+        draft.media = MutableMedia(mediaIds: mediaStrings)
+      }
+      
+      let result = try await client.postTweet(draft)
+      self.lastTweet = try await client.getTweet(result.data.id).data
       sendTweetCallback(response: result, error: nil)
-    } else {
-      sendTweetCallback(response: nil, error: nil)
+    } catch {
+      print(error)
+      sendTweetCallback(response: nil, error: error)
     }
+    
+    updateState(.idle)
   }
   
   /// Asynchronously update client state on the main thread
@@ -258,9 +261,9 @@ extension TwitterClientManager {
       self.draft = MutableTweet(text: draft.text)
       
       // TODO: Fix draft media
-//      if let media = draft.media {
-//        self.draft.media = UIImage(data: media)
-//      }
+      //      if let media = draft.media {
+      //        self.draft.media = UIImage(data: media)
+      //      }
     }
     
     let managedObjectContext = PersistanceController.shared.context

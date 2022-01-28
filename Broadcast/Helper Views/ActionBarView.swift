@@ -20,7 +20,8 @@ struct ActionBarView: View {
     
     if moreMediaAllowed && !twitterClient.selectedMedia.isEmpty {
       config.filter = .images
-      config.selectionLimit = 4 - twitterClient.selectedMedia.count
+      config.selectionLimit = 4
+      config.preselectedAssetIdentifiers = twitterClient.selectedMedia.map(\.id)
     } else {
       config.filter = .any(of: [.images, .videos])
     }

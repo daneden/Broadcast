@@ -76,19 +76,6 @@ struct BroadcastButtonStyle: ButtonStyle {
     }
   }
   
-  var prominenceStyle: HierarchicalShapeStyle {
-    switch prominence {
-    case .primary:
-      return .primary
-    case .secondary:
-      return .secondary
-    case .tertiary:
-      return .tertiary
-    case .destructive:
-      return .primary
-    }
-  }
-  
   func makeBody(configuration: Configuration) -> some View {
     HStack {
       if isFullWidth { Spacer(minLength: 0) }
@@ -110,7 +97,7 @@ struct BroadcastButtonStyle: ButtonStyle {
         }
       }
     )
-    .clipShape(Capsule())
+    .clipShape(RoundedRectangle(cornerRadius: 100, style: .continuous))
     .scaleEffect(configuration.isPressed ? 0.95 : 1)
     .animation(.interactiveSpring(), value: configuration.isPressed)
     .onChange(of: configuration.isPressed) { isPressed in

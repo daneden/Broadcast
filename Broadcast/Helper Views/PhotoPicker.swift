@@ -10,7 +10,7 @@ import PhotosUI
 import SwiftUI
 
 struct UserSelectedMedia {
-  let id = UUID()
+  var id: String = UUID().uuidString
   var data: Data?
   var thumbnailData: Data?
   var mimeType: String?
@@ -97,7 +97,8 @@ struct ImagePicker: UIViewControllerRepresentable {
           CGImageDestinationFinalize(imageDestination)
           
           dispatchQueue.sync {
-            let selection = UserSelectedMedia(data: rawImageData,
+            let selection = UserSelectedMedia(id: result.assetIdentifier ?? UUID().uuidString,
+                                              data: rawImageData,
                                               thumbnailData: data as Data,
                                               mimeType: utType?.preferredMIMEType ?? "image/jpeg")
             selectedImageDatas[index] = selection
