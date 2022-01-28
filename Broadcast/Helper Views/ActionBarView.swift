@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct ActionBarView: View {
   @ScaledMetric var barHeight: CGFloat = 80
@@ -14,12 +15,32 @@ struct ActionBarView: View {
   
   @State private var photoPickerIsPresented = false
   
+  private var pickerConfig: PHPickerConfiguration {
+    var config = PHPickerConfiguration(photoLibrary: .shared())
+    
+    if moreMediaAllowed && !twitterClient.selectedMedia.isEmpty {
+      config.filter = .images
+      config.selectionLimit = 4 - twitterClient.selectedMedia.count
+    } else {
+      config.filter = .any(of: [.images, .videos])
+    }
+    
+    return config
+  }
+  
+  private var moreMediaAllowed: Bool {
+    if twitterClient.selectedMedia.contains(where: { $0.mimeType?.contains("video") ?? true }) { return false }
+    if twitterClient.selectedMedia.contains(where: { $0.mimeType?.contains("gif") ?? true }) { return false }
+    if twitterClient.selectedMedia.count == 4 { return false }
+    return true
+  }
+  
   var body: some View {
     publishingActions
       .disabled(twitterClient.state == .busy)
-//      .sheet(isPresented: $photoPickerIsPresented) {
-//        ImagePicker(chosenImage: $twitterClient.draft.media)
-//      }
+      .sheet(isPresented: $photoPickerIsPresented) {
+        ImagePicker(configuration: pickerConfig, selection: $twitterClient.selectedMedia)
+      }
   }
   
   var publishingActions: some View {
@@ -90,6 +111,7 @@ struct ActionBarView: View {
       }
       .buttonStyle(BroadcastButtonStyle(prominence: .tertiary, isFullWidth: false))
       .accessibilityIdentifier("imagePickerButton")
+      .disabled(!moreMediaAllowed)
     }
   }
 }

@@ -70,7 +70,7 @@ struct ContentView: View {
                   alignment: .topLeading
                 )
               
-//              AttachmentThumbnail(image: $twitterClient.draft.media)
+              AttachmentThumbnail(media: $twitterClient.selectedMedia)
             } else {
               WelcomeView()
             }
@@ -88,12 +88,11 @@ struct ContentView: View {
               Label("Sign In With Twitter", image: "twitter.fill")
                 .font(.broadcastHeadline)
             }
-            .buttonStyle(BroadcastButtonStyle())
+            .buttonStyle(.bordered)
             .accessibilityIdentifier("loginButton")
           }
         }
         .padding()
-        .animation(.springAnimation)
         .background(
           VisualEffectView(effect: UIBlurEffect(style: .regular))
             .ignoresSafeArea()

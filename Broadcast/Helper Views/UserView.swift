@@ -37,8 +37,8 @@ struct UserView: View {
   }
 }
 
-//struct UserView_Previews: PreviewProvider {
-//  static var previews: some View {
-//    UserView(user: .mockUser)
-//  }
-//}
+struct UserView_Previews: PreviewProvider {
+  static var previews: some View {
+    UserView(user: .mockUser)
+  }
+}

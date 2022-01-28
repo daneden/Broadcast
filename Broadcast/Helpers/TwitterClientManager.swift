@@ -23,6 +23,7 @@ class TwitterClientManager: ObservableObject {
   @Published var state: State = .initializing
   @Published var lastTweet: Tweet?
   @Published var client: Twift?
+  @Published var selectedMedia: [UserSelectedMedia] = []
   
   @MainActor
   init() {
@@ -122,6 +123,35 @@ class TwitterClientManager: ObservableObject {
       draft.reply = .init(inReplyToTweetId: lastTweet.id)
     }
     
+    var mediaStrings: [String] = []
+    for media in selectedMedia {
+      if let data = media.data,
+         let mimeTypeString = media.mimeType,
+         let mimeType = Media.MimeType(rawValue: mimeTypeString) {
+        let result = try? await client?.upload(mediaData: data, mimeType: mimeType)
+        
+        guard let result = result else {
+          self.state = .genericTextAndMediaError
+          print(result?.processingInfo?.error)
+          return
+        }
+        
+        if media.hasAltText {
+          try? await client?.addAltText(to: result.mediaIdString, text: media.altText)
+        }
+        
+        if result.processingInfo?.state != .failed && result.processingInfo?.state != .succeeded {
+          _ = try? await client?.checkMediaUploadSuccessful(result.mediaIdString)
+        }
+        
+        mediaStrings.append(result.mediaIdString)
+      }
+    }
+    
+    if !mediaStrings.isEmpty {
+      draft.media = MutableMedia(mediaIds: mediaStrings)
+    }
+    
     let result = try? await client?.postTweet(draft)
     
     if let result = result {
@@ -193,7 +223,7 @@ extension TwitterClientManager {
   public func draftIsValid() -> Bool {
     if let text = draft.text, !text.isEmpty {
       return TwitterText.remainingCharacterCount(text: text) >= 0
-    } else if draft.media != nil {
+    } else if !selectedMedia.isEmpty {
       return true
     } else {
       return false

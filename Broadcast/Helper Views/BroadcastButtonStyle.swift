@@ -37,15 +37,28 @@ struct BroadcastButtonStyle: ButtonStyle {
   var isFullWidth = true
   var isLoading = false
   
+  var foregroundStyle: HierarchicalShapeStyle {
+    switch prominence {
+    case .primary:
+      return .primary
+    case .secondary:
+      return .secondary
+    case .tertiary:
+      return .tertiary
+    case .destructive:
+      return .primary
+    }
+  }
+  
   var background: some View {
     Group {
       switch prominence {
       case .primary:
         Color.accentColor
       case .secondary:
-        Color.accentColor.opacity(0.1)
+        Color.accentColor.opacity(0.1).background(.ultraThinMaterial)
       case .tertiary:
-        VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
+        Color.clear.background(.ultraThinMaterial)
       case .destructive:
         Color(.systemRed)
       }
@@ -57,9 +70,22 @@ struct BroadcastButtonStyle: ButtonStyle {
     case .secondary:
       return .accentColor
     case .tertiary:
-      return .primary
+      return .secondary
     default:
       return .white
+    }
+  }
+  
+  var prominenceStyle: HierarchicalShapeStyle {
+    switch prominence {
+    case .primary:
+      return .primary
+    case .secondary:
+      return .secondary
+    case .tertiary:
+      return .tertiary
+    case .destructive:
+      return .primary
     }
   }
   
