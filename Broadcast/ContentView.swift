@@ -72,6 +72,7 @@ struct ContentView: View {
                 .animation(.springAnimation, value: imageHeightCompensation)
               
               AttachmentThumbnail(media: $twitterClient.selectedMedia)
+                .disabled(twitterClient.state == .busy)
             } else {
               WelcomeView()
             }
