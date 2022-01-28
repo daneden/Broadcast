@@ -172,6 +172,8 @@ class TwitterClientManager: ObservableObject {
   }
   
   @Published var userSearchResults: [User]?
+  
+  @MainActor
   func searchScreenNames(_ screenName: String) async {
     let url = URL(string: "https://twitter.com/i/search/typeahead.json?count=10&q=%23\(screenName)&result_type=users")!
     
@@ -179,9 +181,12 @@ class TwitterClientManager: ObservableObject {
       "Authorization": typeaheadToken
     ]
     
-    // TODO: Fix user auth for typeahead search
+    guard case .userAccessTokens(_, let userCredentials) = client?.authenticationType else {
+      return
+    }
+    
     if let userId = user?.id {
-      headers["Cookie"] = "twid=u%3D\(userId);auth_token=\(ClientCredentials.credentials.key)"
+      headers["Cookie"] = "twid=u%3D\(userId);auth_token=\(userCredentials.key)"
     }
     
     var request = URLRequest(url: url)
@@ -191,7 +196,9 @@ class TwitterClientManager: ObservableObject {
     do {
       let (result, _) = try await URLSession.shared.data(for: request)
       let decodedResult = try JSONDecoder().decode(TypeaheadResponse.self, from: result)
-      self.userSearchResults = decodedResult.users
+      withAnimation(.easeInOut(duration: 0.2)) {
+        self.userSearchResults = decodedResult.users?.compactMap { $0.toUser() }
+      }
     } catch {
       print(error)
     }
@@ -215,6 +222,30 @@ class TwitterClientManager: ObservableObject {
     
     return repliesToTweet.map { tweet in
       (tweet: tweet, author: replyAuthors.first(where: { $0.id == tweet.authorId! })!)
+    }
+  }
+}
+
+fileprivate struct V1User: Codable {
+  let id_str: String
+  let name: String
+  let screen_name: String
+  let profile_image_url_https: URL
+  
+  func toUser() -> User? {
+    let jsonString = """
+  {
+    "id": "\(id_str)",
+    "profileImageUrl": "\(profile_image_url_https)",
+    "name": "\(name)",
+    "username": "\(screen_name)"
+  }
+"""
+    do {
+      return try JSONDecoder().decode(User.self, from: jsonString.data(using: .utf8)!)
+    } catch {
+      print(error)
+      return nil
     }
   }
 }
@@ -325,7 +356,7 @@ extension TwitterClientManager {
   }
 }
 
-struct TypeaheadResponse: Decodable {
+fileprivate struct TypeaheadResponse: Decodable {
   var num_results: Int
-  var users: [User]?
+  var users: [V1User]?
 }

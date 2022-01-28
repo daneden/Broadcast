@@ -53,6 +53,7 @@
 		71B82910268F2195002AEE72 /* LastTweetReplyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B8290F268F2195002AEE72 /* LastTweetReplyView.swift */; };
 		71BBAAE9268CF1BD004048A0 /* ComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71BBAAE8268CF1BD004048A0 /* ComposerView.swift */; };
 		71BBAAEB268CF532004048A0 /* TwitterAPI-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 71BBAAEA268CF532004048A0 /* TwitterAPI-Info.plist */; };
+		71D283F127A469EF00640B2A /* AttributeScopes+TwitterEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D283F027A469EF00640B2A /* AttributeScopes+TwitterEntities.swift */; };
 		71E36FFB2689EED40078D956 /* ShakeModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E36FFA2689EED40078D956 /* ShakeModifier.swift */; };
 /* End PBXBuildFile section */
 
@@ -113,6 +114,7 @@
 		71B8290F268F2195002AEE72 /* LastTweetReplyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastTweetReplyView.swift; sourceTree = "<group>"; };
 		71BBAAE8268CF1BD004048A0 /* ComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposerView.swift; sourceTree = "<group>"; };
 		71BBAAEA268CF532004048A0 /* TwitterAPI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TwitterAPI-Info.plist"; sourceTree = "<group>"; };
+		71D283F027A469EF00640B2A /* AttributeScopes+TwitterEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributeScopes+TwitterEntities.swift"; sourceTree = "<group>"; };
 		71E36FFA2689EED40078D956 /* ShakeModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeModifier.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -220,6 +222,7 @@
 				71800BFE26999BA6009D11A1 /* PersistanceController.swift */,
 				7199AE7F26B9892E001DEB46 /* Debouncer.swift */,
 				715AAE0B26C9589A002BCEA1 /* TestUtils.swift */,
+				71D283F027A469EF00640B2A /* AttributeScopes+TwitterEntities.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -417,6 +420,7 @@
 				71800BF426906BC0009D11A1 /* DraftsListView.swift in Sources */,
 				71E36FFB2689EED40078D956 /* ShakeModifier.swift in Sources */,
 				71800BF8269998BF009D11A1 /* UIImage.extension.swift in Sources */,
+				71D283F127A469EF00640B2A /* AttributeScopes+TwitterEntities.swift in Sources */,
 				719087CF26891C7F005B96CE /* Array.extension.swift in Sources */,
 				7188E64D2687C6A1007CFD78 /* Binding.extension.swift in Sources */,
 				7199AE8026B9892E001DEB46 /* Debouncer.swift in Sources */,

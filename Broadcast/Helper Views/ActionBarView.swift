@@ -18,6 +18,9 @@ struct ActionBarView: View {
   private var pickerConfig: PHPickerConfiguration {
     var config = PHPickerConfiguration(photoLibrary: .shared())
     
+    config.preferredAssetRepresentationMode = .current
+    config.selection = .ordered
+    
     if moreMediaAllowed && !twitterClient.selectedMedia.isEmpty {
       config.filter = .images
       config.selectionLimit = 4
