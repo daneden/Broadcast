@@ -27,7 +27,7 @@ struct BroadcastApp: App {
               persistenceController.save()
             }
           
-          VisualEffectView(effect: UIBlurEffect(style: .regular))
+          Color.clear.background(.regularMaterial)
             .frame(height: geom.safeAreaInsets.top)
             .ignoresSafeArea(.all, edges: .top)
         }

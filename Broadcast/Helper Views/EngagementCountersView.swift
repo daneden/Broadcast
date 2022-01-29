@@ -15,9 +15,9 @@ struct EngagementCountersView: View {
     let replyCount = tweet.publicMetrics?.replyCount ?? 0
     switch replyCount {
     case 0:
-      return "No replies"
+      return "No Replies"
     case 1:
-      return "1 Reply"
+      return "\(replyCount) Reply"
     default:
       return "\(replyCount) Replies"
     }

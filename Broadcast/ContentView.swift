@@ -95,7 +95,7 @@ struct ContentView: View {
         }
         .padding()
         .background(
-          VisualEffectView(effect: UIBlurEffect(style: .regular))
+          Color.clear.background(.regularMaterial)
             .ignoresSafeArea()
             .opacity(twitterClient.user == nil ? 0 : 1)
         )
