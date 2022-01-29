@@ -43,6 +43,7 @@ struct ActionBarView: View {
       .disabled(twitterClient.state == .busy())
       .sheet(isPresented: $photoPickerIsPresented) {
         ImagePicker(configuration: pickerConfig, selection: $twitterClient.selectedMedia)
+          .ignoresSafeArea()
       }
       .onLongPressGesture {
         ThemeHelper.shared.rotateTheme()

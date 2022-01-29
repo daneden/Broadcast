@@ -14,6 +14,15 @@ struct AsyncLocalMediaPreview: View {
     case failed
     case loading
     case loadingWithProgress(_ progress: Progress)
+    
+    var finished: Bool {
+      switch self {
+      case .loaded(_), .failed:
+        return true
+      default:
+        return false
+      }
+    }
   }
   var assetId: String
   var asset: PHPickerResult
