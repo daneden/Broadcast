@@ -18,14 +18,12 @@
 		71800BF026905DB3009D11A1 /* EngagementCountersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71800BEF26905DB3009D11A1 /* EngagementCountersView.swift */; };
 		71800BF226906721009D11A1 /* ActionBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71800BF126906721009D11A1 /* ActionBarView.swift */; };
 		71800BF426906BC0009D11A1 /* DraftsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71800BF326906BC0009D11A1 /* DraftsListView.swift */; };
-		71800BF8269998BF009D11A1 /* UIImage.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71800BF7269998BF009D11A1 /* UIImage.extension.swift */; };
 		71800BFD26999B1B009D11A1 /* DraftsModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 71800BFB26999B1B009D11A1 /* DraftsModel.xcdatamodeld */; };
 		71800BFF26999BA6009D11A1 /* PersistanceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71800BFE26999BA6009D11A1 /* PersistanceController.swift */; };
 		7188E6292687B0FE007CFD78 /* BroadcastApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6282687B0FE007CFD78 /* BroadcastApp.swift */; };
 		7188E62B2687B0FE007CFD78 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E62A2687B0FE007CFD78 /* ContentView.swift */; };
 		7188E62D2687B0FF007CFD78 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7188E62C2687B0FF007CFD78 /* Assets.xcassets */; };
 		7188E6302687B0FF007CFD78 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7188E62F2687B0FF007CFD78 /* Preview Assets.xcassets */; };
-		7188E63B2687B19D007CFD78 /* Notification.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E63A2687B19D007CFD78 /* Notification.extension.swift */; };
 		7188E6472687B6C2007CFD78 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6462687B6C2007CFD78 /* SafariView.swift */; };
 		7188E6492687C0E0007CFD78 /* BroadcastButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6482687C0E0007CFD78 /* BroadcastButtonStyle.swift */; };
 		7188E64B2687C44D007CFD78 /* String.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E64A2687C44D007CFD78 /* String.extension.swift */; };
@@ -80,7 +78,6 @@
 		71800BEF26905DB3009D11A1 /* EngagementCountersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngagementCountersView.swift; sourceTree = "<group>"; };
 		71800BF126906721009D11A1 /* ActionBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionBarView.swift; sourceTree = "<group>"; };
 		71800BF326906BC0009D11A1 /* DraftsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraftsListView.swift; sourceTree = "<group>"; };
-		71800BF7269998BF009D11A1 /* UIImage.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.extension.swift; sourceTree = "<group>"; };
 		71800BFC26999B1B009D11A1 /* DraftsModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DraftsModel.xcdatamodel; sourceTree = "<group>"; };
 		71800BFE26999BA6009D11A1 /* PersistanceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistanceController.swift; sourceTree = "<group>"; };
 		7188E6252687B0FE007CFD78 /* Broadcast.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Broadcast.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,7 +86,6 @@
 		7188E62C2687B0FF007CFD78 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7188E62F2687B0FF007CFD78 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		7188E6312687B0FF007CFD78 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7188E63A2687B19D007CFD78 /* Notification.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.extension.swift; sourceTree = "<group>"; };
 		7188E6462687B6C2007CFD78 /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
 		7188E6482687C0E0007CFD78 /* BroadcastButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastButtonStyle.swift; sourceTree = "<group>"; };
 		7188E64A2687C44D007CFD78 /* String.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.extension.swift; sourceTree = "<group>"; };
@@ -200,10 +196,8 @@
 				711F3FF9268F50C800605C89 /* Animation.extension.swift */,
 				719087CE26891C7F005B96CE /* Array.extension.swift */,
 				7188E6602688A01F007CFD78 /* Font.extension.swift */,
-				7188E63A2687B19D007CFD78 /* Notification.extension.swift */,
 				7188E64A2687C44D007CFD78 /* String.extension.swift */,
 				7188E66B2688DB44007CFD78 /* UIApplication.extension.swift */,
-				71800BF7269998BF009D11A1 /* UIImage.extension.swift */,
 				717041F626B703A600001360 /* TwitterClient+MockTweet.swift */,
 				7199AE7926B96D0D001DEB46 /* NSRegularExpression+Convenience.swift */,
 			);
@@ -395,7 +389,6 @@
 				7188E6612688A01F007CFD78 /* Font.extension.swift in Sources */,
 				7188E62B2687B0FE007CFD78 /* ContentView.swift in Sources */,
 				717041F526B7037300001360 /* TweetView.swift in Sources */,
-				7188E63B2687B19D007CFD78 /* Notification.extension.swift in Sources */,
 				717041F326B6FFEA00001360 /* RepliesListView.swift in Sources */,
 				7188E6292687B0FE007CFD78 /* BroadcastApp.swift in Sources */,
 				71B8290C268D0AC6002AEE72 /* TwitterClientManager.swift in Sources */,
@@ -420,7 +413,6 @@
 				71800BF426906BC0009D11A1 /* DraftsListView.swift in Sources */,
 				71A9157927A59C9000706024 /* AsyncLocalMediaPreview.swift in Sources */,
 				71E36FFB2689EED40078D956 /* ShakeModifier.swift in Sources */,
-				71800BF8269998BF009D11A1 /* UIImage.extension.swift in Sources */,
 				71D283F127A469EF00640B2A /* AttributeScopes+TwitterEntities.swift in Sources */,
 				719087CF26891C7F005B96CE /* Array.extension.swift in Sources */,
 				7188E64D2687C6A1007CFD78 /* Binding.extension.swift in Sources */,

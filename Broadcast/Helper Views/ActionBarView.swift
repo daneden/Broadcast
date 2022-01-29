@@ -33,7 +33,7 @@ struct ActionBarView: View {
   }
   
   private var moreMediaAllowed: Bool {
-    //if twitterClient.selectedMedia.contains(where: { $0.value?.mimeType == .mov || $0.value?.mimeType == .gif }) { return false }
+    if twitterClient.selectedMedia.contains(where: { $0.value.mediaMimeType == .mov || $0.value.mediaMimeType == .gif }) { return false }
     if twitterClient.selectedMedia.count == 4 { return false }
     return true
   }

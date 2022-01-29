@@ -66,7 +66,7 @@ class TwitterClientManager: ObservableObject {
   
   @MainActor
   func signIn() async {
-    self.state = .busy()
+    self.updateState(.busy())
     
     let client: Twift? = await withUnsafeContinuation { continuation in
       Twift.Authentication().requestUserCredentials(clientCredentials: ClientCredentials.credentials,
@@ -83,7 +83,7 @@ class TwitterClientManager: ObservableObject {
     }
     
     await self.updateClient(client, animated: true)
-    self.state = .idle
+    self.updateState(.idle)
   }
   
   @MainActor
