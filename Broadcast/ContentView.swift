@@ -18,7 +18,6 @@ struct ContentView: View {
   @EnvironmentObject var twitterClient: TwitterClientManager
   
   @State private var photoPickerIsPresented = false
-  @State private var signOutScreenIsPresented = false
   @State private var repliesSheetIsPresented = false
   
   @State private var sendingTweet = false
@@ -64,7 +63,7 @@ struct ContentView: View {
             }
             
             if twitterClient.user != nil {
-              ComposerView(signOutScreenIsPresented: $signOutScreenIsPresented)
+              ComposerView()
                 .frame(
                   height: geom.size.height - (bottomPadding + (captionSize * 2)) - imageHeightCompensation,
                   alignment: .topLeading
@@ -72,7 +71,7 @@ struct ContentView: View {
                 .animation(.springAnimation, value: imageHeightCompensation)
               
               AttachmentThumbnail(media: $twitterClient.selectedMedia)
-                .disabled(twitterClient.state == .busy)
+                .disabled(twitterClient.state == .busy())
             } else {
               WelcomeView()
             }
@@ -86,7 +85,7 @@ struct ContentView: View {
           if twitterClient.user != nil {
             ActionBarView(replying: $replying)
           } else {
-            Button(action: { twitterClient.signIn() }) {
+            Button(action: { Task { await twitterClient.signIn() } }) {
               Label("Sign In With Twitter", image: "twitter.fill")
                 .font(.broadcastHeadline)
             }
@@ -101,9 +100,6 @@ struct ContentView: View {
             .opacity(twitterClient.user == nil ? 0 : 1)
         )
         .gesture(DragGesture().onEnded({ _ in UIApplication.shared.endEditing() }))
-      }
-      .sheet(isPresented: $signOutScreenIsPresented) {
-        SignOutView()
       }
       .sheet(isPresented: $repliesSheetIsPresented) {
         RepliesListView(tweet: twitterClient.lastTweet)

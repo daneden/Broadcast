@@ -28,6 +28,8 @@ struct BroadcastLabelStyle: LabelStyle {
 }
 
 struct BroadcastButtonStyle: ButtonStyle {
+  @Environment(\.isEnabled) var isEnabled
+  
   enum Prominence {
     case primary, secondary, tertiary, destructive
   }
@@ -36,19 +38,6 @@ struct BroadcastButtonStyle: ButtonStyle {
   var prominence: Prominence = .primary
   var isFullWidth = true
   var isLoading = false
-  
-  var foregroundStyle: HierarchicalShapeStyle {
-    switch prominence {
-    case .primary:
-      return .primary
-    case .secondary:
-      return .secondary
-    case .tertiary:
-      return .tertiary
-    case .destructive:
-      return .primary
-    }
-  }
   
   var background: some View {
     Group {
@@ -60,7 +49,7 @@ struct BroadcastButtonStyle: ButtonStyle {
       case .tertiary:
         Color.clear.background(.ultraThinMaterial)
       case .destructive:
-        Color(.systemRed)
+        Color.red
       }
     }
   }
@@ -70,7 +59,7 @@ struct BroadcastButtonStyle: ButtonStyle {
     case .secondary:
       return .accentColor
     case .tertiary:
-      return .secondary
+      return isEnabled ? .primary : .secondary
     default:
       return .white
     }
@@ -93,7 +82,7 @@ struct BroadcastButtonStyle: ButtonStyle {
     .overlay(
       Group {
         if isLoading {
-          ProgressView()
+          ProgressView().tint(foregroundColor)
         }
       }
     )

@@ -24,7 +24,7 @@ struct ActionBarView: View {
     if moreMediaAllowed && !twitterClient.selectedMedia.isEmpty {
       config.filter = .images
       config.selectionLimit = 4
-      config.preselectedAssetIdentifiers = twitterClient.selectedMedia.map(\.id)
+      config.preselectedAssetIdentifiers = twitterClient.selectedMedia.map(\.key)
     } else {
       config.filter = .any(of: [.images, .videos])
     }
@@ -33,17 +33,19 @@ struct ActionBarView: View {
   }
   
   private var moreMediaAllowed: Bool {
-    if twitterClient.selectedMedia.contains(where: { $0.mimeType?.contains("video") ?? true }) { return false }
-    if twitterClient.selectedMedia.contains(where: { $0.mimeType?.contains("gif") ?? true }) { return false }
+    //if twitterClient.selectedMedia.contains(where: { $0.value?.mimeType == .mov || $0.value?.mimeType == .gif }) { return false }
     if twitterClient.selectedMedia.count == 4 { return false }
     return true
   }
   
   var body: some View {
     publishingActions
-      .disabled(twitterClient.state == .busy)
+      .disabled(twitterClient.state == .busy())
       .sheet(isPresented: $photoPickerIsPresented) {
         ImagePicker(configuration: pickerConfig, selection: $twitterClient.selectedMedia)
+      }
+      .onLongPressGesture {
+        ThemeHelper.shared.rotateTheme()
       }
   }
   
@@ -72,7 +74,7 @@ struct ActionBarView: View {
           BroadcastButtonStyle(
             prominence: replying ? .primary : .secondary,
             isFullWidth: replying,
-            isLoading: twitterClient.state == .busy && replying
+            isLoading: twitterClient.state == .busy() && replying
           )
         )
         .disabled(replying && !twitterClient.draftIsValid())
@@ -100,7 +102,7 @@ struct ActionBarView: View {
         BroadcastButtonStyle(
           prominence: !replying ? .primary : .secondary,
           isFullWidth: !replying,
-          isLoading: twitterClient.state == .busy && !replying
+          isLoading: twitterClient.state == .busy() && !replying
         )
       )
       .disabled(!replying && !twitterClient.draftIsValid())

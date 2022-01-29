@@ -13,6 +13,7 @@ import UIKit
 import AuthenticationServices
 import SwiftKeychainWrapper
 import SwiftUI
+import PhotosUI
 
 let typeaheadToken = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
@@ -23,7 +24,9 @@ class TwitterClientManager: ObservableObject {
   @Published var state: State = .initializing
   @Published var lastTweet: Tweet?
   @Published var client: Twift?
-  @Published var selectedMedia: [UserSelectedMedia] = []
+  
+  @Published var selectedMedia: [String: PHPickerResult] = [:]
+  @Published var mediaAltText: [String: String] = [:]
   
   @MainActor
   init() {
@@ -43,29 +46,44 @@ class TwitterClientManager: ObservableObject {
   }
   
   @MainActor
-  private func updateClient(_ client: Twift?) async {
-    if let client = client {
-      self.user = try? await client.getMe(fields: [\.profileImageUrl]).data
-      self.lastTweet = try? await client.userTimeline(fields: [\.createdAt, \.publicMetrics]).data.first
-    }
+  private func updateClient(_ client: Twift?, animated: Bool = false) async {
+    guard let client = client else { return }
+    
     self.client = client
+    let user = try? await client.getMe(fields: [\.profileImageUrl]).data
+    let lastTweet = try? await client.userTimeline(fields: [\.createdAt, \.publicMetrics]).data.first
+    
+    if animated {
+      withAnimation {
+        self.user = user
+        self.lastTweet = lastTweet
+      }
+    } else {
+      self.user = user
+      self.lastTweet = lastTweet
+    }
   }
   
   @MainActor
-  func signIn() {
-    self.state = .busy
-    Twift.Authentication().requestUserCredentials(clientCredentials: ClientCredentials.credentials,
-                                                  callbackURL: ClientCredentials.callbackURL) { (userCredentials, error) in
-      
+  func signIn() async {
+    self.state = .busy()
+    
+    let client: Twift? = await withUnsafeContinuation { continuation in
+      Twift.Authentication().requestUserCredentials(clientCredentials: ClientCredentials.credentials,
+                                                    callbackURL: ClientCredentials.callbackURL) { (userCredentials, error) in
         if let userCredentials = userCredentials {
           let newClient = Twift(.userAccessTokens(clientCredentials: ClientCredentials.credentials, userCredentials: userCredentials))
-          self.client = newClient
           self.storeCredentials(credentials: userCredentials)
+          continuation.resume(returning: newClient)
         } else if let error = error {
           print(error)
+          continuation.resume(returning: nil)
         }
-        self.state = .idle
+      }
     }
+    
+    await self.updateClient(client, animated: true)
+    self.state = .idle
   }
   
   @MainActor
@@ -101,12 +119,12 @@ class TwitterClientManager: ObservableObject {
     if response != nil {
       self.updateState(.idle)
       self.draft = .init()
-      self.selectedMedia = []
+      withAnimation { self.selectedMedia = [:] }
       Haptics.shared.sendStandardFeedback(feedbackType: .success)
     } else if let error = error {
       print(error.localizedDescription)
       
-      if draft.media != nil {
+      if !self.selectedMedia.isEmpty {
         self.updateState(.genericTextAndMediaError)
       } else {
         self.updateState(.genericTextError)
@@ -122,7 +140,7 @@ class TwitterClientManager: ObservableObject {
       return
     }
 
-    updateState(.busy)
+    updateState(.busy())
 
     do {
       if asReply, let lastTweet = lastTweet {
@@ -130,22 +148,44 @@ class TwitterClientManager: ObservableObject {
       }
       
       var mediaStrings: [String] = []
-      for media in selectedMedia {
-        if let data = media.data,
-           let mimeTypeString = media.mimeType,
-           let mimeType = Media.MimeType(rawValue: mimeTypeString) {
-          let result = try await client.upload(mediaData: data, mimeType: mimeType)
-          
-          if media.hasAltText {
-            try await client.addAltText(to: result.mediaIdString, text: media.altText)
+      for (key, media) in selectedMedia {
+        let media: (Data, Media.MimeType)? = await withUnsafeContinuation { continuation in
+          let itemProvider = media.itemProvider
+          guard let utType = itemProvider.registeredTypeIdentifiers.reduce(nil, { (guess: UTType?, current: String) in
+            if guess == nil {
+              return UTType(current)
+            } else {
+              return nil
+            }
+          }) else {
+            return continuation.resume(returning: nil)
           }
           
-          if result.processingInfo != nil {
-            _ = try await client.checkMediaUploadSuccessful(result.mediaIdString)
-          }
-          
-          mediaStrings.append(result.mediaIdString)
+          itemProvider.loadDataRepresentation(forTypeIdentifier: utType.identifier, completionHandler: { data, error in
+            if let data = data,
+               let mimeType = Media.MimeType(rawValue: utType.preferredMIMEType!) {
+              continuation.resume(returning: (data, mimeType))
+            } else {
+              print("unable to load data for object with type", utType)
+            }
+          })
         }
+        
+        guard let (data, mimeType) = media else {
+          return updateState(.genericTextAndMediaError)
+        }
+        
+        let result = try await client.upload(mediaData: data, mimeType: mimeType)
+          
+        if let altText = mediaAltText[key] {
+          try await client.addAltText(to: result.mediaIdString, text: altText)
+        }
+          
+        if result.processingInfo != nil {
+          _ = try await client.checkMediaUploadSuccessful(result.mediaIdString)
+        }
+          
+        mediaStrings.append(result.mediaIdString)
       }
       
       if !mediaStrings.isEmpty {
@@ -305,7 +345,8 @@ extension TwitterClientManager {
 // MARK: Models
 extension TwitterClientManager {
   enum State: Equatable {
-    case idle, busy, initializing
+    case idle, initializing
+    case busy(_ progress: Progress? = nil)
     case error(_: String? = nil)
     
     static var genericTextError = State.error("Oh man, something went wrong sending that tweet. It might be too long.")

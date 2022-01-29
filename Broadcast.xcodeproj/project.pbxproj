@@ -33,7 +33,6 @@
 		7188E64F2687CCD0007CFD78 /* PhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E64E2687CCD0007CFD78 /* PhotoPicker.swift */; };
 		7188E6532687D16C007CFD78 /* AttachmentThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6522687D16C007CFD78 /* AttachmentThumbnail.swift */; };
 		7188E65D26887DCD007CFD78 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 7188E65C26887DCD007CFD78 /* SwiftKeychainWrapper */; };
-		7188E65F26889147007CFD78 /* SignOutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E65E26889147007CFD78 /* SignOutView.swift */; };
 		7188E6612688A01F007CFD78 /* Font.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6602688A01F007CFD78 /* Font.extension.swift */; };
 		7188E6632688A0FC007CFD78 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6622688A0FC007CFD78 /* WelcomeView.swift */; };
 		7188E6652688A436007CFD78 /* ThemeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E6642688A436007CFD78 /* ThemeHelper.swift */; };
@@ -48,6 +47,7 @@
 		7199AE8026B9892E001DEB46 /* Debouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7199AE7F26B9892E001DEB46 /* Debouncer.swift */; };
 		71A1088A268B073B007E1FFB /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A10889268B073B007E1FFB /* Haptics.swift */; };
 		71A6A264278C73AD00BF2387 /* TwitterAPI-Info.example.plist in Resources */ = {isa = PBXBuildFile; fileRef = 71A6A263278C73AD00BF2387 /* TwitterAPI-Info.example.plist */; };
+		71A9157927A59C9000706024 /* AsyncLocalMediaPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A9157827A59C9000706024 /* AsyncLocalMediaPreview.swift */; };
 		71AA4AC6268A032400B7B577 /* RemoteImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71AA4AC5268A032400B7B577 /* RemoteImage.swift */; };
 		71B8290C268D0AC6002AEE72 /* TwitterClientManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B8290B268D0AC6002AEE72 /* TwitterClientManager.swift */; };
 		71B82910268F2195002AEE72 /* LastTweetReplyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B8290F268F2195002AEE72 /* LastTweetReplyView.swift */; };
@@ -96,7 +96,6 @@
 		7188E64C2687C6A1007CFD78 /* Binding.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Binding.extension.swift; sourceTree = "<group>"; };
 		7188E64E2687CCD0007CFD78 /* PhotoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPicker.swift; sourceTree = "<group>"; };
 		7188E6522687D16C007CFD78 /* AttachmentThumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentThumbnail.swift; sourceTree = "<group>"; };
-		7188E65E26889147007CFD78 /* SignOutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignOutView.swift; sourceTree = "<group>"; };
 		7188E6602688A01F007CFD78 /* Font.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Font.extension.swift; sourceTree = "<group>"; };
 		7188E6622688A0FC007CFD78 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		7188E6642688A436007CFD78 /* ThemeHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeHelper.swift; sourceTree = "<group>"; };
@@ -109,6 +108,7 @@
 		7199AE7F26B9892E001DEB46 /* Debouncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debouncer.swift; sourceTree = "<group>"; };
 		71A10889268B073B007E1FFB /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		71A6A263278C73AD00BF2387 /* TwitterAPI-Info.example.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TwitterAPI-Info.example.plist"; sourceTree = "<group>"; };
+		71A9157827A59C9000706024 /* AsyncLocalMediaPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncLocalMediaPreview.swift; sourceTree = "<group>"; };
 		71AA4AC5268A032400B7B577 /* RemoteImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImage.swift; sourceTree = "<group>"; };
 		71B8290B268D0AC6002AEE72 /* TwitterClientManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitterClientManager.swift; sourceTree = "<group>"; };
 		71B8290F268F2195002AEE72 /* LastTweetReplyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastTweetReplyView.swift; sourceTree = "<group>"; };
@@ -173,7 +173,6 @@
 				7188E6312687B0FF007CFD78 /* Info.plist */,
 				7188E6282687B0FE007CFD78 /* BroadcastApp.swift */,
 				7188E62A2687B0FE007CFD78 /* ContentView.swift */,
-				7188E65E26889147007CFD78 /* SignOutView.swift */,
 				7188E6622688A0FC007CFD78 /* WelcomeView.swift */,
 				7188E62C2687B0FF007CFD78 /* Assets.xcassets */,
 				7188E6392687B192007CFD78 /* Extensions */,
@@ -246,6 +245,7 @@
 				7199AE7B26B97327001DEB46 /* UserView.swift */,
 				7199AE7D26B973B2001DEB46 /* MentionBar.swift */,
 				7101073526C810AC00A713A5 /* NullStateView.swift */,
+				71A9157827A59C9000706024 /* AsyncLocalMediaPreview.swift */,
 			);
 			path = "Helper Views";
 			sourceTree = "<group>";
@@ -418,6 +418,7 @@
 				71800BFF26999BA6009D11A1 /* PersistanceController.swift in Sources */,
 				71B82910268F2195002AEE72 /* LastTweetReplyView.swift in Sources */,
 				71800BF426906BC0009D11A1 /* DraftsListView.swift in Sources */,
+				71A9157927A59C9000706024 /* AsyncLocalMediaPreview.swift in Sources */,
 				71E36FFB2689EED40078D956 /* ShakeModifier.swift in Sources */,
 				71800BF8269998BF009D11A1 /* UIImage.extension.swift in Sources */,
 				71D283F127A469EF00640B2A /* AttributeScopes+TwitterEntities.swift in Sources */,
@@ -427,7 +428,6 @@
 				711F3FFA268F50C800605C89 /* Animation.extension.swift in Sources */,
 				71AA4AC6268A032400B7B577 /* RemoteImage.swift in Sources */,
 				7188E6672688B99E007CFD78 /* VisualEffectView.swift in Sources */,
-				7188E65F26889147007CFD78 /* SignOutView.swift in Sources */,
 				71A1088A268B073B007E1FFB /* Haptics.swift in Sources */,
 				71BBAAE9268CF1BD004048A0 /* ComposerView.swift in Sources */,
 				715AAE0C26C9589A002BCEA1 /* TestUtils.swift in Sources */,

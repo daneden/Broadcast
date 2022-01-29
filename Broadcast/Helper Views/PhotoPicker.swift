@@ -8,23 +8,35 @@
 import Foundation
 import PhotosUI
 import SwiftUI
+import Twift
 
-struct UserSelectedMedia {
-  var id: String = UUID().uuidString
-  var data: Data?
-  var thumbnailData: Data?
-  var mimeType: String?
-  var altText: String = ""
+extension PHPickerResult {
+  var mediaType: UTType? {
+    guard let registeredTypeIdentifier = self.itemProvider.registeredTypeIdentifiers.first else {
+      return nil
+    }
+    return UTType(registeredTypeIdentifier)
+  }
   
-  var hasAltText: Bool { !altText.isEmpty }
-  var canAddAltText: Bool { mimeType?.contains("image") ?? false }
+  var mediaMimeType: Media.MimeType? {
+    guard let utTypeMimeType = mediaType?.preferredMIMEType else { return nil }
+    return .init(rawValue: utTypeMimeType)
+  }
+  
+  var allowsAltText: Bool {
+    guard let mimeType = mediaMimeType else { return false }
+    switch mimeType {
+    case .gif, .jpeg: return true
+    default: return false
+    }
+  }
 }
 
 struct ImagePicker: UIViewControllerRepresentable {
   @Environment(\.presentationMode) var presentationMode
   var configuration: PHPickerConfiguration = PHPickerConfiguration(photoLibrary: PHPhotoLibrary.shared())
   
-  @Binding var selection: [UserSelectedMedia]
+  @Binding var selection: [String: PHPickerResult]
   
   func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> PHPickerViewController {
     let controller = PHPickerViewController(configuration: configuration)
@@ -49,72 +61,11 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
     
     func picker(_: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-      if results.isEmpty {
-        self.parent.presentationMode.wrappedValue.dismiss()
+      for result in results {
+        self.parent.selection[result.assetIdentifier!] = result
       }
-      let dispatchQueue = DispatchQueue(label: "me.daneden.Twift_SwiftUI.AlbumImageQueue")
-      var selectedImageDatas = [UserSelectedMedia?](repeating: nil, count: results.count) // Awkwardly named, sure
-      var totalConversionsCompleted = 0
       
-      for (index, result) in results.enumerated() {
-        result.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { url, error in
-          guard let url = url, let rawImageData = try? Data(contentsOf: url) else {
-            dispatchQueue.sync { totalConversionsCompleted += 1 }
-            return
-          }
-          
-          let sourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
-          
-          guard let source = CGImageSourceCreateWithURL(url as CFURL, sourceOptions) else {
-            dispatchQueue.sync { totalConversionsCompleted += 1 }
-            return
-          }
-          
-          let downsampleOptions = [
-            kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceCreateThumbnailWithTransform: false,
-            kCGImageSourceThumbnailMaxPixelSize: 2_000,
-          ] as CFDictionary
-          
-          guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, downsampleOptions) else {
-            dispatchQueue.sync { totalConversionsCompleted += 1}
-            return
-          }
-          
-          let data = NSMutableData()
-          let utType = UTType.init(filenameExtension: url.pathExtension)
-          
-          guard let imageDestination = CGImageDestinationCreateWithData(data, (utType ?? UTType.jpeg).identifier as CFString, 1, nil) else {
-            dispatchQueue.sync { totalConversionsCompleted += 1 }
-            return
-          }
-          
-          let destinationProperties = [
-            kCGImageDestinationLossyCompressionQuality: utType == .png ? 1.0 : 0.75
-          ] as CFDictionary
-          
-          CGImageDestinationAddImage(imageDestination, cgImage, destinationProperties)
-          CGImageDestinationFinalize(imageDestination)
-          
-          dispatchQueue.sync {
-            let selection = UserSelectedMedia(id: result.assetIdentifier ?? UUID().uuidString,
-                                              data: rawImageData,
-                                              thumbnailData: data as Data,
-                                              mimeType: utType?.preferredMIMEType ?? "image/jpeg")
-            selectedImageDatas[index] = selection
-            totalConversionsCompleted += 1
-            
-            if totalConversionsCompleted == results.count {
-              print(selectedImageDatas)
-              
-              DispatchQueue.main.async {
-                self.parent.selection.append(contentsOf: selectedImageDatas.compactMap { $0 })
-              }
-              self.parent.presentationMode.wrappedValue.dismiss()
-            }
-          }
-        }
-      }
+      self.parent.presentationMode.wrappedValue.dismiss()
     }
   }
 }

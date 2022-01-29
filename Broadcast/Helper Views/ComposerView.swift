@@ -21,7 +21,6 @@ fileprivate let placeholderCandidates: [String] = [
 
 struct ComposerView: View {
   let debouncer = Debouncer(timeInterval: 0.3)
-  @Binding var signOutScreenIsPresented: Bool
   
   @EnvironmentObject var twitterClient: TwitterClientManager
   @ScaledMetric private var minComposerHeight: CGFloat = 120
@@ -79,20 +78,24 @@ struct ComposerView: View {
     ZStack(alignment: .bottom) {
       VStack(alignment: .trailing) {
         HStack(alignment: .top) {
-          AsyncImage(url: twitterClient.user?.profileImageUrl) { image in
+          Menu {
+            Section {
+              Button(role: .destructive, action: {twitterClient.signOut()}) {
+                Label("Sign Out", systemImage: "person.badge.minus")
+              }
+            }
+          } label: {
+            AsyncImage(url: twitterClient.user?.profileImageUrlLarger) { image in
               image
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: 36, height: 36)
                 .cornerRadius(36)
             } placeholder: {
               ProgressView()
             }
-              .onTapGesture {
-                signOutScreenIsPresented = true
-              }
-              .accessibilityIdentifier("profilePhotoButton")
-          
+            .background(.regularMaterial)
+            .frame(width: 36, height: 36)
+          }
           
           ZStack(alignment: .topLeading) {
             Text(tweetText.isEmpty ? placeholder : tweetText)
@@ -136,7 +139,7 @@ struct ComposerView: View {
             .multilineTextAlignment(.trailing)
         }
       }
-      .disabled(twitterClient.state == .busy)
+      .disabled(twitterClient.state == .busy())
       .padding()
       .background(Color(.tertiarySystemGroupedBackground))
       .onShake {
@@ -194,6 +197,6 @@ struct ComposerView: View {
 
 struct ComposerView_Previews: PreviewProvider {
     static var previews: some View {
-      ComposerView(signOutScreenIsPresented: .constant(false))
+      ComposerView()
     }
 }
