@@ -11,16 +11,19 @@ import SwiftUI
 import Twift
 
 extension PHPickerResult {
-  var mediaType: UTType? {
-    guard let registeredTypeIdentifier = self.itemProvider.registeredTypeIdentifiers.first else {
-      return nil
-    }
-    return UTType(registeredTypeIdentifier)
+  var mediaTypes: [UTType] {
+    return self.itemProvider.registeredTypeIdentifiers.compactMap { UTType($0) }
   }
   
   var mediaMimeType: Media.MimeType? {
-    guard let utTypeMimeType = mediaType?.preferredMIMEType else { return nil }
-    return .init(rawValue: utTypeMimeType)
+    return mediaTypes.reduce(nil, { partialResult, current in
+      if partialResult == nil,
+         let mimeType = current.preferredMIMEType {
+        return Media.MimeType(rawValue: mimeType)
+      } else {
+        return nil
+      }
+    })
   }
   
   var allowsAltText: Bool {
