@@ -26,7 +26,7 @@ extension PHPickerResult {
   var allowsAltText: Bool {
     guard let mimeType = mediaMimeType else { return false }
     switch mimeType {
-    case .gif, .jpeg: return true
+    case .gif, .jpeg, .png: return true
     default: return false
     }
   }
