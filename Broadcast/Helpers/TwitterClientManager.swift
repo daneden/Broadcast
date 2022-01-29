@@ -17,6 +17,29 @@ import PhotosUI
 
 let typeaheadToken = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
+typealias AuthenticatedIds = [User.ID]
+
+extension AuthenticatedIds: RawRepresentable {
+  public typealias RawValue = String
+  public init?(rawValue: RawValue) {
+    guard let data = rawValue.data(using: .utf8),
+          let result = try? JSONDecoder().decode(AuthenticatedIds.self, from: data) else {
+      return nil
+    }
+    
+    self = result
+  }
+  
+  public var rawValue: RawValue {
+    guard let encoded = try? JSONEncoder().encode(self),
+          let result = String(data: encoded, encoding: .utf8) else {
+      return "[]"
+    }
+    
+    return result
+  }
+}
+
 class TwitterClientManager: ObservableObject {
   let draftsStore = PersistanceController.shared
   @Published var user: User?

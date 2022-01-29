@@ -46,6 +46,7 @@ struct AsyncLocalMediaPreview: View {
           .padding()
       case .loadingWithProgress(let progress):
         ProgressView(progress)
+          .progressViewStyle(.circular)
           .padding()
       }
     }
