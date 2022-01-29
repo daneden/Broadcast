@@ -41,7 +41,7 @@ class ThemeHelper: ObservableObject {
   
   @AppStorage("themeColorIndex") private var currentColorIndex = 0 {
     didSet {
-      withAnimation { color = allColors[currentColorIndex] }
+      color = allColors[currentColorIndex]
     }
   }
   
