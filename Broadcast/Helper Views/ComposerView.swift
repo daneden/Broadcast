@@ -82,20 +82,11 @@ struct ComposerView: View {
             Section {
               Button(role: .destructive, action: {twitterClient.signOut()}) {
                 Label("Sign Out", systemImage: "person.badge.minus")
-              }
+              }.accessibilityIdentifier("logoutButton")
             }
           } label: {
-            AsyncImage(url: twitterClient.user?.profileImageUrlLarger) { image in
-              image
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .cornerRadius(36)
-            } placeholder: {
-              ProgressView()
-            }
-            .background(.regularMaterial)
-            .frame(width: 36, height: 36)
-          }
+            UserAvatar(avatarUrl: twitterClient.user?.profileImageUrlLarger)
+          }.accessibilityIdentifier("profilePhotoButton")
           
           ZStack(alignment: .topLeading) {
             Text(tweetText.isEmpty ? placeholder : tweetText)

@@ -25,15 +25,7 @@ struct TweetView: View {
   
   var body: some View {
     HStack(alignment: .top) {
-      AsyncImage(url: author.profileImageUrl) { image in
-        image
-          .resizable()
-          .aspectRatio(contentMode: .fill)
-          .frame(width: avatarSize, height: avatarSize)
-          .cornerRadius(36)
-      } placeholder: {
-        ProgressView()
-      }
+      UserAvatar(avatarUrl: author.profileImageUrlLarger)
       
       VStack(alignment: .leading, spacing: 4) {
         HStack {

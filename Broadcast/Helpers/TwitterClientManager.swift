@@ -127,10 +127,9 @@ class TwitterClientManager: ObservableObject {
   }
   
   func retreiveCredentials() -> OAuthCredentials? {
-    // TODO: Fix test environment
-    //    if isTestEnvironment {
-    //      return .init(queryString: ClientCredentials.__authQueryString)
-    //    }
+    if isTestEnvironment {
+      return ClientCredentials.userCredentials
+    }
     guard let data = KeychainWrapper.standard.data(forKey: "broadcast-credentials") else {
       return nil
     }
@@ -316,7 +315,7 @@ fileprivate struct V1User: Codable {
 /* MARK: Drafts */
 extension TwitterClientManager {
   public func draftIsValid() -> Bool {
-    if let text = draft.text, !text.isEmpty {
+    if let text = draft.text, !text.isEmpty && !text.isBlank {
       return TwitterText.remainingCharacterCount(text: text) >= 0
     } else if !selectedMedia.isEmpty {
       return true
@@ -386,16 +385,16 @@ extension TwitterClientManager {
     }
     
     static var apiKey: String {
-      guard let value = plist?.object(forKey: "API_KEY") as? String else {
-        fatalError("Couldn't find key 'API_KEY' in 'TwitterAPI-Info.plist'.")
+      guard let value = plist?.object(forKey: "TWITTER_CONSUMER_KEY") as? String else {
+        fatalError("Couldn't find key 'TWITTER_CONSUMER_KEY' in 'TwitterAPI-Info.plist'.")
       }
       
       return value
     }
     
     static var apiSecret: String {
-      guard let value = plist?.object(forKey: "API_SECRET") as? String else {
-        fatalError("Couldn't find key 'API_KEY' in 'TwitterAPI-Info.plist'.")
+      guard let value = plist?.object(forKey: "TWITTER_CONSUMER_SECRET") as? String else {
+        fatalError("Couldn't find key 'TWITTER_CONSUMER_SECRET' in 'TwitterAPI-Info.plist'.")
       }
       
       return value
@@ -405,17 +404,29 @@ extension TwitterClientManager {
       .init(key: apiKey, secret: apiSecret)
     }
     
-    static var __authQueryString: String {
-      guard let value = plist?.object(forKey: "__TEST_AUTH_QUERY_STRING") as? String else {
-        fatalError("Couldn't find key '__TEST_AUTH_QUERY_STRING' in 'TwitterAPI-Info.plist'.")
+    static var callbackProtocol = "twitter-broadcast://"
+    static var callbackURL: URL {
+      URL(string: callbackProtocol)!
+    }
+    
+    static var accessKey: String {
+      guard let value = plist?.object(forKey: "TWITTER_ACCESS_KEY") as? String else {
+        fatalError("Couldn't find key 'TWITTER_ACCESS_KEY' in 'TwitterAPI-Info.plist'.")
       }
       
       return value
     }
     
-    static var callbackProtocol = "twitter-broadcast://"
-    static var callbackURL: URL {
-      URL(string: callbackProtocol)!
+    static var accessSecret: String {
+      guard let value = plist?.object(forKey: "TWITTER_ACCESS_SECRET") as? String else {
+        fatalError("Couldn't find key 'TWITTER_ACCESS_SECRET' in 'TwitterAPI-Info.plist'.")
+      }
+      
+      return value
+    }
+    
+    static var userCredentials: OAuthCredentials {
+      .init(key: accessKey, secret: accessSecret)
     }
   }
 }

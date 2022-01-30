@@ -14,15 +14,7 @@ struct UserView: View {
   var user: User
   var body: some View {
     HStack {
-      AsyncImage(url: user.profileImageUrl) { image in
-        image
-          .resizable()
-          .aspectRatio(contentMode: .fill)
-          .frame(width: avatarSize, height: avatarSize)
-          .cornerRadius(36)
-      } placeholder: {
-        ProgressView()
-      }
+      UserAvatar(avatarUrl: user.profileImageUrlLarger, size: avatarSize)
       
       VStack(alignment: .leading) {
         if let name = user.name {

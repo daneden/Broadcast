@@ -99,6 +99,7 @@ struct ActionBarView: View {
             )
           )
       }
+      .accessibilityIdentifier("sendTweetButton")
       .buttonStyle(
         BroadcastButtonStyle(
           prominence: !replying ? .primary : .secondary,
@@ -107,7 +108,6 @@ struct ActionBarView: View {
         )
       )
       .disabled(!replying && !twitterClient.draftIsValid())
-      .accessibilityIdentifier("sendTweetButton")
       
       Button(action: {
         photoPickerIsPresented.toggle()

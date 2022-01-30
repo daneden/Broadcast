@@ -89,10 +89,10 @@ struct ContentView: View {
                 Label("Sign In With Twitter", image: "twitter.fill")
                   .font(.broadcastHeadline)
               }
+              .accessibilityIdentifier("loginButton")
             }
           }
           .buttonStyle(BroadcastButtonStyle())
-          .accessibilityIdentifier("loginButton")
           .padding()
           .background(.ultraThinMaterial)
           .gesture(DragGesture().onEnded({ _ in UIApplication.shared.endEditing() }))

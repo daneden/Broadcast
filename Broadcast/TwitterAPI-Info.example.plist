@@ -2,11 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>__TEST_AUTH_QUERY_STRING</key>
-	<string>Enter auth query string here (necessary for tests)</string>
-	<key>API_SECRET</key>
+	<key>TWITTER_ACCESS_KEY</key>
+	<string>(Required for tests only) Enter user access token</string>
+	<key>TWITTER_ACCESS_SECRET</key>
+	<string>(Required for tests only) Enter user access secret</string>
+	<key>TWITTER_CONSUMER_KEY</key>
 	<string>Enter API Secret Here</string>
-	<key>API_KEY</key>
+	<key>TWITTER_CONSUMER_SECRET</key>
 	<string>Enter API Key Here</string>
 </dict>
 </plist>
