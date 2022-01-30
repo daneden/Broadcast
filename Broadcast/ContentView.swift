@@ -11,7 +11,7 @@ import TwitterText
 import Twift
 
 struct ContentView: View {
-  @ScaledMetric private var captionSize: CGFloat = 14
+  @ScaledMetric private var captionSize: CGFloat = 20
   @ScaledMetric private var bottomPadding: CGFloat = 80
   @ScaledMetric private var replyBoxLimit: CGFloat = 96
   
@@ -33,7 +33,7 @@ struct ContentView: View {
     GeometryReader { geom in
       ZStack(alignment: .bottom) {
         ScrollView {
-          VStack(spacing: 8) {
+          VStack(spacing: captionSize / 2) {
             if replying, let lastTweet = twitterClient.lastTweet {
               LastTweetReplyView(lastTweet: lastTweet)
                 .background(GeometryReader { geometry in
@@ -76,30 +76,27 @@ struct ContentView: View {
               WelcomeView()
             }
           }
-          .padding()
-          .padding(.bottom, bottomPadding)
+          .padding(.top, captionSize)
+          .padding(.horizontal)
           .frame(maxWidth: geom.size.width)
         }
-        
-        VStack {
-          if twitterClient.user != nil {
-            ActionBarView(replying: $replying)
-          } else {
-            Button(action: { Task { await twitterClient.signIn() } }) {
-              Label("Sign In With Twitter", image: "twitter.fill")
-                .font(.broadcastHeadline)
+        .safeAreaInset(edge: .bottom, content: {
+          Group {
+            if twitterClient.user != nil {
+              ActionBarView(replying: $replying)
+            } else {
+              Button(action: { Task { await twitterClient.signIn() } }) {
+                Label("Sign In With Twitter", image: "twitter.fill")
+                  .font(.broadcastHeadline)
+              }
             }
-            .buttonStyle(BroadcastButtonStyle())
-            .accessibilityIdentifier("loginButton")
           }
-        }
-        .padding()
-        .background(
-          Color.clear.background(.regularMaterial)
-            .ignoresSafeArea()
-            .opacity(twitterClient.user == nil ? 0 : 1)
-        )
-        .gesture(DragGesture().onEnded({ _ in UIApplication.shared.endEditing() }))
+          .buttonStyle(BroadcastButtonStyle())
+          .accessibilityIdentifier("loginButton")
+          .padding()
+          .background(.ultraThinMaterial)
+          .gesture(DragGesture().onEnded({ _ in UIApplication.shared.endEditing() }))
+        })
       }
       .sheet(isPresented: $repliesSheetIsPresented) {
         RepliesListView(tweet: twitterClient.lastTweet)
@@ -111,7 +108,7 @@ struct ContentView: View {
         UITextView.appearance().backgroundColor = .clear
       }
       .onPreferenceChange(ReplyBoxSizePreferenceKey.self) { newValue in
-        withAnimation(.springAnimation) { replyBoxHeight = newValue + 8 }
+        withAnimation(.springAnimation) { replyBoxHeight = newValue + (captionSize / 2) }
       }
       .overlay {
         if twitterClient.state == .initializing {

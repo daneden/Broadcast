@@ -116,8 +116,9 @@ struct ComposerView: View {
         }.transition(.scale)
         
         Divider()
+          .padding(.bottom, verticalPadding)
         
-        HStack(alignment: .top) {
+        HStack(alignment: .firstTextBaseline) {
           Menu {
             Button(action: { twitterClient.saveDraft() }) {
               Label("Save Draft", systemImage: "square.and.pencil")
@@ -141,7 +142,7 @@ struct ComposerView: View {
       }
       .disabled(twitterClient.state == .busy())
       .padding()
-      .background(Color(.tertiarySystemGroupedBackground))
+      .background(.thinMaterial)
       .onShake {
         rotatePlaceholder()
         Haptics.shared.sendStandardFeedback(feedbackType: .success)

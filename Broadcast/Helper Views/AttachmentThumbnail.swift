@@ -55,6 +55,7 @@ struct AttachmentThumbnail: View {
         }
       }
     }
+    .transition(.scale)
   }
   
   func itemHasAltText(_ id: String) -> Bool {

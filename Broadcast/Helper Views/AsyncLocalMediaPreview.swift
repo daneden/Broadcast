@@ -49,7 +49,6 @@ struct AsyncLocalMediaPreview: View {
           .padding()
       }
     }
-    .transition(.opacity)
     .frame(maxWidth: .infinity, minHeight: 48)
     .background(.thinMaterial)
     .task { await loadPreview() }

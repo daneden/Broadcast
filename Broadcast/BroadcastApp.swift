@@ -27,9 +27,9 @@ struct BroadcastApp: App {
               persistenceController.save()
             }
           
-          Color.clear.background(.regularMaterial)
+          Color.clear.background(Material.bar)
             .frame(height: geom.safeAreaInsets.top)
-            .ignoresSafeArea(.all, edges: .top)
+            .ignoresSafeArea(.container, edges: .top)
         }
       }
     }
