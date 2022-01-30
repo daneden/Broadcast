@@ -52,10 +52,9 @@ struct AttachmentThumbnail: View {
               .offset(x: -8, y: 8)
             }
           }
-        }
+        }.transition(.scale)
       }
     }
-    .transition(.scale)
   }
   
   func itemHasAltText(_ id: String) -> Bool {

@@ -92,9 +92,9 @@ struct ContentView: View {
               .accessibilityIdentifier("loginButton")
             }
           }
-          .buttonStyle(BroadcastButtonStyle())
+          .buttonStyle(BroadcastButtonStyle(isLoading: twitterClient.state != .idle))
           .padding()
-          .background(.ultraThinMaterial)
+          .background(Material.bar)
           .gesture(DragGesture().onEnded({ _ in UIApplication.shared.endEditing() }))
         })
       }

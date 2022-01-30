@@ -104,7 +104,7 @@ struct ComposerView: View {
               .accessibilityIdentifier("tweetComposer")
           }
           .font(.broadcastTitle3)
-        }.transition(.scale)
+        }
         
         Divider()
           .padding(.bottom, verticalPadding)

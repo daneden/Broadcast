@@ -30,7 +30,7 @@ struct BroadcastApp: App {
           Color.clear.background(Material.bar)
             .frame(height: geom.safeAreaInsets.top)
             .ignoresSafeArea(.container, edges: .top)
-        }
+        }.background(Material.bar)
       }
     }
   }

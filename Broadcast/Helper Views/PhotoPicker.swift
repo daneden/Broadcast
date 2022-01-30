@@ -19,7 +19,8 @@ extension PHPickerResult {
     return mediaTypes.reduce(nil, { partialResult, current in
       if partialResult == nil,
          let mimeType = current.preferredMIMEType {
-        return Media.MimeType(rawValue: mimeType)
+        let castMimeType = mimeType == "image/heic" ? "image/jpeg" : mimeType
+        return Media.MimeType(rawValue: castMimeType)
       } else {
         return nil
       }
