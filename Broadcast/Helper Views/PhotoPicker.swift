@@ -11,28 +11,28 @@ import SwiftUI
 import Twift
 
 extension PHPickerResult {
-  var mediaTypes: [UTType] {
-    return self.itemProvider.registeredTypeIdentifiers.compactMap { UTType($0) }
+  var mediaType: UTType? {
+    if let typeIdentifier = itemProvider.registeredTypeIdentifiers.first {
+      return UTType(typeIdentifier)
+    } else if let pathExtension = itemProvider.suggestedName?.split(after: ".").first {
+      return UTType(filenameExtension: pathExtension)
+    } else {
+      print(itemProvider.registeredTypeIdentifiers, itemProvider.suggestedName, itemProvider.preferredPresentationStyle)
+      return nil
+    }
   }
   
   var mediaMimeType: Media.MimeType? {
-    return mediaTypes.reduce(nil, { partialResult, current in
-      if partialResult == nil,
-         let mimeType = current.preferredMIMEType {
-        let castMimeType = mimeType == "image/heic" ? "image/jpeg" : mimeType
-        return Media.MimeType(rawValue: castMimeType)
-      } else {
-        return nil
-      }
-    })
+    if let mimeType = mediaType?.preferredMIMEType {
+      let castMimeType = mimeType == "image/heic" ? "image/jpeg" : mimeType
+      return Media.MimeType(rawValue: castMimeType)
+    } else {
+      return nil
+    }
   }
   
   var allowsAltText: Bool {
-    guard let mimeType = mediaMimeType else { return false }
-    switch mimeType {
-    case .gif, .jpeg, .png: return true
-    default: return false
-    }
+    return mediaType?.conforms(to: .image) ?? false
   }
 }
 
