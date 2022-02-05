@@ -32,7 +32,7 @@ extension PHPickerResult {
   }
   
   var allowsAltText: Bool {
-    return mediaType?.conforms(to: .image) ?? false
+    return !(mediaType?.conforms(to: .video) ?? false)
   }
 }
 

@@ -30,7 +30,7 @@ struct TweetView: View {
       VStack(alignment: .leading, spacing: 4) {
         HStack {
           if let date = tweet.createdAt {
-            Text("\(Text(author.name).fontWeight(.bold).foregroundColor(.primary)) \(Text("@\(author.username)")) • \(date.formatted(.relative(presentation: .named)))))")
+            Text("\(Text(author.name).fontWeight(.bold).foregroundColor(.primary)) \(Text("@\(author.username)")) • \(date.formatted(.relative(presentation: .named)))")
               .foregroundColor(.secondary)
           }
         }

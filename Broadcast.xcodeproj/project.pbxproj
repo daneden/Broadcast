@@ -42,6 +42,7 @@
 		7199AE7C26B97327001DEB46 /* UserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7199AE7B26B97327001DEB46 /* UserView.swift */; };
 		7199AE7E26B973B2001DEB46 /* MentionBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7199AE7D26B973B2001DEB46 /* MentionBar.swift */; };
 		7199AE8026B9892E001DEB46 /* Debouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7199AE7F26B9892E001DEB46 /* Debouncer.swift */; };
+		719D19C127AEDD4E003120F0 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 719D19C027AEDD4E003120F0 /* VisualEffectView.swift */; };
 		71A1088A268B073B007E1FFB /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A10889268B073B007E1FFB /* Haptics.swift */; };
 		71A6A264278C73AD00BF2387 /* TwitterAPI-Info.example.plist in Resources */ = {isa = PBXBuildFile; fileRef = 71A6A263278C73AD00BF2387 /* TwitterAPI-Info.example.plist */; };
 		71A9157927A59C9000706024 /* AsyncLocalMediaPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A9157827A59C9000706024 /* AsyncLocalMediaPreview.swift */; };
@@ -99,6 +100,7 @@
 		7199AE7B26B97327001DEB46 /* UserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserView.swift; sourceTree = "<group>"; };
 		7199AE7D26B973B2001DEB46 /* MentionBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionBar.swift; sourceTree = "<group>"; };
 		7199AE7F26B9892E001DEB46 /* Debouncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debouncer.swift; sourceTree = "<group>"; };
+		719D19C027AEDD4E003120F0 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
 		71A10889268B073B007E1FFB /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		71A6A263278C73AD00BF2387 /* TwitterAPI-Info.example.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TwitterAPI-Info.example.plist"; sourceTree = "<group>"; };
 		71A9157827A59C9000706024 /* AsyncLocalMediaPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncLocalMediaPreview.swift; sourceTree = "<group>"; };
@@ -234,6 +236,7 @@
 				717041F426B7037300001360 /* TweetView.swift */,
 				7199AE7B26B97327001DEB46 /* UserView.swift */,
 				713E16E927A6EAA900314B44 /* UserAvatar.swift */,
+				719D19C027AEDD4E003120F0 /* VisualEffectView.swift */,
 			);
 			path = "Helper Views";
 			sourceTree = "<group>";
@@ -409,6 +412,7 @@
 				71D283F127A469EF00640B2A /* AttributeScopes+TwitterEntities.swift in Sources */,
 				719087CF26891C7F005B96CE /* Array.extension.swift in Sources */,
 				7188E64D2687C6A1007CFD78 /* Binding.extension.swift in Sources */,
+				719D19C127AEDD4E003120F0 /* VisualEffectView.swift in Sources */,
 				7199AE8026B9892E001DEB46 /* Debouncer.swift in Sources */,
 				711F3FFA268F50C800605C89 /* Animation.extension.swift in Sources */,
 				71A1088A268B073B007E1FFB /* Haptics.swift in Sources */,

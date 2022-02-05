@@ -316,7 +316,7 @@ fileprivate struct V1User: Codable {
 extension TwitterClientManager {
   public func draftIsValid() -> Bool {
     if let text = draft.text, !text.isEmpty && !text.isBlank {
-      return TwitterText.remainingCharacterCount(text: text) >= 0
+      return TwitterText.tweetLength(text: text) <= 280
     } else if !selectedMedia.isEmpty {
       return true
     } else {

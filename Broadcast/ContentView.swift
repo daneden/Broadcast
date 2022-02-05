@@ -94,7 +94,7 @@ struct ContentView: View {
           }
           .buttonStyle(BroadcastButtonStyle(isLoading: twitterClient.state != .idle))
           .padding()
-          .background(Material.bar)
+          .background(VisualEffectView(effect: UIBlurEffect(style: .regular)).ignoresSafeArea())
           .gesture(DragGesture().onEnded({ _ in UIApplication.shared.endEditing() }))
         })
       }

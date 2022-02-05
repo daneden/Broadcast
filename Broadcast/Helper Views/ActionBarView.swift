@@ -47,6 +47,7 @@ struct ActionBarView: View {
       }
       .onLongPressGesture {
         ThemeHelper.shared.rotateTheme()
+        Haptics.shared.sendStandardFeedback(feedbackType: .success)
       }
   }
   

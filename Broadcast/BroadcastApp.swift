@@ -27,10 +27,10 @@ struct BroadcastApp: App {
               persistenceController.save()
             }
           
-          Color.clear.background(Material.bar)
+          VisualEffectView(effect: UIBlurEffect(style: .regular))
             .frame(height: geom.safeAreaInsets.top)
             .ignoresSafeArea(.container, edges: .top)
-        }.background(Material.bar)
+        }
       }
     }
   }
