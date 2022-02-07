@@ -12,14 +12,14 @@ import Twift
 
 extension PHPickerResult {
   var mediaType: UTType? {
-    if let typeIdentifier = itemProvider.registeredTypeIdentifiers.first {
-      return UTType(typeIdentifier)
-    } else if let pathExtension = itemProvider.suggestedName?.split(after: ".").first {
-      return UTType(filenameExtension: pathExtension)
-    } else {
-      print(itemProvider.registeredTypeIdentifiers, itemProvider.suggestedName, itemProvider.preferredPresentationStyle)
-      return nil
+    for typeIdentifier in itemProvider.registeredTypeIdentifiers {
+      if let type = UTType(typeIdentifier),
+         type.preferredMIMEType != nil {
+        return type
+      }
     }
+    
+    return nil
   }
   
   var mediaMimeType: Media.MimeType? {
@@ -32,7 +32,7 @@ extension PHPickerResult {
   }
   
   var allowsAltText: Bool {
-    return !(mediaType?.conforms(to: .video) ?? false)
+    return (mediaType?.conforms(to: .image) ?? false)
   }
 }
 
@@ -66,7 +66,10 @@ struct ImagePicker: UIViewControllerRepresentable {
     
     func picker(_: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
       for result in results {
-        self.parent.selection[result.assetIdentifier!] = result
+        // Prevent overriding PHPickerResults for items previously selected
+        if self.parent.selection[result.assetIdentifier!] == nil {
+          self.parent.selection[result.assetIdentifier!] = result
+        }
       }
       
       self.parent.presentationMode.wrappedValue.dismiss()

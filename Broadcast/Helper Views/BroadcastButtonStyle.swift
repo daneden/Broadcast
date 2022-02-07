@@ -78,6 +78,7 @@ struct BroadcastButtonStyle: ButtonStyle {
     }
     .padding(paddingSize)
     .background(background.padding(-paddingSize))
+    .background(.regularMaterial)
     .foregroundStyle(foregroundColor)
     .overlay(
       Group {

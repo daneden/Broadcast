@@ -184,11 +184,12 @@ class TwitterClientManager: ObservableObject {
           }
           
           itemProvider.loadDataRepresentation(forTypeIdentifier: utType.identifier, completionHandler: { data, error in
+            let castMimeType = utType.preferredMIMEType == "video/quicktime" ? "video/mov" : utType.preferredMIMEType
             if let data = data,
-               let mimeType = Media.MimeType(rawValue: utType.preferredMIMEType!) {
+               let mimeType = Media.MimeType(rawValue: castMimeType!) {
               continuation.resume(returning: (data, mimeType))
             } else {
-              print("unable to load data for object with type", utType)
+              return self.updateState(.error("There was a problem Tweeting the attached media. It might be too large, or in an unusual format."))
             }
           })
         }

@@ -27,6 +27,16 @@ struct AttachmentThumbnail: View {
               .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             
             HStack {
+              Button(action: { removeImage(key) }) {
+                Label("Remove Image", systemImage: "xmark")
+                  .labelStyle(.iconOnly)
+              }
+              .buttonStyle(BroadcastButtonStyle(paddingSize: 8, prominence: .tertiary, isFullWidth: false))
+              .clipShape(Circle())
+              .offset(x: 8, y: 8)
+              
+              Spacer()
+              
               if let item = media[key],
                  item.allowsAltText {
                 Button(action: { selectedMediaId = key }) {
@@ -35,21 +45,11 @@ struct AttachmentThumbnail: View {
                 }
                 .buttonStyle(BroadcastButtonStyle(paddingSize: 8, prominence: itemHasAltText(key) ? .primary : .tertiary, isFullWidth: false))
                 .clipShape(Circle())
-                .offset(x: 8, y: 8)
+                .offset(x: -8, y: 8)
                 .sheet(item: $selectedMediaId) { id in
                   AltTextSheet(assetId: id, asset: item)
                 }
               }
-              
-              Spacer()
-              
-              Button(action: { removeImage(key) }) {
-                Label("Remove Image", systemImage: "xmark")
-                  .labelStyle(.iconOnly)
-              }
-              .buttonStyle(BroadcastButtonStyle(paddingSize: 8, prominence: .tertiary, isFullWidth: false))
-              .clipShape(Circle())
-              .offset(x: -8, y: 8)
             }
           }
         }.transition(.scale)

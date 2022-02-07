@@ -7,18 +7,20 @@
 
 import SwiftUI
 import PhotosUI
+import AVKit
 import QuickLook
 
 struct AsyncLocalMediaPreview: View {
   private enum PreviewLoadingState {
-    case loaded(_ image: UIImage)
+    case loadedImage(_ image: UIImage)
+    case loadedVideo(_ video: AVPlayer)
     case failed
     case loading
     case loadingWithProgress(_ progress: Progress)
     
     var finished: Bool {
       switch self {
-      case .loaded(_), .failed:
+      case .loadedImage(_), .loadedVideo(_), .failed:
         return true
       default:
         return false
@@ -30,33 +32,39 @@ struct AsyncLocalMediaPreview: View {
   
   @State private var state: PreviewLoadingState = .loading
   @State var loadingProgress: Progress?
+  @State private var showLoadingErrorAlert = false
   
   var body: some View {
     Group {
       switch state {
-      case .loaded(let image):
+      case .loadedImage(let image):
         Image(uiImage: image)
           .resizable()
           .scaledToFit()
+      case .loadedVideo(let player):
+        VideoPlayer(player: player)
+          .scaledToFit()
+          .fixedSize()
       case .failed:
-        Label("Cannot load media", systemImage: "eye.slash")
+        Label("Cannot Load Preview", systemImage: "eye.slash")
           .foregroundStyle(.secondary)
           .padding()
       case .loading:
-        ProgressView()
+        ProgressView("Loading Preview")
           .padding()
       case .loadingWithProgress(let progress):
         ProgressView(value: progress.fractionCompleted)
           .padding()
+        
       }
     }
-    .frame(maxWidth: .infinity, minHeight: 48)
+    .frame(maxWidth: .infinity, minHeight: 80)
     .background(.thinMaterial)
     .task { await loadPreview() }
     .onChange(of: loadingProgress) { value in
       if let value = value,
          !value.isFinished {
-        self.state = .loadingWithProgress(value)
+        withAnimation { self.state = .loadingWithProgress(value) }
       }
     }
   }
@@ -64,20 +72,21 @@ struct AsyncLocalMediaPreview: View {
   func loadPreview() async {
     let itemProvider = asset.itemProvider
     
-    guard let typeIdentifier = itemProvider.registeredTypeIdentifiers.first,
+    guard let typeIdentifier = itemProvider.registeredTypeIdentifiers.last,
           let utType = UTType(typeIdentifier)
     else { return self.state = .failed }
     
-    if utType.conforms(to: .image),
-       itemProvider.canLoadObject(ofClass: UIImage.self) {
-      loadingProgress = itemProvider.loadObject(ofClass: UIImage.self) { image, error in
-        if let image = image as? UIImage {
-          self.state = .loaded(image)
-        } else {
-          self.state = .failed
+    if utType.conforms(to: .image) {
+      if itemProvider.canLoadObject(ofClass: UIImage.self) {
+        loadingProgress = itemProvider.loadObject(ofClass: UIImage.self) { image, error in
+          if let image = image as? UIImage {
+            self.state = .loadedImage(image)
+          } else {
+            self.state = .failed
+          }
         }
       }
-    } else if utType.conforms(to: .video) {
+    } else if utType.conforms(to: .movie) {
       let url: URL? = await withUnsafeContinuation { continuation in
         itemProvider.loadFileRepresentation(forTypeIdentifier: typeIdentifier) { url, error in
           if let error = error {
@@ -108,13 +117,10 @@ struct AsyncLocalMediaPreview: View {
       guard let url = url else {
         return state = .failed
       }
-
-      let thumbnailRequest = QLThumbnailGenerator.Request.init(fileAt: url, size: .init(width: 800, height: 800), scale: 3.0, representationTypes: .thumbnail)
-      guard let thumbnail = try? await QLThumbnailGenerator().generateBestRepresentation(for: thumbnailRequest) else {
-        return state = .failed
-      }
       
-      state = .loaded(thumbnail.uiImage)
+      let player = AVPlayer(url: url)
+      
+      state = .loadedVideo(player)
     } else {
       state = .failed
     }
