@@ -51,6 +51,8 @@ class TwitterClientManager: ObservableObject {
   @Published var selectedMedia: [String: PHPickerResult] = [:]
   @Published var mediaAltText: [String: String] = [:]
   
+  @Published var uploadProgress = Progress()
+  
   @MainActor
   init() {
     if let storedCredentials = self.retreiveCredentials() {
@@ -173,13 +175,7 @@ class TwitterClientManager: ObservableObject {
       for (key, media) in selectedMedia {
         let media: (Data, Media.MimeType)? = await withUnsafeContinuation { continuation in
           let itemProvider = media.itemProvider
-          guard let utType = itemProvider.registeredTypeIdentifiers.reduce(nil, { (guess: UTType?, current: String) in
-            if guess == nil {
-              return UTType(current)
-            } else {
-              return nil
-            }
-          }) else {
+          guard let utType = media.mediaType else {
             return continuation.resume(returning: nil)
           }
           
@@ -198,7 +194,7 @@ class TwitterClientManager: ObservableObject {
           return updateState(.genericTextAndMediaError)
         }
         
-        let result = try await client.upload(mediaData: data, mimeType: mimeType)
+        let result = try await client.upload(mediaData: data, mimeType: mimeType, progress: &self.uploadProgress)
           
         if let altText = mediaAltText[key] {
           try await client.addAltText(to: result.mediaIdString, text: altText)
@@ -222,8 +218,6 @@ class TwitterClientManager: ObservableObject {
       print(error)
       sendTweetCallback(response: nil, error: error)
     }
-    
-    updateState(.idle)
   }
   
   /// Asynchronously update client state on the main thread

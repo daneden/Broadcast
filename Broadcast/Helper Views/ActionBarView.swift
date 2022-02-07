@@ -39,6 +39,7 @@ struct ActionBarView: View {
   }
   
   var body: some View {
+    ProgressView(twitterClient.uploadProgress)
     publishingActions
       .disabled(twitterClient.state == .busy())
       .sheet(isPresented: $photoPickerIsPresented) {

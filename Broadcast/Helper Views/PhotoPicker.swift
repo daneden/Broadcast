@@ -13,6 +13,10 @@ import Twift
 extension PHPickerResult {
   var mediaType: UTType? {
     for typeIdentifier in itemProvider.registeredTypeIdentifiers {
+      if typeIdentifier == "video/quicktime" {
+        continue
+      }
+      
       if let type = UTType(typeIdentifier),
          type.preferredMIMEType != nil {
         return type
