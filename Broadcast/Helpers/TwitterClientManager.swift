@@ -24,8 +24,8 @@ extension AuthenticatedIds: RawRepresentable {
   public init?(rawValue: RawValue) {
     guard let data = rawValue.data(using: .utf8),
           let result = try? JSONDecoder().decode(AuthenticatedIds.self, from: data) else {
-      return nil
-    }
+            return nil
+          }
     
     self = result
   }
@@ -33,8 +33,8 @@ extension AuthenticatedIds: RawRepresentable {
   public var rawValue: RawValue {
     guard let encoded = try? JSONEncoder().encode(self),
           let result = String(data: encoded, encoding: .utf8) else {
-      return "[]"
-    }
+            return "[]"
+          }
     
     return result
   }
@@ -48,7 +48,7 @@ class TwitterClientManager: ObservableObject {
   @Published var lastTweet: Tweet?
   @Published var client: Twift?
   
-  @Published var selectedMedia: [String: PHPickerResult] = [:]
+  @Published var selectedMedia: [String: NSItemProvider] = [:]
   @Published var mediaAltText: [String: String] = [:]
   
   @Published var uploadProgress = Progress()
@@ -163,9 +163,9 @@ class TwitterClientManager: ObservableObject {
     guard let client = self.client else {
       return
     }
-
+    
     updateState(.busy())
-
+    
     do {
       if asReply, let lastTweet = lastTweet {
         draft.reply = .init(inReplyToTweetId: lastTweet.id)
@@ -173,14 +173,13 @@ class TwitterClientManager: ObservableObject {
       
       var mediaStrings: [String] = []
       for (key, media) in selectedMedia {
+        
         let media: (Data, String)? = await withUnsafeContinuation { continuation in
           var utType: UTType
           
-          let itemProvider = media.itemProvider
-          
-          if itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+          if media.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
             utType = media.mediaType ?? .image
-          } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
+          } else if media.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
             utType = media.mediaType ?? .movie
           } else {
             return continuation.resume(returning: nil)
@@ -190,7 +189,12 @@ class TwitterClientManager: ObservableObject {
             return continuation.resume(returning: nil)
           }
           
-          itemProvider.loadDataRepresentation(forTypeIdentifier: utType.identifier, completionHandler: { data, error in
+          media.loadDataRepresentation(forTypeIdentifier: utType.identifier, completionHandler: { data, error in
+            if let error = error {
+              print(error)
+              return self.sendTweetCallback(response: nil, error: error)
+            }
+            
             if let data = data {
               continuation.resume(returning: (data, mimeTypeString))
             } else {
@@ -204,15 +208,15 @@ class TwitterClientManager: ObservableObject {
         }
         
         let result = try await client.upload(mediaData: data, mimeType: mimeType, progress: &self.uploadProgress)
-          
+        
         if let altText = mediaAltText[key] {
           try await client.addAltText(to: result.mediaIdString, text: altText)
         }
-          
+        
         if result.processingInfo != nil {
           _ = try await client.checkMediaUploadSuccessful(result.mediaIdString)
         }
-          
+        
         mediaStrings.append(result.mediaIdString)
       }
       
@@ -438,4 +442,58 @@ extension TwitterClientManager {
 fileprivate struct TypeaheadResponse: Decodable {
   var num_results: Int
   var users: [V1User]?
+}
+
+extension TwitterClientManager: DropDelegate {
+  func performDrop(info: DropInfo) -> Bool {
+    let videoProviders = info.itemProviders(for: [.movie])
+    let imageProviders = info.itemProviders(for: [.image])
+    
+    guard videoProviders.count <= 1 else { return false }
+    guard imageProviders.count <= 4 else { return false }
+    
+    guard (!videoProviders.isEmpty && imageProviders.isEmpty) ||
+            (videoProviders.isEmpty && !imageProviders.isEmpty) else {
+              return false
+            }
+    
+    for provider in info.itemProviders(for: [.image]) {
+      guard let mediaType = provider.mediaType else { return false }
+      
+      if self.selectedMedia.count < 4 {
+        let id = UUID().uuidString
+        provider.loadItem(forTypeIdentifier: mediaType.identifier, options: nil) { result, error in
+          if let error = error {
+            print(error)
+          } else if let result = result {
+            withAnimation {
+              DispatchQueue.main.async {
+                self.selectedMedia[id] = NSItemProvider(item: result, typeIdentifier: mediaType.identifier)
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    for provider in videoProviders {
+      guard let mediaType = provider.mediaType else { return false }
+      if self.selectedMedia.count < 1 {
+        let id = UUID().uuidString
+        provider.loadItem(forTypeIdentifier: mediaType.identifier, options: nil) { result, error in
+          if let error = error {
+            print(error)
+          } else if let result = result {
+            withAnimation {
+              DispatchQueue.main.async {
+                self.selectedMedia[id] = NSItemProvider(item: result, typeIdentifier: mediaType.identifier)
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return true
+  }
 }

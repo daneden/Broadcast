@@ -14,7 +14,7 @@ extension String: Identifiable {
 
 struct AttachmentThumbnail: View {
   @EnvironmentObject var twitterClient: TwitterClientManager
-  @Binding var media: [String: PHPickerResult]
+  @Binding var media: [String: NSItemProvider]
   @State private var altTextSheetIsPresented = false
   @State private var selectedMediaId: String?
 
@@ -73,7 +73,7 @@ fileprivate struct AltTextSheet: View {
   @Environment(\.presentationMode) var presentationMode
   
   var assetId: String
-  var asset: PHPickerResult
+  var asset: NSItemProvider
   
   @State var altText = ""
   

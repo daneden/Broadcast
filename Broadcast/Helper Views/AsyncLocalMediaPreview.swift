@@ -28,7 +28,7 @@ struct AsyncLocalMediaPreview: View {
     }
   }
   var assetId: String
-  var asset: PHPickerResult
+  var asset: NSItemProvider
   
   @State private var state: PreviewLoadingState = .loading
   @State var loadingProgress: Progress?
@@ -70,7 +70,7 @@ struct AsyncLocalMediaPreview: View {
   }
   
   func loadPreview() async {
-    let itemProvider = asset.itemProvider
+    let itemProvider = asset
     
     guard let typeIdentifier = itemProvider.registeredTypeIdentifiers.last,
           let utType = UTType(typeIdentifier)

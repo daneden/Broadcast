@@ -10,9 +10,9 @@ import PhotosUI
 import SwiftUI
 import Twift
 
-extension PHPickerResult {
+extension NSItemProvider {
   var mediaType: UTType? {
-    for typeIdentifier in itemProvider.registeredTypeIdentifiers {
+    for typeIdentifier in registeredTypeIdentifiers {
       if let type = UTType(typeIdentifier),
          type.preferredMIMEType != nil {
         return type
@@ -31,7 +31,7 @@ struct ImagePicker: UIViewControllerRepresentable {
   @Environment(\.presentationMode) var presentationMode
   var configuration: PHPickerConfiguration = PHPickerConfiguration(photoLibrary: PHPhotoLibrary.shared())
   
-  @Binding var selection: [String: PHPickerResult]
+  @Binding var selection: [String: NSItemProvider]
   
   func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> PHPickerViewController {
     let controller = PHPickerViewController(configuration: configuration)
@@ -59,7 +59,7 @@ struct ImagePicker: UIViewControllerRepresentable {
       for result in results {
         // Prevent overriding PHPickerResults for items previously selected
         if self.parent.selection[result.assetIdentifier!] == nil {
-          self.parent.selection[result.assetIdentifier!] = result
+          self.parent.selection[result.assetIdentifier!] = result.itemProvider
         }
       }
       

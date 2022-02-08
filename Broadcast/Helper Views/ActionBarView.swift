@@ -18,7 +18,7 @@ struct ActionBarView: View {
   private var pickerConfig: PHPickerConfiguration {
     var config = PHPickerConfiguration(photoLibrary: .shared())
     
-    config.preferredAssetRepresentationMode = .compatible
+    config.preferredAssetRepresentationMode = .automatic
     config.selection = .ordered
     
     if moreMediaAllowed && !twitterClient.selectedMedia.isEmpty {
