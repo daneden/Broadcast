@@ -173,19 +173,28 @@ class TwitterClientManager: ObservableObject {
       
       var mediaStrings: [String] = []
       for (key, media) in selectedMedia {
-        let media: (Data, Media.MimeType)? = await withUnsafeContinuation { continuation in
+        let media: (Data, String)? = await withUnsafeContinuation { continuation in
+          var utType: UTType
+          
           let itemProvider = media.itemProvider
-          guard let utType = media.mediaType else {
+          
+          if itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+            utType = media.mediaType ?? .image
+          } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
+            utType = media.mediaType ?? .movie
+          } else {
+            return continuation.resume(returning: nil)
+          }
+          
+          guard let mimeTypeString = utType.preferredMIMEType else {
             return continuation.resume(returning: nil)
           }
           
           itemProvider.loadDataRepresentation(forTypeIdentifier: utType.identifier, completionHandler: { data, error in
-            let castMimeType = utType.preferredMIMEType == "video/quicktime" ? "video/mov" : utType.preferredMIMEType
-            if let data = data,
-               let mimeType = Media.MimeType(rawValue: castMimeType!) {
-              continuation.resume(returning: (data, mimeType))
+            if let data = data {
+              continuation.resume(returning: (data, mimeTypeString))
             } else {
-              return self.updateState(.error("There was a problem Tweeting the attached media. It might be too large, or in an unusual format."))
+              return self.updateState(.error("There was a problem Tweeting the attached media because it's in an unusual format."))
             }
           })
         }

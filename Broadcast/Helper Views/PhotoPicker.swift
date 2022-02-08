@@ -13,10 +13,6 @@ import Twift
 extension PHPickerResult {
   var mediaType: UTType? {
     for typeIdentifier in itemProvider.registeredTypeIdentifiers {
-      if typeIdentifier == "video/quicktime" {
-        continue
-      }
-      
       if let type = UTType(typeIdentifier),
          type.preferredMIMEType != nil {
         return type
@@ -24,15 +20,6 @@ extension PHPickerResult {
     }
     
     return nil
-  }
-  
-  var mediaMimeType: Media.MimeType? {
-    if let mimeType = mediaType?.preferredMIMEType {
-      let castMimeType = mimeType == "image/heic" ? "image/jpeg" : mimeType
-      return Media.MimeType(rawValue: castMimeType)
-    } else {
-      return nil
-    }
   }
   
   var allowsAltText: Bool {

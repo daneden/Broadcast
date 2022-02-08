@@ -18,7 +18,7 @@ struct ActionBarView: View {
   private var pickerConfig: PHPickerConfiguration {
     var config = PHPickerConfiguration(photoLibrary: .shared())
     
-    config.preferredAssetRepresentationMode = .current
+    config.preferredAssetRepresentationMode = .compatible
     config.selection = .ordered
     
     if moreMediaAllowed && !twitterClient.selectedMedia.isEmpty {
@@ -33,13 +33,12 @@ struct ActionBarView: View {
   }
   
   private var moreMediaAllowed: Bool {
-    if twitterClient.selectedMedia.contains(where: { $0.value.mediaMimeType == .mov || $0.value.mediaMimeType == .gif }) { return false }
+    if twitterClient.selectedMedia.contains(where: { $0.value.mediaType!.conforms(to: .movie) || $0.value.mediaType!.conforms(to: .video) }) { return false }
     if twitterClient.selectedMedia.count == 4 { return false }
     return true
   }
   
   var body: some View {
-    ProgressView(twitterClient.uploadProgress)
     publishingActions
       .disabled(twitterClient.state == .busy())
       .sheet(isPresented: $photoPickerIsPresented) {
