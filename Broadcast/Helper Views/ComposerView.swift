@@ -30,6 +30,7 @@ struct ComposerView: View {
   
   @State private var placeholder: String = placeholderCandidates.randomElement()
   @State private var draftListVisible = false
+  @State private var dropActive = false
   
   private let mentioningRegex = NSRegularExpression("@[a-z0-9_]+$", options: .caseInsensitive)
   
@@ -102,6 +103,7 @@ struct ComposerView: View {
               .keyboardType(.twitter)
               .padding(.top, (verticalPadding / 3) * -1)
               .accessibilityIdentifier("tweetComposer")
+              .disabled(dropActive)
           }
           .font(.broadcastTitle3)
         }
@@ -158,6 +160,24 @@ struct ComposerView: View {
           }
         }
       }
+      .overlay {
+        if dropActive {
+          ZStack {
+            Color.clear
+            
+            VStack {
+              Image(systemName: "photo.on.rectangle.angled")
+              Text("Add media attachment")
+            }
+            .foregroundStyle(.primary)
+            .padding()
+          }
+          .background(.ultraThinMaterial)
+          .background(.tertiary)
+          .foregroundStyle(.tint)
+        }
+      }
+      .onDrop(of: [.image], delegate: AttachmentDropDelegate(dropActive: $dropActive, twitterClient: twitterClient))
       
       if let users = mentionCandidates,
          !users.isEmpty,

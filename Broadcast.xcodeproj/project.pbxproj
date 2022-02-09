@@ -38,6 +38,7 @@
 		7188E66C2688DB44007CFD78 /* UIApplication.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188E66B2688DB44007CFD78 /* UIApplication.extension.swift */; };
 		719087CD26891586005B96CE /* TwitterText in Frameworks */ = {isa = PBXBuildFile; productRef = 719087CC26891586005B96CE /* TwitterText */; };
 		719087CF26891C7F005B96CE /* Array.extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 719087CE26891C7F005B96CE /* Array.extension.swift */; };
+		7197795B27B408540079AD69 /* AttachmentDropDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7197795A27B408540079AD69 /* AttachmentDropDelegate.swift */; };
 		7199AE7A26B96D0D001DEB46 /* NSRegularExpression+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7199AE7926B96D0D001DEB46 /* NSRegularExpression+Convenience.swift */; };
 		7199AE7C26B97327001DEB46 /* UserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7199AE7B26B97327001DEB46 /* UserView.swift */; };
 		7199AE7E26B973B2001DEB46 /* MentionBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7199AE7D26B973B2001DEB46 /* MentionBar.swift */; };
@@ -96,6 +97,7 @@
 		7188E6642688A436007CFD78 /* ThemeHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeHelper.swift; sourceTree = "<group>"; };
 		7188E66B2688DB44007CFD78 /* UIApplication.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplication.extension.swift; sourceTree = "<group>"; };
 		719087CE26891C7F005B96CE /* Array.extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Array.extension.swift; sourceTree = "<group>"; };
+		7197795A27B408540079AD69 /* AttachmentDropDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentDropDelegate.swift; sourceTree = "<group>"; };
 		7199AE7926B96D0D001DEB46 /* NSRegularExpression+Convenience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSRegularExpression+Convenience.swift"; sourceTree = "<group>"; };
 		7199AE7B26B97327001DEB46 /* UserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserView.swift; sourceTree = "<group>"; };
 		7199AE7D26B973B2001DEB46 /* MentionBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionBar.swift; sourceTree = "<group>"; };
@@ -214,6 +216,7 @@
 				715AAE0B26C9589A002BCEA1 /* TestUtils.swift */,
 				7188E6642688A436007CFD78 /* ThemeHelper.swift */,
 				71B8290B268D0AC6002AEE72 /* TwitterClientManager.swift */,
+				7197795A27B408540079AD69 /* AttachmentDropDelegate.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -396,6 +399,7 @@
 				71800BF026905DB3009D11A1 /* EngagementCountersView.swift in Sources */,
 				7199AE7C26B97327001DEB46 /* UserView.swift in Sources */,
 				7188E6652688A436007CFD78 /* ThemeHelper.swift in Sources */,
+				7197795B27B408540079AD69 /* AttachmentDropDelegate.swift in Sources */,
 				7199AE7E26B973B2001DEB46 /* MentionBar.swift in Sources */,
 				71800BF226906721009D11A1 /* ActionBarView.swift in Sources */,
 				7188E64F2687CCD0007CFD78 /* PhotoPicker.swift in Sources */,

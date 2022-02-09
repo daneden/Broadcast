@@ -118,7 +118,6 @@ struct ContentView: View {
           }.background(.background)
         }
       }
-      .onDrop(of: [.image], delegate: twitterClient)
     }
   }
 }
