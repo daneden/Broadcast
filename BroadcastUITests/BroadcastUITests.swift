@@ -6,6 +6,7 @@
 //
 
 import XCTest
+import Twift
 
 extension XCUIApplication {
   static func initWithLaunchParameters() -> XCUIApplication {
@@ -87,16 +88,13 @@ class BroadcastUITests: XCTestCase {
     let app = XCUIApplication.initWithLaunchParameters()
     app.launch()
     
-    let profilePhoto = app.images["profilePhotoButton"]
+    let profilePhoto = app.buttons["profilePhotoButton"]
     profilePhoto.tap()
     
-    let logoutHandle = app.descendants(matching: .any).matching(identifier: "logoutProfilePhotoHandle").firstMatch
-    let logoutTarget = app.images["logoutTarget"]
-    logoutHandle.press(forDuration: 0.1, thenDragTo: logoutTarget)
-    
-    _ = XCTWaiter.wait(for: [expectation(description: "Wait for .5 seconds")], timeout: 0.5)
+    let logoutHandle = app.descendants(matching: .any).matching(identifier: "logoutButton").firstMatch
+    logoutHandle.tap()
     
     let loginButton = app.buttons["loginButton"]
-    XCTAssert(loginButton.exists)
+    XCTAssert(loginButton.waitForExistence(timeout: 1))
   }
 }

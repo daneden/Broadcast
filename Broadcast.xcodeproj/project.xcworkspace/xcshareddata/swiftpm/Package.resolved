@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "Swifter",
-        "repositoryURL": "https://github.com/daneden/Swifter",
-        "state": {
-          "branch": null,
-          "revision": "21a1cf736971d07dec56cf5cc0294f31a34ec528",
-          "version": "2.5.1"
-        }
-      },
-      {
         "package": "SwiftKeychainWrapper",
         "repositoryURL": "https://github.com/jrendel/SwiftKeychainWrapper",
         "state": {
@@ -26,6 +17,15 @@
           "branch": null,
           "revision": "2e09be8af614401bc9f87d40093ec19ce56ccaf2",
           "version": "0.1.3"
+        }
+      },
+      {
+        "package": "Twift",
+        "repositoryURL": "https://github.com/daneden/Twift.git",
+        "state": {
+          "branch": "main",
+          "revision": "30a21fca9a1d7399c4fb52cf0d04dfaceaa2d0ca",
+          "version": null
         }
       },
       {

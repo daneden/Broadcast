@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import Twift
 
 struct LastTweetReplyView: View {
+  @Environment(\.cornerRadius) var cornerRadius: Double
   @ScaledMetric var spacing: CGFloat = 4
-  var lastTweet: TwitterClient.Tweet
+  var lastTweet: Tweet
   
   var body: some View {
     VStack(alignment: .leading, spacing: spacing) {
@@ -37,12 +39,12 @@ struct LastTweetReplyView: View {
     }
     .padding(spacing * 2)
     .background(Color.accentColor.opacity(0.1))
-    .cornerRadius(spacing * 2)
+    .cornerRadius(cornerRadius)
   }
 }
 
-struct LastTweetReplyView_Previews: PreviewProvider {
-    static var previews: some View {
-      LastTweetReplyView(lastTweet: TwitterClient.Tweet(text: "Example tweet"))
-    }
-}
+//struct LastTweetReplyView_Previews: PreviewProvider {
+//    static var previews: some View {
+//      LastTweetReplyView(lastTweet: TwitterClient.Tweet(text: "Example tweet"))
+//    }
+//}

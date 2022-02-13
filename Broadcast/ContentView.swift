@@ -8,16 +8,17 @@
 import SwiftUI
 import Introspect
 import TwitterText
+import Twift
 
 struct ContentView: View {
-  @ScaledMetric private var captionSize: CGFloat = 14
+  @Environment(\.cornerRadius) var cornerRadius: Double
+  @ScaledMetric private var captionSize: CGFloat = 20
   @ScaledMetric private var bottomPadding: CGFloat = 80
   @ScaledMetric private var replyBoxLimit: CGFloat = 96
   
-  @EnvironmentObject var twitterClient: TwitterClient
+  @EnvironmentObject var twitterClient: TwitterClientManager
   
   @State private var photoPickerIsPresented = false
-  @State private var signOutScreenIsPresented = false
   @State private var repliesSheetIsPresented = false
   
   @State private var sendingTweet = false
@@ -25,7 +26,7 @@ struct ContentView: View {
   @State private var replyBoxHeight: CGFloat = 0
   
   private var imageHeightCompensation: CGFloat {
-    (twitterClient.draft.media == nil ? 0 : bottomPadding) +
+    (twitterClient.selectedMedia.isEmpty ? 0 : bottomPadding) +
       (replying ? min(replyBoxHeight, replyBoxLimit) : 0)
   }
   
@@ -33,7 +34,7 @@ struct ContentView: View {
     GeometryReader { geom in
       ZStack(alignment: .bottom) {
         ScrollView {
-          VStack {
+          VStack(spacing: captionSize / 2) {
             if replying, let lastTweet = twitterClient.lastTweet {
               LastTweetReplyView(lastTweet: lastTweet)
                 .background(GeometryReader { geometry in
@@ -54,7 +55,7 @@ struct ContentView: View {
                 .padding()
                 .frame(maxWidth: .infinity)
                 .background(Color(.systemRed).opacity(0.2))
-                .cornerRadius(captionSize)
+                .cornerRadius(cornerRadius)
                 .onTapGesture {
                   withAnimation {
                     twitterClient.state = .idle
@@ -62,60 +63,61 @@ struct ContentView: View {
                 }
             }
             
-            if $twitterClient.user.wrappedValue != nil {
-              ComposerView(signOutScreenIsPresented: $signOutScreenIsPresented)
+            if twitterClient.user != nil {
+              ComposerView()
                 .frame(
                   height: geom.size.height - (bottomPadding + (captionSize * 2)) - imageHeightCompensation,
                   alignment: .topLeading
                 )
+                .animation(.springAnimation, value: imageHeightCompensation)
               
-              AttachmentThumbnail(image: $twitterClient.draft.media)
+              AttachmentThumbnail(media: $twitterClient.selectedMedia)
+                .disabled(twitterClient.state.isBusy)
             } else {
               WelcomeView()
             }
           }
-          .padding()
-          .padding(.bottom, bottomPadding)
+          .padding(.top, captionSize)
+          .padding(.horizontal)
           .frame(maxWidth: geom.size.width)
         }
-        
-        VStack {
-          if twitterClient.user != nil {
-            ActionBarView(replying: $replying)
-          } else {
-            Button(action: { twitterClient.signIn() }) {
-              Label("Sign In With Twitter", image: "twitter.fill")
-                .font(.broadcastHeadline)
+        .safeAreaInset(edge: .bottom, content: {
+          Group {
+            if twitterClient.user != nil {
+              ActionBarView(replying: $replying)
+            } else {
+              Button(action: { Task { await twitterClient.signIn() } }) {
+                Label("Sign In With Twitter", image: "twitter.fill")
+                  .font(.broadcastHeadline)
+              }
+              .accessibilityIdentifier("loginButton")
             }
-            .buttonStyle(BroadcastButtonStyle())
-            .accessibilityIdentifier("loginButton")
           }
-        }
-        .padding()
-        .animation(.springAnimation)
-        .background(
-          VisualEffectView(effect: UIBlurEffect(style: .regular))
-            .ignoresSafeArea()
-            .opacity(twitterClient.user == nil ? 0 : 1)
-        )
-        .gesture(DragGesture().onEnded({ _ in UIApplication.shared.endEditing() }))
-      }
-      .sheet(isPresented: $signOutScreenIsPresented) {
-        SignOutView()
+          .buttonStyle(BroadcastButtonStyle(isLoading: twitterClient.state != .idle))
+          .padding()
+          .background(VisualEffectView(effect: UIBlurEffect(style: .regular)).ignoresSafeArea())
+          .gesture(DragGesture().onEnded({ _ in UIApplication.shared.endEditing() }))
+        })
       }
       .sheet(isPresented: $repliesSheetIsPresented) {
         RepliesListView(tweet: twitterClient.lastTweet)
           .accentColor(ThemeHelper.shared.color)
           .font(.broadcastBody)
+          .environmentObject(twitterClient)
       }
       .onAppear {
         UITextView.appearance().backgroundColor = .clear
       }
-      .onChange(of: replying) { _ in
-        twitterClient.revalidateAccount()
-      }
       .onPreferenceChange(ReplyBoxSizePreferenceKey.self) { newValue in
-        withAnimation(.easeInOut(duration: 0.1)) { replyBoxHeight = newValue }
+        withAnimation(.springAnimation) { replyBoxHeight = newValue + (captionSize / 2) }
+      }
+      .overlay {
+        if twitterClient.state == .initializing {
+          ZStack {
+            ProgressView()
+              .frame(maxWidth: .infinity, maxHeight: .infinity)
+          }.background(.background)
+        }
       }
     }
   }

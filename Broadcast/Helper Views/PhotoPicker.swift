@@ -6,20 +6,41 @@
 //
 
 import Foundation
-import UIKit
+import PhotosUI
 import SwiftUI
+import Twift
+
+extension NSItemProvider {
+  var mediaType: UTType? {
+    for typeIdentifier in registeredTypeIdentifiers {
+      if let type = UTType(typeIdentifier),
+         type.preferredMIMEType != nil {
+        return type
+      }
+    }
+    
+    return nil
+  }
+  
+  var allowsAltText: Bool {
+    return (mediaType?.conforms(to: .image) ?? false)
+  }
+}
 
 struct ImagePicker: UIViewControllerRepresentable {
   @Environment(\.presentationMode) var presentationMode
-  @Binding var chosenImage: UIImage?
+  var configuration: PHPickerConfiguration = PHPickerConfiguration(photoLibrary: PHPhotoLibrary.shared())
   
-  func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> UIImagePickerController {
-    let picker = UIImagePickerController()
-    picker.delegate = context.coordinator
-    return picker
+  @Binding var selection: [String: NSItemProvider]
+  
+  func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePicker>) -> PHPickerViewController {
+    let controller = PHPickerViewController(configuration: configuration)
+    controller.delegate = context.coordinator
+    
+    return controller
   }
   
-  func updateUIViewController(_ uiViewController: UIImagePickerController, context: UIViewControllerRepresentableContext<ImagePicker>) {
+  func updateUIViewController(_ uiViewController: PHPickerViewController, context: UIViewControllerRepresentableContext<ImagePicker>) {
     
   }
   
@@ -27,19 +48,22 @@ struct ImagePicker: UIViewControllerRepresentable {
     Coordinator(self)
   }
   
-  class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+  class Coordinator: PHPickerViewControllerDelegate {
     let parent: ImagePicker
     
     init(_ parent: ImagePicker) {
       self.parent = parent
     }
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-      if let image = info[.originalImage] as? UIImage {
-        parent.chosenImage = image
+    func picker(_: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+      for result in results {
+        // Prevent overriding PHPickerResults for items previously selected
+        if self.parent.selection[result.assetIdentifier!] == nil {
+          self.parent.selection[result.assetIdentifier!] = result.itemProvider
+        }
       }
       
-      parent.presentationMode.wrappedValue.dismiss()
+      self.parent.presentationMode.wrappedValue.dismiss()
     }
   }
 }

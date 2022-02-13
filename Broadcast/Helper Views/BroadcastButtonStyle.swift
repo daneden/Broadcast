@@ -28,6 +28,8 @@ struct BroadcastLabelStyle: LabelStyle {
 }
 
 struct BroadcastButtonStyle: ButtonStyle {
+  @Environment(\.isEnabled) var isEnabled
+  
   enum Prominence {
     case primary, secondary, tertiary, destructive
   }
@@ -36,6 +38,7 @@ struct BroadcastButtonStyle: ButtonStyle {
   var prominence: Prominence = .primary
   var isFullWidth = true
   var isLoading = false
+  var loadingLabel: String?
   
   var background: some View {
     Group {
@@ -43,11 +46,11 @@ struct BroadcastButtonStyle: ButtonStyle {
       case .primary:
         Color.accentColor
       case .secondary:
-        Color.accentColor.opacity(0.1)
+        Color.accentColor.opacity(0.1).background(.ultraThinMaterial)
       case .tertiary:
-        VisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
+        Color.clear.background(.ultraThinMaterial)
       case .destructive:
-        Color(.systemRed)
+        Color.red
       }
     }
   }
@@ -57,7 +60,7 @@ struct BroadcastButtonStyle: ButtonStyle {
     case .secondary:
       return .accentColor
     case .tertiary:
-      return .primary
+      return isEnabled ? .primary : .secondary
     default:
       return .white
     }
@@ -76,15 +79,23 @@ struct BroadcastButtonStyle: ButtonStyle {
     }
     .padding(paddingSize)
     .background(background.padding(-paddingSize))
-    .foregroundColor(foregroundColor)
+    .background(.regularMaterial)
+    .foregroundStyle(foregroundColor)
     .overlay(
       Group {
         if isLoading {
-          ProgressView()
+          HStack(spacing: 8) {
+            ProgressView().tint(foregroundColor)
+            if let loadingLabel = loadingLabel {
+              Text(loadingLabel)
+                .foregroundColor(foregroundColor)
+                .font(.broadcastBody.bold())
+            }
+          }
         }
       }
     )
-    .clipShape(Capsule())
+    .clipShape(RoundedRectangle(cornerRadius: 100, style: .continuous))
     .scaleEffect(configuration.isPressed ? 0.95 : 1)
     .animation(.interactiveSpring(), value: configuration.isPressed)
     .onChange(of: configuration.isPressed) { isPressed in

@@ -15,7 +15,7 @@ struct DraftsListView: View {
   @FetchRequest(entity: Draft.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Draft.date, ascending: true)])
   var drafts: FetchedResults<Draft>
   
-  @EnvironmentObject var twitterClient: TwitterClient
+  @EnvironmentObject var twitterClient: TwitterClientManager
   @EnvironmentObject var themeHelper: ThemeHelper
   
   var body: some View {
@@ -39,17 +39,6 @@ struct DraftsListView: View {
                   } else {
                     Text("Empty Draft").foregroundColor(.secondary)
                   }
-                }
-                
-                Spacer()
-                
-                if let imageData = draft.media,
-                   let image = UIImage(data: imageData) {
-                  Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: thumbnailSize, height: thumbnailSize)
-                    .cornerRadius(8)
                 }
               }
               .contentShape(Rectangle())

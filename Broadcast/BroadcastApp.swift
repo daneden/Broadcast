@@ -11,7 +11,7 @@ import SwiftUI
 struct BroadcastApp: App {
   @Environment(\.scenePhase) var scenePhase
   @StateObject var themeHelper = ThemeHelper.shared
-  @StateObject var twitterClient = TwitterClient()
+  @StateObject var twitterClient = TwitterClientManager()
   let persistenceController = PersistanceController.shared
   
   var body: some Scene {
@@ -24,16 +24,12 @@ struct BroadcastApp: App {
             .environment(\.managedObjectContext, persistenceController.container.viewContext)
             .accentColor(themeHelper.color)
             .onChange(of: scenePhase) { newPhase in
-              if newPhase == .active {
-                twitterClient.revalidateAccount()
-              }
-              
               persistenceController.save()
             }
           
           VisualEffectView(effect: UIBlurEffect(style: .regular))
             .frame(height: geom.safeAreaInsets.top)
-            .ignoresSafeArea(.all, edges: .top)
+            .ignoresSafeArea(.container, edges: .top)
         }
       }
     }

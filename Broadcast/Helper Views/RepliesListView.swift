@@ -6,35 +6,34 @@
 //
 
 import SwiftUI
+import Twift
 
 struct RepliesListView: View {
+  @EnvironmentObject var twitterClient: TwitterClientManager
   @Environment(\.presentationMode) var presentationMode
-  var tweet: TwitterClient.Tweet?
+  var tweet: Tweet?
+  @State var replies: [(tweet: Tweet, author: User)] = []
   
   var body: some View {
     NavigationView {
       Group {
-        if let tweet = tweet, let replies = tweet.replies, !replies.isEmpty {
-          List {
-            ForEach(replies, id: \.id) { reply in
-              TweetView(tweet: reply)
-                .onTapGesture {
-                  guard let screenName = reply.author?.screenName,
-                        let tweetId = reply.id else { return }
-                  let url = URL(string: "https://twitter.com/\(screenName)/status/\(tweetId)")
-                  
-                  UIApplication.shared.open(url!)
-                }
-            }
+        if !replies.isEmpty {
+          List(replies, id: \.tweet.id) { reply in
+            TweetView(tweet: reply.tweet, author: reply.author)
           }
         } else {
           NullStateView(type: .replies)
         }
-      }.navigationTitle("Replies")
-      .toolbar {
-        Button("Close") {
-          presentationMode.wrappedValue.dismiss()
+      }
+        .navigationTitle("Replies")
+        .toolbar {
+          Button("Close") {
+            presentationMode.wrappedValue.dismiss()
+          }
         }
+    }.task {
+      if let tweet = tweet {
+        replies = await twitterClient.getReplies(for: tweet.id)
       }
     }
   }

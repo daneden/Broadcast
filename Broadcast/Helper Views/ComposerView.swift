@@ -7,6 +7,7 @@
 
 import SwiftUI
 import TwitterText
+import Twift
 
 fileprivate let placeholderCandidates: [String] = [
   "Wh—what’s going on?",
@@ -19,10 +20,10 @@ fileprivate let placeholderCandidates: [String] = [
 ]
 
 struct ComposerView: View {
+  @Environment(\.cornerRadius) var cornerRadius: Double
   let debouncer = Debouncer(timeInterval: 0.3)
-  @Binding var signOutScreenIsPresented: Bool
   
-  @EnvironmentObject var twitterClient: TwitterClient
+  @EnvironmentObject var twitterClient: TwitterClientManager
   @ScaledMetric private var minComposerHeight: CGFloat = 120
   @ScaledMetric private var captionSize: CGFloat = 14
   @ScaledMetric private var leftOffset: CGFloat = 4
@@ -30,6 +31,7 @@ struct ComposerView: View {
   
   @State private var placeholder: String = placeholderCandidates.randomElement()
   @State private var draftListVisible = false
+  @State private var dropActive = false
   
   private let mentioningRegex = NSRegularExpression("@[a-z0-9_]+$", options: .caseInsensitive)
   
@@ -45,7 +47,7 @@ struct ComposerView: View {
     TwitterText.tweetLength(text: tweetText)
   }
   
-  private var mentionCandidates: [TwitterClient.User]? {
+  private var mentionCandidates: [User]? {
     twitterClient.userSearchResults
   }
   
@@ -78,17 +80,15 @@ struct ComposerView: View {
     ZStack(alignment: .bottom) {
       VStack(alignment: .trailing) {
         HStack(alignment: .top) {
-          if let profileImageURL = twitterClient.user?.profileImageURL {
-            RemoteImage(url: profileImageURL, placeholder: { ProgressView() })
-              .aspectRatio(contentMode: .fill)
-              .frame(width: 36, height: 36)
-              .cornerRadius(36)
-              .onTapGesture {
-                signOutScreenIsPresented = true
-                UIApplication.shared.endEditing()
-              }
-              .accessibilityIdentifier("profilePhotoButton")
-          }
+          Menu {
+            Section {
+              Button(role: .destructive, action: {twitterClient.signOut()}) {
+                Label("Sign Out", systemImage: "person.badge.minus")
+              }.accessibilityIdentifier("logoutButton")
+            }
+          } label: {
+            UserAvatar(avatarUrl: twitterClient.user?.profileImageUrlLarger)
+          }.accessibilityIdentifier("profilePhotoButton")
           
           ZStack(alignment: .topLeading) {
             Text(tweetText.isEmpty ? placeholder : tweetText)
@@ -104,17 +104,19 @@ struct ComposerView: View {
               .keyboardType(.twitter)
               .padding(.top, (verticalPadding / 3) * -1)
               .accessibilityIdentifier("tweetComposer")
+              .disabled(dropActive)
           }
           .font(.broadcastTitle3)
-        }.transition(.scale)
+        }
         
         Divider()
+          .padding(.bottom, verticalPadding)
         
-        HStack(alignment: .top) {
+        HStack(alignment: .firstTextBaseline) {
           Menu {
             Button(action: { twitterClient.saveDraft() }) {
               Label("Save Draft", systemImage: "square.and.pencil")
-            }.disabled(!twitterClient.draft.isValid)
+            }.disabled(!twitterClient.draftIsValid())
             
             Button(action: { draftListVisible = true }) {
               Label("View Drafts", systemImage: "doc.on.doc")
@@ -132,14 +134,14 @@ struct ComposerView: View {
             .multilineTextAlignment(.trailing)
         }
       }
-      .disabled(twitterClient.state == .busy)
+      .disabled(twitterClient.state.isBusy)
       .padding()
-      .background(Color(.tertiarySystemGroupedBackground))
+      .background(.thinMaterial)
       .onShake {
         rotatePlaceholder()
         Haptics.shared.sendStandardFeedback(feedbackType: .success)
       }
-      .onChange(of: twitterClient.draft.isValid) { isValid in
+      .onChange(of: twitterClient.draftIsValid()) { isValid in
         if !isValid && charCount > 280 {
           Haptics.shared.sendStandardFeedback(feedbackType: .warning)
         }
@@ -153,10 +155,36 @@ struct ComposerView: View {
         if let screenName = value {
           debouncer.renewInterval()
           debouncer.handler = {
-            self.twitterClient.searchScreenNames(screenName)
+            Task {
+              await self.twitterClient.searchScreenNames(screenName)
+            }
           }
         }
       }
+      .overlay {
+        if dropActive {
+          ZStack {
+            Color.clear
+            
+            VStack {
+              Image(systemName: "photo.on.rectangle.angled")
+              Text("Add media attachment")
+            }
+            .foregroundStyle(.primary)
+            .padding()
+          }
+          .background(.ultraThinMaterial)
+          .background(.tertiary)
+          .foregroundStyle(.tint)
+        }
+      }
+      .onDrop(
+        of: [.image],
+        delegate: AttachmentDropDelegate(
+          dropActive: $dropActive,
+          twitterClient: twitterClient
+        )
+      )
       
       if let users = mentionCandidates,
          !users.isEmpty,
@@ -166,12 +194,12 @@ struct ComposerView: View {
           completeMention(user)
         }
       }
-    }.cornerRadius(captionSize)
+    }.cornerRadius(cornerRadius)
   }
   
-  func completeMention(_ user: TwitterClient.User) {
+  func completeMention(_ user: User) {
     let textToComplete = mentioningRegex.firstMatchAsString(tweetText) ?? ""
-    let draft = twitterClient.draft.text?.replacingOccurrences(of: textToComplete, with: "@\(user.screenName) ")
+    let draft = twitterClient.draft.text?.replacingOccurrences(of: textToComplete, with: "@\(user.username) ")
     twitterClient.draft.text = draft
   }
   
@@ -188,6 +216,6 @@ struct ComposerView: View {
 
 struct ComposerView_Previews: PreviewProvider {
     static var previews: some View {
-      ComposerView(signOutScreenIsPresented: .constant(false))
+      ComposerView()
     }
 }

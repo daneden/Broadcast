@@ -6,27 +6,32 @@
 //
 
 import Foundation
+import Twift
 
-extension TwitterClient.Tweet {
-  static var mockTweet: TwitterClient.Tweet {
-    TwitterClient.Tweet(
-      numericId: 0,
-      id: "0",
-      text: "just setting up my twttr",
-      likes: 420,
-      retweets: 69,
-      date: Date(),
-      author: .mockUser
-    )
+extension Tweet {
+  static var mockTweet: Tweet {
+    let jsonString = """
+{
+  "id": "0",
+"text": "just setting up my twttr",
+"createdAt": \(Date().timeIntervalSince1970),
+"authorId": "0"
+}
+"""
+    return try! JSONDecoder().decode(Tweet.self, from: jsonString.data(using: .utf8)!)
   }
 }
 
-extension TwitterClient.User {
-  static var mockUser: TwitterClient.User {
-    TwitterClient.User(
-      id: "0",
-      screenName: "_dte",
-      originalProfileImageURL: URL(string: "https://pbs.twimg.com/profile_images/1337359860409790469/javRMXyG_x96.jpg")!
-    )
+extension User {
+  static var mockUser: User {
+    let jsonString = """
+{
+  "id": "0",
+"name": "Daniel Eden",
+"username": "_dte",
+"profileImageUrl": "https://pbs.twimg.com/profile_images/1337359860409790469/javRMXyG_x96.jpg"
+}
+"""
+    return try! JSONDecoder().decode(User.self, from: jsonString.data(using: .utf8)!)
   }
 }
