@@ -40,17 +40,6 @@ struct DraftsListView: View {
                     Text("Empty Draft").foregroundColor(.secondary)
                   }
                 }
-                
-                Spacer()
-                
-//                if let imageData = draft.media,
-//                   let image = UIImage(data: imageData) {
-//                  Image(uiImage: image)
-//                    .resizable()
-//                    .aspectRatio(contentMode: .fill)
-//                    .frame(width: thumbnailSize, height: thumbnailSize)
-//                    .cornerRadius(8)
-//                }
               }
               .contentShape(Rectangle())
               .onTapGesture {

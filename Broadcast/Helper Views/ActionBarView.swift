@@ -15,10 +15,17 @@ struct ActionBarView: View {
   
   @State private var photoPickerIsPresented = false
   
+  var loadingLabel: String? {
+    switch twitterClient.state {
+    case .busy(let label): return label
+    default: return nil
+    }
+  }
+  
   private var pickerConfig: PHPickerConfiguration {
     var config = PHPickerConfiguration(photoLibrary: .shared())
     
-    config.preferredAssetRepresentationMode = .automatic
+    config.preferredAssetRepresentationMode = .compatible
     config.selection = .ordered
     
     if moreMediaAllowed && !twitterClient.selectedMedia.isEmpty {
@@ -40,7 +47,7 @@ struct ActionBarView: View {
   
   var body: some View {
     publishingActions
-      .disabled(twitterClient.state == .busy())
+      .disabled(twitterClient.state.isBusy)
       .sheet(isPresented: $photoPickerIsPresented) {
         ImagePicker(configuration: pickerConfig, selection: $twitterClient.selectedMedia)
           .ignoresSafeArea()
@@ -76,7 +83,8 @@ struct ActionBarView: View {
           BroadcastButtonStyle(
             prominence: replying ? .primary : .secondary,
             isFullWidth: replying,
-            isLoading: twitterClient.state == .busy() && replying
+            isLoading: twitterClient.state.isBusy && replying,
+            loadingLabel: loadingLabel
           )
         )
         .disabled(replying && !twitterClient.draftIsValid())
@@ -105,7 +113,8 @@ struct ActionBarView: View {
         BroadcastButtonStyle(
           prominence: !replying ? .primary : .secondary,
           isFullWidth: !replying,
-          isLoading: twitterClient.state == .busy() && !replying
+          isLoading: twitterClient.state.isBusy && !replying,
+          loadingLabel: loadingLabel
         )
       )
       .disabled(!replying && !twitterClient.draftIsValid())

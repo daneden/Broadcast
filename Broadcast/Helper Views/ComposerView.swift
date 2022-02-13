@@ -20,6 +20,7 @@ fileprivate let placeholderCandidates: [String] = [
 ]
 
 struct ComposerView: View {
+  @Environment(\.cornerRadius) var cornerRadius: Double
   let debouncer = Debouncer(timeInterval: 0.3)
   
   @EnvironmentObject var twitterClient: TwitterClientManager
@@ -133,7 +134,7 @@ struct ComposerView: View {
             .multilineTextAlignment(.trailing)
         }
       }
-      .disabled(twitterClient.state == .busy())
+      .disabled(twitterClient.state.isBusy)
       .padding()
       .background(.thinMaterial)
       .onShake {
@@ -177,7 +178,13 @@ struct ComposerView: View {
           .foregroundStyle(.tint)
         }
       }
-      .onDrop(of: [.image], delegate: AttachmentDropDelegate(dropActive: $dropActive, twitterClient: twitterClient))
+      .onDrop(
+        of: [.image],
+        delegate: AttachmentDropDelegate(
+          dropActive: $dropActive,
+          twitterClient: twitterClient
+        )
+      )
       
       if let users = mentionCandidates,
          !users.isEmpty,
@@ -187,7 +194,7 @@ struct ComposerView: View {
           completeMention(user)
         }
       }
-    }.cornerRadius(captionSize)
+    }.cornerRadius(cornerRadius)
   }
   
   func completeMention(_ user: User) {

@@ -9,6 +9,7 @@ import SwiftUI
 import Twift
 
 struct MentionBar: View {
+  @Environment(\.cornerRadius) var cornerRadius: Double
   var users: [User]
   var tapHandler: (User) -> Void = { _ in }
   
@@ -19,7 +20,7 @@ struct MentionBar: View {
           UserView(user: user)
             .padding(8)
             .background(.regularMaterial)
-            .cornerRadius(6)
+            .cornerRadius(cornerRadius / 2)
             .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 6)
             .onTapGesture {
               tapHandler(user)

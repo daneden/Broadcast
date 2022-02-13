@@ -10,7 +10,7 @@ import PhotosUI
 import AVKit
 import QuickLook
 
-struct AsyncLocalMediaPreview: View {
+struct LocalMediaPreview: View {
   private enum PreviewLoadingState {
     case loadedImage(_ image: UIImage)
     case loadedVideo(_ video: AVPlayer)
@@ -44,7 +44,6 @@ struct AsyncLocalMediaPreview: View {
       case .loadedVideo(let player):
         VideoPlayer(player: player)
           .scaledToFit()
-          .fixedSize()
       case .failed:
         Label("Cannot Load Preview", systemImage: "eye.slash")
           .foregroundStyle(.secondary)

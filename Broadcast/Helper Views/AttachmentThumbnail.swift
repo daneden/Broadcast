@@ -13,6 +13,7 @@ extension String: Identifiable {
 }
 
 struct AttachmentThumbnail: View {
+  @Environment(\.cornerRadius) var cornerRadius
   @EnvironmentObject var twitterClient: TwitterClientManager
   @Binding var media: [String: NSItemProvider]
   @State private var altTextSheetIsPresented = false
@@ -23,8 +24,8 @@ struct AttachmentThumbnail: View {
       if let media = media, !media.isEmpty {
         ForEach(Array(media.keys), id: \.self) { key in
           ZStack(alignment: .top) {
-            AsyncLocalMediaPreview(assetId: key, asset: media[key]!)
-              .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            LocalMediaPreview(assetId: key, asset: media[key]!)
+              .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             
             HStack {
               Button(action: { removeImage(key) }) {
@@ -69,8 +70,9 @@ struct AttachmentThumbnail: View {
 }
 
 fileprivate struct AltTextSheet: View {
-  @EnvironmentObject var twitterClient: TwitterClientManager
+  @Environment(\.cornerRadius) var cornerRadius: Double
   @Environment(\.presentationMode) var presentationMode
+  @EnvironmentObject var twitterClient: TwitterClientManager
   
   var assetId: String
   var asset: NSItemProvider
@@ -82,8 +84,8 @@ fileprivate struct AltTextSheet: View {
       Form {
         HStack {
           Spacer()
-          AsyncLocalMediaPreview(assetId: assetId, asset: asset)
-            .cornerRadius(8)
+          LocalMediaPreview(assetId: assetId, asset: asset)
+            .cornerRadius(cornerRadius / 2)
             .frame(minWidth: 0, maxWidth: 200, minHeight: 0, maxHeight: 200)
           Spacer()
         }

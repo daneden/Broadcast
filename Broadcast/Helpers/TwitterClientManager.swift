@@ -14,6 +14,7 @@ import AuthenticationServices
 import SwiftKeychainWrapper
 import SwiftUI
 import PhotosUI
+import CryptoKit
 
 let typeaheadToken = "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
 
@@ -173,8 +174,7 @@ class TwitterClientManager: ObservableObject {
       
       var mediaStrings: [String] = []
       for (key, media) in selectedMedia {
-        
-        let media: (Data, String)? = await withUnsafeContinuation { continuation in
+        let media: (Data?, URL?, String)? = await withUnsafeContinuation { continuation in
           var utType: UTType
           
           if media.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
@@ -189,25 +189,67 @@ class TwitterClientManager: ObservableObject {
             return continuation.resume(returning: nil)
           }
           
-          media.loadDataRepresentation(forTypeIdentifier: utType.identifier, completionHandler: { data, error in
-            if let error = error {
-              print(error)
-              return self.sendTweetCallback(response: nil, error: error)
+          if utType.conforms(to: .movie) {
+            media.loadFileRepresentation(forTypeIdentifier: utType.identifier) { url, error in
+              if let error = error {
+                return self.sendTweetCallback(response: nil, error: error)
+              }
+              
+              if let url = url {
+                let outputUrl = URL(fileURLWithPath: NSTemporaryDirectory() + UUID().uuidString + ".mp4")
+                let fileData = try? Data(contentsOf: url)
+                try? fileData?.write(to: outputUrl)
+                continuation.resume(returning: (nil, outputUrl, mimeTypeString))
+              } else {
+                return self.updateState(.genericTextAndMediaError)
+              }
             }
-            
-            if let data = data {
-              continuation.resume(returning: (data, mimeTypeString))
-            } else {
-              return self.updateState(.error("There was a problem Tweeting the attached media because it's in an unusual format."))
+          } else {
+            media.loadDataRepresentation(forTypeIdentifier: utType.identifier) { data, error in
+              if let error = error {
+                return self.sendTweetCallback(response: nil, error: error)
+              }
+              
+              if let data = data {
+                continuation.resume(returning: (data, nil, mimeTypeString))
+              } else {
+                return self.updateState(.error("There was a problem Tweeting the attached media because it's in an unusual format."))
+              }
             }
-          })
+          }
         }
         
-        guard let (data, mimeType) = media else {
+        guard let (data, url, mimeType) = media else {
           return updateState(.genericTextAndMediaError)
         }
         
-        let result = try await client.upload(mediaData: data, mimeType: mimeType, progress: &self.uploadProgress)
+        var finalData: Data!
+        if let url = url {
+          self.updateState(.busy("Compressing"))
+          let outputUrl = URL(fileURLWithPath: NSTemporaryDirectory() + UUID().uuidString + ".mp4")
+          let exportSession: AVAssetExportSession? = await compressVideo(inputURL: url, outputURL: outputUrl)
+          
+          guard let url = exportSession?.outputURL,
+                let data = try? Data(contentsOf: url) else {
+                  return self.updateState(.genericTextAndMediaError)
+                }
+          finalData = data
+        } else if let data = data {
+          finalData = data
+        }
+        
+        var category: MediaCategory
+        
+        if mimeType.contains("gif") {
+          category = .tweetGif
+        } else if mimeType.contains("video") {
+          category = .tweetVideo
+        } else {
+          category = .tweetImage
+        }
+        
+        self.updateState(.busy("Uploading"))
+        let result = try await client.upload(mediaData: finalData, mimeType: mimeType, category: category)
         
         if let altText = mediaAltText[key] {
           try await client.addAltText(to: result.mediaIdString, text: altText)
@@ -224,11 +266,11 @@ class TwitterClientManager: ObservableObject {
         draft.media = MutableMedia(mediaIds: mediaStrings)
       }
       
+      self.updateState(.busy("Posting"))
       let result = try await client.postTweet(draft)
       self.lastTweet = try await client.getTweet(result.data.id).data
       sendTweetCallback(response: result, error: nil)
     } catch {
-      print(error)
       sendTweetCallback(response: nil, error: error)
     }
   }
@@ -376,11 +418,18 @@ extension TwitterClientManager {
 extension TwitterClientManager {
   enum State: Equatable {
     case idle, initializing
-    case busy(_ progress: Progress? = nil)
+    case busy(_ label: String? = nil)
     case error(_: String? = nil)
     
     static var genericTextError = State.error("Oh man, something went wrong sending that tweet. It might be too long.")
     static var genericTextAndMediaError = State.error("Oh man, something went wrong sending that tweet. Maybe it’s too long, or your chosen media is causing a problem.")
+    
+    var isBusy: Bool {
+      switch self {
+      case .busy(_): return true
+      default: return false
+      }
+    }
   }
   
   struct ClientCredentials {

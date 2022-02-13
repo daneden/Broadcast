@@ -38,6 +38,7 @@ struct BroadcastButtonStyle: ButtonStyle {
   var prominence: Prominence = .primary
   var isFullWidth = true
   var isLoading = false
+  var loadingLabel: String?
   
   var background: some View {
     Group {
@@ -83,7 +84,14 @@ struct BroadcastButtonStyle: ButtonStyle {
     .overlay(
       Group {
         if isLoading {
-          ProgressView().tint(foregroundColor)
+          HStack(spacing: 8) {
+            ProgressView().tint(foregroundColor)
+            if let loadingLabel = loadingLabel {
+              Text(loadingLabel)
+                .foregroundColor(foregroundColor)
+                .font(.broadcastBody.bold())
+            }
+          }
         }
       }
     )

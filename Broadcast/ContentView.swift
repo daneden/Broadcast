@@ -11,6 +11,7 @@ import TwitterText
 import Twift
 
 struct ContentView: View {
+  @Environment(\.cornerRadius) var cornerRadius: Double
   @ScaledMetric private var captionSize: CGFloat = 20
   @ScaledMetric private var bottomPadding: CGFloat = 80
   @ScaledMetric private var replyBoxLimit: CGFloat = 96
@@ -54,7 +55,7 @@ struct ContentView: View {
                 .padding()
                 .frame(maxWidth: .infinity)
                 .background(Color(.systemRed).opacity(0.2))
-                .cornerRadius(captionSize)
+                .cornerRadius(cornerRadius)
                 .onTapGesture {
                   withAnimation {
                     twitterClient.state = .idle
@@ -71,7 +72,7 @@ struct ContentView: View {
                 .animation(.springAnimation, value: imageHeightCompensation)
               
               AttachmentThumbnail(media: $twitterClient.selectedMedia)
-                .disabled(twitterClient.state == .busy())
+                .disabled(twitterClient.state.isBusy)
             } else {
               WelcomeView()
             }
