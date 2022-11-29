@@ -98,12 +98,22 @@ struct ComposerView: View {
               .opacity(tweetText.isEmpty ? 1 : 0)
               .accessibility(hidden: true)
             
-            TextEditor(text: Binding($twitterClient.draft.text, replacingNilWith: ""))
-              .foregroundColor(Color(.label))
-              .multilineTextAlignment(.leading)
-              .keyboardType(.twitter)
-              .padding(.top, (verticalPadding / 3) * -1)
-              .accessibilityIdentifier("tweetComposer")
+						if #available(iOS 16.0, *) {
+							TextEditor(text: Binding($twitterClient.draft.text, replacingNilWith: ""))
+								.foregroundColor(Color(.label))
+								.multilineTextAlignment(.leading)
+								.keyboardType(.twitter)
+								.padding(.top, (verticalPadding / 3) * -1)
+								.accessibilityIdentifier("tweetComposer")
+								.scrollContentBackground(.hidden)
+						} else {
+							TextEditor(text: Binding($twitterClient.draft.text, replacingNilWith: ""))
+								.foregroundColor(Color(.label))
+								.multilineTextAlignment(.leading)
+								.keyboardType(.twitter)
+								.padding(.top, (verticalPadding / 3) * -1)
+								.accessibilityIdentifier("tweetComposer")
+						}
           }
           .font(.broadcastTitle3)
         }.transition(.scale)

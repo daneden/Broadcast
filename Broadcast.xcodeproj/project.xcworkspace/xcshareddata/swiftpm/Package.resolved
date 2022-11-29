@@ -1,52 +1,50 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "Swifter",
-        "repositoryURL": "https://github.com/daneden/Swifter",
-        "state": {
-          "branch": null,
-          "revision": "21a1cf736971d07dec56cf5cc0294f31a34ec528",
-          "version": "2.5.1"
-        }
-      },
-      {
-        "package": "SwiftKeychainWrapper",
-        "repositoryURL": "https://github.com/jrendel/SwiftKeychainWrapper",
-        "state": {
-          "branch": null,
-          "revision": "185a3165346a03767101c4f62e9a545a0fe0530f",
-          "version": "4.0.1"
-        }
-      },
-      {
-        "package": "Introspect",
-        "repositoryURL": "https://github.com/siteline/SwiftUI-Introspect",
-        "state": {
-          "branch": null,
-          "revision": "2e09be8af614401bc9f87d40093ec19ce56ccaf2",
-          "version": "0.1.3"
-        }
-      },
-      {
-        "package": "twitter-text",
-        "repositoryURL": "https://github.com/nysander/twitter-text.git",
-        "state": {
-          "branch": null,
-          "revision": "09fb2896ca4bec3b17513de2da9376559062116d",
-          "version": "0.0.1"
-        }
-      },
-      {
-        "package": "UnicodeURL",
-        "repositoryURL": "https://github.com/nysander/UnicodeURL.git",
-        "state": {
-          "branch": null,
-          "revision": "fe15c8b585c2e6d22dfe81da899183e6aa376a93",
-          "version": "0.1.0"
-        }
+  "pins" : [
+    {
+      "identity" : "swifter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/daneden/Swifter",
+      "state" : {
+        "revision" : "21a1cf736971d07dec56cf5cc0294f31a34ec528",
+        "version" : "2.5.1"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "swiftkeychainwrapper",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jrendel/SwiftKeychainWrapper",
+      "state" : {
+        "revision" : "185a3165346a03767101c4f62e9a545a0fe0530f",
+        "version" : "4.0.1"
+      }
+    },
+    {
+      "identity" : "swiftui-introspect",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/siteline/SwiftUI-Introspect",
+      "state" : {
+        "revision" : "2e09be8af614401bc9f87d40093ec19ce56ccaf2",
+        "version" : "0.1.3"
+      }
+    },
+    {
+      "identity" : "twitter-text",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nysander/twitter-text.git",
+      "state" : {
+        "revision" : "09fb2896ca4bec3b17513de2da9376559062116d",
+        "version" : "0.0.1"
+      }
+    },
+    {
+      "identity" : "unicodeurl",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nysander/UnicodeURL.git",
+      "state" : {
+        "revision" : "fe15c8b585c2e6d22dfe81da899183e6aa376a93",
+        "version" : "0.1.0"
+      }
+    }
+  ],
+  "version" : 2
 }
